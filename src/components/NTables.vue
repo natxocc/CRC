@@ -30,7 +30,6 @@
       @grid-ready="onGridReady"
       @cell-clicked="onCellClicked"
       @cell-value-changed="onCellValueChanged"
-      @filter-changed="onFilterChanged"
     ></ag-grid-vue>
   </div>
 </template>
@@ -152,11 +151,7 @@ export default {
     autoFilter() {
       if (this.gridApi) {
         this.gridApi.setFilterModel(this.filters);
-        this.gridApi.onFilterChanged();
       }
-    },
-    onFilterChanged() {
-      this.$emit("gridData", this.gridApi.rowModel);
     },
     onCellClicked(event) {
       this.$emit("cellClicked", event);

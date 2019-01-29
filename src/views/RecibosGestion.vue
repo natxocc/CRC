@@ -57,6 +57,7 @@
           expandBesides
           label="Fechas"
           optionsDense
+          v-model="filters.date"
         />
       </div>
     </div>
@@ -209,7 +210,6 @@
       :quickFilter="quickFilter"
       :rowClassRules="rowClassRules"
       :rowData="rowData"
-      @gridData="gridData"
       @rowSelected="rowSelected"
       @rowSelectedSub="rowSelectedSub"
       table="Recibos"
@@ -252,7 +252,8 @@ export default {
       rowData: null,
       quickFilter: null,
       filters: {
-        Estado: ["PENDIENTE", "PENDIENTE (MODIF)"]
+        Estado: ["PENDIENTE", "PENDIENTE (MODIF)"],
+        date: null
         // Importe: {type: "greaterThanOrEqual", filter: "0"}
       },
       rowClassRules: {
@@ -266,8 +267,8 @@ export default {
 
       // CLIENT
       client: {
-        columns: [],
-        data: [],
+        columns: null,
+        data: null,
         name: null,
         telf: null,
         mail: null,
@@ -301,7 +302,7 @@ export default {
     saveData() {
       let self = this;
       axios
-        .post("http://" + localStorage.url + "/reale/php/consulta.php", {
+        .post("http://" + localStorage.url + "/crc/php/consulta.php", {
           cmd: "updateRecord",
           table: "Clientes",
           idkey: "NIF",
@@ -331,7 +332,7 @@ export default {
         "'";
       showLoading();
       axios
-        .post("http://" + localStorage.url + "/reale/php/consulta.php", {
+        .post("http://" + localStorage.url + "/crc/php/consulta.php", {
           cmd: "getRecords",
           table: "Recibos",
           subtable: "RecibosGestion",
@@ -364,7 +365,7 @@ export default {
       if (params[0].NombreTomador) {
         let where = "NombreCompleto = '" + params[0].NombreTomador + "'";
         axios
-          .post("http://" + localStorage.url + "/reale/php/consulta.php", {
+          .post("http://" + localStorage.url + "/crc/php/consulta.php", {
             cmd: "getRecords",
             table: "Clientes",
             where: where,
@@ -383,7 +384,7 @@ export default {
             } else {
               self.client.selected = false;
               self.client.telf = self.client.mail = self.client.name = null;
-              self.client.columns = self.client.data = [];
+              self.client.columns = self.client.data = null;
             }
           });
       }

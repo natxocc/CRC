@@ -1,2 +1,2 @@
-xcopy /s /Y C:\Users\Natxo\Documents\GitHub\Reale\public\reale\*.* \\servidor\web\reale\
-xcopy /s /Y C:\Users\Natxo\Documents\GitHub\Reale\public\reale\*.* C:\Users\Natxo\Downloads\UniServerZ\www\reale\
+xcopy /s /Y C:\Users\Natxo\Documents\GitHub\CRC\public\crc\*.* \\servidor\web\crc\
+REM xcopy /s /Y C:\Users\Natxo\Documents\GitHub\Reale\public\crc\*.* C:\Users\Natxo\Downloads\UniServerZ\www\reale\

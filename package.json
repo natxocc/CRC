@@ -1,5 +1,5 @@
 {
-  "name": "Reale",
+  "name": "CRC",
   "version": "0.1.0",
   "private": false,
   "scripts": {
@@ -14,7 +14,7 @@
     "axios": "^0.18.0",
     "highcharts": "^7.0.2",
     "highcharts-vue": "^1.2.0",
-    "quasar": "^1.0.0-alpha.13",
+    "quasar": "^1.0.0-alpha.18",
     "vue": "^2.5.21",
     "vue-property-decorator": "^7.3.0",
     "vue-router": "^3.0.1"
