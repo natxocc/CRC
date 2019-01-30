@@ -2,164 +2,54 @@
   <div class="container">
     <!-- SELECT FILTERS -->
     <div class="row">
-      <div
-        class="col-xs-12 col-md-5"
-        style="padding: 10px"
-      >
-        <q-input
-          dense
-          :label="$q.lang.recibo.FiltroRapido"
-          type="text"
-          v-model="quickFilter"
-        >
-          <q-icon
-            name="filter_list"
-            slot="prepend"
-          />
-          <q-icon
-            @click="quickFilter = ''"
-            class="cursor-pointer"
-            name="close"
-            slot="append"
-          />
+      <div class="col-xs-12 col-md-5" style="padding: 10px">
+        <q-input :label="$q.lang.recibo.FiltroRapido" dense type="text" v-model="quickFilter">
+          <q-icon name="filter_list" slot="prepend"/>
+          <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
         </q-input>
       </div>
-      <div
-        class="col-xs-12 col-md-5"
-        style="padding: 10px"
-      >
-        <q-select
-          :options="[
-        'PENDIENTE',
-        'DEVUELTO',
-        'COBRADO',
-        'ANULADO',
-        'EMITIDO'
-        ]"
-          @input="callData"
-          dense
-          expandBesides
-          :label="$q.lang.recibo.FiltrosDeEstado"
-          multiple
-          optionsDense
-          v-model="filterEstados"
-        />
+      <div class="col-xs-12 col-md-5" style="padding: 10px">
+        <q-select :label="$q.lang.recibo.FiltrosDeEstado" :options="filters.Estados" @input="callData" dense expandBesides multiple optionsDense v-model="filters.EstadosSel"/>
       </div>
-      <div
-        class="col-xs-12 col-md-2"
-        style="padding: 10px"
-      >
-        <q-select
-          :options="['6 MESES', '1 AÑO']"
-          @input="callData"
-          dense
-          expandBesides
-          :label="$q.lang.recibo.SeleccionarFechas"
-          optionsDense
-          v-model="filters.date"
-        />
+      <div class="col-xs-12 col-md-2" style="padding: 10px">
+        <q-select :label="$q.lang.recibo.SeleccionarFechas" :options="['6 MESES', '1 AÑO']" @input="callData" dense expandBesides optionsDense v-model="filters.date"/>
       </div>
     </div>
     <!-- MINI TOOLBAR -->
     <q-bar class="bg-primary text-white">
-      <q-btn
-        :disabled="recibo.selected"
-        dense
-        flat
-        icon="add"
-      >
-        <q-tooltip
-          anchor="top middle"
-          self="bottom middle"
-        >{{$q.lang.recibo.NuevoReciboT}}</q-tooltip>{{$q.lang.recibo.NuevoRecibo}}
+      <q-btn :disabled="recibo.selected" dense flat icon="add">
+        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevoReciboT}}</q-tooltip>
+        {{$q.lang.recibo.NuevoRecibo}}
       </q-btn>
-      <q-btn
-        :disabled="!recibo.selected"
-        @click="deleteRecord"
-        color="warning"
-        dense
-        flat
-        icon="delete"
-      >
-        <q-tooltip
-          anchor="top middle"
-          self="bottom middle"
-        >{{$q.lang.recibo.EliminarReciboT}}</q-tooltip>{{$q.lang.recibo.EliminarRecibo}}
+      <q-btn :disabled="!recibo.selected" @click="deleteRecord" color="warning" dense flat icon="delete">
+        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarReciboT}}</q-tooltip>
+        {{$q.lang.recibo.EliminarRecibo}}
       </q-btn>
-      <q-btn
-        :disabled="!recibo.selected"
-        dense
-        flat
-        icon="add"
-      >
-        <q-tooltip
-          anchor="top middle"
-          self="bottom middle"
-        >{{$q.lang.recibo.NuevaGestionT}}</q-tooltip>{{$q.lang.recibo.NuevaGestion}}
+      <q-btn :disabled="!recibo.selected" dense flat icon="add">
+        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevaGestionT}}</q-tooltip>
+        {{$q.lang.recibo.NuevaGestion}}
       </q-btn>
-      <q-btn
-        :disabled="!recibo.selectedSub"
-        dense
-        flat
-        icon="edit"
-      >
-        <q-tooltip
-          anchor="top middle"
-          self="bottom middle"
-        >{{$q.lang.recibo.EditarGestionT}}</q-tooltip>{{$q.lang.recibo.EditarGestion}}
+      <q-btn :disabled="!recibo.selectedSub" dense flat icon="edit">
+        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EditarGestionT}}</q-tooltip>
+        {{$q.lang.recibo.EditarGestion}}
       </q-btn>
-      <q-btn
-        :disabled="!recibo.selectedSub"
-        color="warning"
-        dense
-        flat
-        icon="delete"
-      >
-        <q-tooltip
-          anchor="top middle"
-          self="bottom middle"
-        >{{$q.lang.recibo.EliminarGestionT}}</q-tooltip>{{$q.lang.recibo.EliminarGestion}}
+      <q-btn :disabled="!recibo.selectedSub" color="warning" dense flat icon="delete">
+        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarGestionT}}</q-tooltip>
+        {{$q.lang.recibo.EliminarGestion}}
       </q-btn>
-      <q-btn
-        @click="client.dialog=true"
-        dense
-        flat
-        icon="perm_contact_calendar"
-        v-if="!client.selected && recibo.selected"
-      >
-        <q-tooltip
-          anchor="top middle"
-          self="bottom middle"
-        >Crear nuevo Cliente</q-tooltip>Nuevo Cliente
+      <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected">
+        <q-tooltip anchor="top middle" self="bottom middle">Crear nuevo Cliente</q-tooltip>Nuevo Cliente
       </q-btn>
-      <q-btn
-        @click="client.dialog=true"
-        dense
-        flat
-        icon="perm_contact_calendar"
-        v-if="client.selected"
-      >
-        <q-tooltip
-          anchor="top middle"
-          self="bottom middle"
-        >Información de Contacto</q-tooltip>
-        <span
-          class="text-weight-bold"
-          style="margin: 2px"
-        >{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
+      <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
+        <q-tooltip anchor="top middle" self="bottom middle">Información de Contacto</q-tooltip>
+        <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
       </q-btn>
       <q-space/>
       <div>
         <!-- AYUDA -->
         <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
-        <q-btn-dropdown
-          color="primary"
-          icon="help_outline"
-          size="sm"
-          split
-        >
+        <q-btn-dropdown color="primary" icon="help_outline" size="sm" split>
           <q-list dense>
-       
             <q-item>
               <q-item-section>
                 <q-item-label>{{$q.lang.recibo.RecibosSinTratamiento}}</q-item-label>
@@ -193,7 +83,6 @@
     <n-tables
       :columnDefs="columnDefs"
       :columnDefsSub="columnDefsSub"
-      :filters="filters"
       :masterDetail="true"
       :quickFilter="quickFilter"
       :rowClassRules="rowClassRules"
@@ -203,14 +92,7 @@
       table="Recibos"
     />
     <!-- DIALOGO DE CLIENTES -->
-    <n-dialog
-      :columns="client.columns"
-      :data="client.data"
-      :model="client.dialog"
-      :table="null"
-      @cancel="client.dialog=false"
-      @onSave="saveData"
-    ></n-dialog>
+    <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" :table="null" @cancel="client.dialog=false" @onSave="saveData"></n-dialog>
   </div>
 </template>
 
@@ -239,11 +121,10 @@ export default {
       columnDefsSub: [],
       rowData: null,
       quickFilter: null,
-      filterEstados: ["PENDIENTE"],
       filters: {
-        // Estado: ["PENDIENTE"],
-        // date: null
-        // Importe: {type: "greaterThanOrEqual", filter: "0"}
+        EstadosSel: ["PENDIENTE"],
+        Estados: ["PENDIENTE", "DEVUELTO", "COBRADO", "ANULADO", "EMITIDO"],
+        date: null
       },
       rowClassRules: {
         pendiente:
@@ -279,7 +160,7 @@ export default {
         .dialog({
           title: "Confirmar",
           message: "Desea Eliminar este Registro",
-          cancel: true,
+          cancel: true
         })
         .onOk(() => {
           console.log("OK");
@@ -309,8 +190,8 @@ export default {
       let dateend = new Date().toISOString().substr(0, 10);
       let where = "(",
         or = "";
-      for (let i = 0; i < this.filterEstados.length; i++) {
-        where += or + "Estado LIKE '" + this.filterEstados[i] + "%'";
+      for (let i = 0; i < this.filters.EstadosSel.length; i++) {
+        where += or + "Estado LIKE '" + this.filters.EstadosSel[i] + "%'";
         or = " OR ";
       }
       where +=

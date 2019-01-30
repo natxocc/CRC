@@ -33,10 +33,10 @@
 				"wrap_attributes": "force-expand-multiline"
 			},
 			"prettyhtml": {
-				"printWidth": 150,
+				"printWidth": 250,
 				"singleQuote": false,
 				"sortAttributes": true,
-				"wrapAttributes": true
+				"wrapAttributes": false
 			},
 			"prettier": {
 				"bracketSpacing": false,

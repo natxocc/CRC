@@ -120,7 +120,7 @@ export default {
     SeleccionarFechas: "Seleccionar Fechas"
   },
   menu: {
-    Recibos: "Reciboss",
+    Recibos: "Recibos",
     GestionDeRecibos: "Gestión de Recibos",
     BajasProvisionales: "Baja provisionales",
     Polizas: "Polizas",
