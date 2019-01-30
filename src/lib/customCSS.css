@@ -16,6 +16,9 @@
 .ag-theme-balham .pendiente {
   background-color: #fcf18e;
 }
+.ag-theme-balham .error {
+  background-color: #a8a8a7;
+}
 
 .close.icon {
   color: #000;

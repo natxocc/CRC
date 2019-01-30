@@ -113,9 +113,11 @@ export default {
     RecibosAnulados: "Recibos anulados por Reale u Oficina",
     RecibosCobrados: "Recibos cobrados por Reale u Oficina",
     RecibosUrgentes: "Recibos Urgentes con más de 25 días sin resolver",
+    RecibosError: "Recibos que tienen un error de gestión",
     FiltroRapido: "Filtro Rápido",
     FiltrosDeEstado: "Filtros de Estado",
-    SeleccionarFechas: "Seleccionar Fechas"
+    TodosLosRegistrosT: "Por defecto se filtran los últimos 13 meses",
+    TodosLosRegistros: "Mostrar Todos los Recibos"
   },
   menu: {
     Recibos: "Recibos",

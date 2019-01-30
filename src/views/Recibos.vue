@@ -12,7 +12,9 @@
         <q-select :label="$q.lang.recibo.FiltrosDeEstado" :options="filters.Estados" @input="callData" dense expandBesides multiple optionsDense v-model="filters.EstadosSel"/>
       </div>
       <div class="col-xs-12 col-md-2" style="padding: 10px">
-        <q-select :label="$q.lang.recibo.SeleccionarFechas" :options="['6 MESES', '1 AÑO']" @input="callData" dense expandBesides optionsDense v-model="filters.date"/>
+        <q-toggle :label="$q.lang.recibo.TodosLosRegistros" v-model="filters.alldata" @input="callData">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.TodosLosRegistrosT}}</q-tooltip>
+        </q-toggle>
       </div>
     </div>
     <!-- MINI TOOLBAR -->
@@ -75,22 +77,17 @@
                 <q-item-label>{{$q.lang.recibo.RecibosUrgentes}}</q-item-label>
               </q-item-section>
             </q-item>
+            <q-item style="background-color: #a8a8a7;">
+              <q-item-section>
+                <q-item-label>{{$q.lang.recibo.RecibosError}}</q-item-label>
+              </q-item-section>
+            </q-item>
           </q-list>
         </q-btn-dropdown>
       </div>
     </q-bar>
     <!-- TABLA DE DATOS -->
-    <n-tables
-      :columnDefs="columnDefs"
-      :columnDefsSub="columnDefsSub"
-      :masterDetail="true"
-      :quickFilter="quickFilter"
-      :rowClassRules="rowClassRules"
-      :rowData="rowData"
-      @rowSelected="rowSelected"
-      @rowSelectedSub="rowSelectedSub"
-      table="Recibos"
-    />
+    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub" table="Recibos"/>
     <!-- DIALOGO DE CLIENTES -->
     <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" :table="null" @cancel="client.dialog=false" @onSave="saveData"></n-dialog>
   </div>
@@ -124,13 +121,15 @@ export default {
       filters: {
         EstadosSel: ["PENDIENTE"],
         Estados: ["PENDIENTE", "DEVUELTO", "COBRADO", "ANULADO", "EMITIDO"],
-        date: null
+        alldata: false
       },
       rowClassRules: {
+        error:
+          "data.Estado.includes('COBRADO') && data.MIEstado.includes('ANULADO')",
         pendiente:
           "data.Estado.includes('PENDIENTE') && data.MIEstado.includes('PENDIENTE')",
         anulado:
-          "data.Estado.includes('ANULADO') || data.MIEstado.includes('ANULADO')",
+          "data.Estado.includes('ANULADO') || (data.MIEstado.includes('ANULADO') && !data.Estado.includes('COBRADO'))",
         cobrado:
           "data.Estado.includes('COBRADO') || (data.MIEstado.includes('COBRADO') && data.Importe == data.Cobrado)"
       },
@@ -183,7 +182,7 @@ export default {
       let self = this;
       // Por defecto los últimos 12 meses
       let dateini = new Date();
-      dateini.setMonth(dateini.getMonth() - 6);
+      dateini.setMonth(dateini.getMonth() - 13);
       dateini = dateini.toISOString().substr(0, 10);
       let dateend = new Date().toISOString().substr(0, 10);
       let where = "(",
@@ -192,12 +191,15 @@ export default {
         where += or + "Estado LIKE '" + this.filters.EstadosSel[i] + "%'";
         or = " OR ";
       }
-      where +=
-        ") AND FechaEfecto>'" +
-        dateini +
-        "' AND FechaEfecto<='" +
-        dateend +
-        "'";
+      where += ")";
+      if (!this.filters.alldata) {
+        where +=
+          " AND FechaEfecto>'" +
+          dateini +
+          "' AND FechaEfecto<='" +
+          dateend +
+          "'";
+      }
       showLoading();
       axios
         .post("http://" + localStorage.url + "/crc/php/consulta.php", {
