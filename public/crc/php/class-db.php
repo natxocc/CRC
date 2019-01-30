@@ -505,6 +505,7 @@ class db
             'IncluirNuevos' => true,
         );
         $resultado = $consulta->DescargarNew($parametros);
+        //echo json_encode($resultado);
         $resultado = $resultado->ListaRecibos->ReciboAmpliado;
         // var_dump($resultado);
         //echo json_encode($resultado);
@@ -518,7 +519,7 @@ class db
             $FechaVencimiento = substr($FV, 0, 4) . "-" . substr($FV, 5, 2) . "-" . substr($FV, 8, 2);
             // Prueba de insertar nuevos registros
             try {
-                $sql = $db->prepare("INSERT INTO Recibos(
+                $sql = $this->db->prepare("INSERT INTO Recibos(
                 CodigoPoliza,
                 CodigoRamo,
                 CodigoRecibo,
@@ -556,7 +557,7 @@ class db
                 $result['type'] = 'insert';
                 // Prueba de actualizar el registro actual
             } catch (Exception $e) {
-                $sql = $db->prepare("UPDATE Recibos SET 
+                $sql = $this->db->prepare("UPDATE Recibos SET 
                 CodigoPoliza = \"$value->CodigoPoliza\",
                 CodigoRamo = \"$value->CodigoRamo\",
                 CodigoRecibo = \"$value->CodigoRecibo\",
@@ -657,7 +658,7 @@ class db
             $TipoInformacion = $value->DatosGenerales->TipoInformacion;
             // Prueba de insertar nuevos registros
             try {
-                $sql = $db->prepare("INSERT INTO Polizas(
+                $sql = $this->db->prepare("INSERT INTO Polizas(
                 FechaAlta,
                 FechaBaja,
                 FechaVencimientoSuplemento,
@@ -701,7 +702,7 @@ class db
                 $result['type'] = 'insert';
                 // Prueba de actualizar el registro actual
             } catch (Exception $e) {
-                $sql = $db->prepare("UPDATE Polizas SET 
+                $sql = $this->db->prepare("UPDATE Polizas SET 
                 FechaAlta=\"$FechaAlta\",
                 FechaBaja=\"$FechaBaja\",
                 FechaVencimientoSuplemento=\"$FechaVencimientoSuplemento\",
@@ -772,7 +773,7 @@ class db
         $date = $this->sanitize($post['days']);
         $today = date('Y-m-d', strtotime('-' . $date . ' day', strtotime(date('Y-m-d'))));
         $sqlquery = "SELECT * from Recibos WHERE (FechaEfecto<'$today') AND (Estado LIKE 'PENDIENTE%') AND (MIEstado = '' OR MIEstado LIKE 'PENDIENTE%')";
-        $sql = $db->prepare($sqlquery);
+        $sql = $this->db->prepare($sqlquery);
         $sql->execute();
         $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
         $return['count'] = $sql->rowCount();
