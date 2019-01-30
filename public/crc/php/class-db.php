@@ -476,11 +476,11 @@ class db
 
 
     /**
-     * updateRecibos
+     * updateRecibos (empresa) = 4 o 10
      *
      * @return void
      */
-    function updateRecibos()
+    function updateRecibos($empresa)
     {
         // Actualiza Fecha inicial y final
         $dateini = date("Y-m", strtotime("-1 month", strtotime(date('Y-m-d')))) . "-01";
@@ -493,7 +493,7 @@ class db
             'exceptions' => false
         ));
         $parametros = array(
-            'Empresa' => 4,
+            'Empresa' => $empresa,
             'Clave' => '12345',
             'Identificador' => 'ag34764w@TTLY9XPR',
             'FechaInicial' => $dateini,

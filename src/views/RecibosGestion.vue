@@ -8,7 +8,7 @@
       >
         <q-input
           dense
-          label="Filtro rápido"
+          :label="$q.lang.recibo.FiltroRapido"
           type="text"
           v-model="quickFilter"
         >
@@ -31,7 +31,6 @@
         <q-select
           :options="[
         'PENDIENTE',
-        'PENDIENTE (MODIF)',
         'DEVUELTO',
         'COBRADO',
         'ANULADO',
@@ -40,10 +39,10 @@
           @input="callData"
           dense
           expandBesides
-          label="Filtros de estado"
+          :label="$q.lang.recibo.FiltrosDeEstado"
           multiple
           optionsDense
-          v-model="filters.Estado"
+          v-model="filterEstados"
         />
       </div>
       <div
@@ -55,7 +54,7 @@
           @input="callData"
           dense
           expandBesides
-          label="Fechas"
+          :label="$q.lang.recibo.SeleccionarFechas"
           optionsDense
           v-model="filters.date"
         />
@@ -72,7 +71,7 @@
         <q-tooltip
           anchor="top middle"
           self="bottom middle"
-        >Añadir Recibo Temporal</q-tooltip>Nuevo Recibo
+        >{{$q.lang.recibo.NuevoReciboT}}</q-tooltip>{{$q.lang.recibo.NuevoRecibo}}
       </q-btn>
       <q-btn
         :disabled="!recibo.selected"
@@ -85,7 +84,7 @@
         <q-tooltip
           anchor="top middle"
           self="bottom middle"
-        >Eliminar Recibo</q-tooltip>Eliminar Recibo
+        >{{$q.lang.recibo.EliminarReciboT}}</q-tooltip>{{$q.lang.recibo.EliminarRecibo}}
       </q-btn>
       <q-btn
         :disabled="!recibo.selected"
@@ -96,7 +95,7 @@
         <q-tooltip
           anchor="top middle"
           self="bottom middle"
-        >Nueva Gestión del recibo</q-tooltip>Nueva Gestión
+        >{{$q.lang.recibo.NuevaGestionT}}</q-tooltip>{{$q.lang.recibo.NuevaGestion}}
       </q-btn>
       <q-btn
         :disabled="!recibo.selectedSub"
@@ -107,7 +106,7 @@
         <q-tooltip
           anchor="top middle"
           self="bottom middle"
-        >Editar Gestión</q-tooltip>Editar Gestión
+        >{{$q.lang.recibo.EditarGestionT}}</q-tooltip>{{$q.lang.recibo.EditarGestion}}
       </q-btn>
       <q-btn
         :disabled="!recibo.selectedSub"
@@ -119,7 +118,7 @@
         <q-tooltip
           anchor="top middle"
           self="bottom middle"
-        >Eliminar Gestión</q-tooltip>Eliminar Gestión
+        >{{$q.lang.recibo.EliminarGestionT}}</q-tooltip>{{$q.lang.recibo.EliminarGestion}}
       </q-btn>
       <q-btn
         @click="client.dialog=true"
@@ -152,7 +151,7 @@
       <q-space/>
       <div>
         <!-- AYUDA -->
-        <q-tooltip>Ayuda de Colores</q-tooltip>
+        <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
         <q-btn-dropdown
           color="primary"
           icon="help_outline"
@@ -160,41 +159,30 @@
           split
         >
           <q-list dense>
+       
             <q-item>
               <q-item-section>
-                <q-item-label>SELECCIONA PARA GESTIONAR RECIBO</q-item-label>
-                <q-item-label caption>Para gestionar un recibo seleccionalo en el cuadro</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-separator/>
-            <q-item>
-              <q-item-section>
-                <q-item-label>RECIBOS SIN TRATAMIENTO</q-item-label>
-                <q-item-label caption>Recibos que no tienen ningún tratamiento en oficina</q-item-label>
+                <q-item-label>{{$q.lang.recibo.RecibosSinTratamiento}}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item style="background-color: #fcf18e;">
               <q-item-section>
-                <q-item-label>PENDIENTES</q-item-label>
-                <q-item-label caption>Recibos con tratamiento y están en curso</q-item-label>
+                <q-item-label>{{$q.lang.recibo.RecibosPendientes}}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item style="background-color: #88c9ff">
               <q-item-section>
-                <q-item-label>ANULADOS</q-item-label>
-                <q-item-label caption>Recibos anulados por Reale u Oficina</q-item-label>
+                <q-item-label>{{$q.lang.recibo.RecibosAnulados}}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item style="background-color: rgb(182, 255, 191)">
               <q-item-section>
-                <q-item-label>COBRADOS</q-item-label>
-                <q-item-label caption>Recibos Cobrados Totalmente por Reale u Oficina</q-item-label>
+                <q-item-label>{{$q.lang.recibo.RecibosCobrados}}</q-item-label>
               </q-item-section>
             </q-item>
             <q-item style="background-color: rgb(252, 151, 151);">
               <q-item-section>
-                <q-item-label>URGENTES</q-item-label>
-                <q-item-label caption>Recibos con más de 25 días sin resolver</q-item-label>
+                <q-item-label>{{$q.lang.recibo.RecibosUrgentes}}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -251,9 +239,10 @@ export default {
       columnDefsSub: [],
       rowData: null,
       quickFilter: null,
+      filterEstados: ["PENDIENTE"],
       filters: {
-        Estado: ["PENDIENTE", "PENDIENTE (MODIF)"],
-        date: null
+        // Estado: ["PENDIENTE"],
+        // date: null
         // Importe: {type: "greaterThanOrEqual", filter: "0"}
       },
       rowClassRules: {
@@ -320,8 +309,8 @@ export default {
       let dateend = new Date().toISOString().substr(0, 10);
       let where = "(",
         or = "";
-      for (let i = 0; i < this.filters.Estado.length; i++) {
-        where += or + "Estado LIKE '" + this.filters.Estado[i] + "'";
+      for (let i = 0; i < this.filterEstados.length; i++) {
+        where += or + "Estado LIKE '" + this.filterEstados[i] + "%'";
         or = " OR ";
       }
       where +=

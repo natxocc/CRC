@@ -39,9 +39,7 @@
 import { AgGridVue } from "ag-grid-vue";
 import Vue from "vue";
 import axios from "axios";
-import localeText from "../locales/NTables";
-import quasar from "quasar";
-
+import localeText from "../lang/es.tables";
 // EXPORT DEFAULT
 export default {
   name: "NTables",
