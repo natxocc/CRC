@@ -118,5 +118,20 @@ export default {
     FiltroRapido: "Filtro Rápido",
     FiltrosDeEstado: "Filtros de Estado",
     SeleccionarFechas: "Seleccionar Fechas"
+  },
+  menu: {
+    Recibos: "Reciboss",
+    GestionDeRecibos: "Gestión de Recibos",
+    BajasProvisionales: "Baja provisionales",
+    Polizas: "Polizas",
+    NuevaProduccion: "Nueva Producción",
+    BajasDefinitivas: "Bajas Definitivas",
+    Clientes: "Clientes",
+    ListaDeClientes: "Lista de clientes",
+    Siniestros: "Siniestros",
+    ListaDeSiniestros: "Lista de siniestros",
+    Usuarios:"Usuarios",
+    GestionDeUsuarios: "Gestion de usuarios"
+
   }
 }

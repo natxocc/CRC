@@ -20,21 +20,23 @@
           </q-toolbar-title>
           <q-space/>
           <q-btn-dropdown
+            :label="lang"
             color="primary"
             size="sm"
             split
-            :label="lang"
           >
             <q-list dense>
-              <q-item clickable @click="lang='ca'">
-                <q-item-section>
-                  CATALÀ
-                </q-item-section>
+              <q-item
+                @click="lang='ca'"
+                clickable
+              >
+                <q-item-section>CATALÀ</q-item-section>
               </q-item>
-              <q-item clickable @click="lang='es'">
-                <q-item-section>
-                  ESPAÑOL
-                </q-item-section>
+              <q-item
+                @click="lang='es'"
+                clickable
+              >
+                <q-item-section>ESPAÑOL</q-item-section>
               </q-item>
               <q-separator/>
             </q-list>
@@ -129,8 +131,8 @@
                   </div>
                   <div class="col-12">
                     <q-input
-                      :type="user.passShow ? 'text' : 'password'"
                       :label="$q.lang.login.Clave"
+                      :type="user.passShow ? 'text' : 'password'"
                       v-model="user.pass"
                     >
                       <q-icon
@@ -153,8 +155,8 @@
                   </div>
                   <div class="col-12">
                     <q-checkbox
-                      dense
                       :label="$q.lang.login.Recordarme"
+                      dense
                       v-model="user.remember"
                     />
                   </div>
@@ -162,16 +164,16 @@
               </q-card-section>
               <q-card-actions align="right">
                 <q-btn
+                  :label="$q.lang.Cancelar"
                   @click="close"
                   color="negative"
                   flat
-                  :label="$q.lang.Cancelar"
                 />
                 <q-btn
+                  :label="$q.lang.Aceptar"
                   @click="login"
                   color="primary"
                   flat
-                  :label="$q.lang.Aceptar"
                 />
               </q-card-actions>
             </q-card>
@@ -190,48 +192,55 @@
   </div>
 </template>
 <script>
-import languages from "./lang/index.json";
+import("./lang/es").then((lang) => {
+  this.$q.lang.set('es');
+});
 export default {
   data() {
     return {
-      lang: this.$q.lang.isoName,
+      lang: 'es',
       menu: {
         left: false,
         right: false,
         leftList: [
           {
             icon: "euro_symbol",
-            name: "Recibos",
+            name: this.$q.lang.menu.Recibos,
             subs: [
-              {name: "Gestión de Recibos", to: "/recibos/gestion"},
-              {name: "Bajas Provisionales", to: "/recibos/bajas"}
+              {
+                name: this.$q.lang.menu.GestionDeRecibos,
+                to: "/recibos/gestion"
+              },
+              {name: this.$q.lang.menu.BajasProvisionales, to: "/recibos/bajas"}
             ]
           },
           {
             icon: "timeline",
-            name: "Polizas",
+            name: this.$q.lang.menu.Polizas,
             subs: [
-              {name: "Nueva Producción", to: "/polizas/produccion"},
-              {name: "Bajas Definitivas", to: "/polizas/bajas"}
+              {
+                name: this.$q.lang.menu.NuevaProduccion,
+                to: "/polizas/produccion"
+              },
+              {name: this.$q.lang.menu.BajasDefinitivas, to: "/polizas/bajas"}
             ]
           },
           {
             icon: "contacts",
-            name: "Clientes",
-            subs: [{name: "Lista de Clientes", to: "/clientes/lista"}]
-          },
-          {
-            icon: "healing",
-            name: "Siniestros",
+            name: this.$q.lang.menu.Clientes,
             subs: [
-              {name: "Lista de Siniestros", to: "/siniestro/lista"},
-              {name: "Consultar Siniestro", to: "/siniestro/consulta"}
+              {name: this.$q.lang.menu.ListaDeClientes, to: "/clientes/lista"}
             ]
           },
           {
+            icon: "healing",
+            name: this.$q.lang.menu.Siniestros,
+            subs: [{name: this.$q.lang.menu.Siniestros, to: "/siniestro/lista"}]
+          },
+          {
             icon: "person",
-            name: "Usuarios",
-            subs: [{name: "Gestión de Usuarios", to: "/usuarios"}]
+            name: this.$q.lang.menu.Usuarios,
+            subs: [{name: this.$q.lang.menu.GestionDeUsuarios, to: "/usuarios"}]
           }
         ]
       },
@@ -274,13 +283,14 @@ export default {
     }
   },
   watch: {
-    lang (lang) {
-      import(`./lang/${lang}`).then(lang => {
-        this.$q.lang.set(lang.default)
-      })
+    lang(lang) {
+      import(`./lang/${lang}`).then((lang) => {
+        this.$q.lang.set(lang.default);
+      });
     }
   },
   beforeMount() {
+    this.lang = "es";
     // Remove on final version
     if (window.location.hostname == "localhost") {
       localStorage.url = "servidor";
@@ -288,9 +298,6 @@ export default {
       this.url = localStorage.url = window.location.hostname;
     }
     // || ^^ Remove on final version
-  },
-  created () {
-    this.lang="es"
   }
 };
 </script>
