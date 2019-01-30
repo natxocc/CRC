@@ -12,6 +12,8 @@ import "../node_modules/quasar/dist/quasar.min.css"
 Vue.config.productionTip = false
 Vue.use(Quasar)
 Vue.use(HighchartsVue);
+import locale from "./lang/es"
+Quasar.lang.set(locale)
 new Vue({
   router,
   render: h => h(App)

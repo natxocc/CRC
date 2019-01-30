@@ -291,7 +291,7 @@ class db
             $columnName = explode("|", $fetch[$key]['Comment']);
             $result[$key]['headerName'] = $columnName[0];
             $result[$key]['headerTooltip'] = $fetch[$key]['Field'];
-            $result[$key]['tooltipField'] = "Normal";
+            $result[$key]['tooltipField'] = "";
             $result[$key]['field'] = $fetch[$key]['Field'];
             if (isset($columnName[1])) {
                 if (strstr($columnName[1], "H")) $result[$key]['hide'] = true;

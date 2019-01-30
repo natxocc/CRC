@@ -88,6 +88,13 @@ export default {
     noNodes: 'No hi han nodes disponibles',
     noResults: 'No s\'han trobat nodes'
   },
+  // NUEVA TRADUCCION
+  login: {
+    InicioSesion: "Inicio de sesión",
+    Usuario: "Usuari",
+    Clave: "Clave",
+    Recordarme: "Recordarme"
+  },
   recibo: {
     NuevoRecibo: "Nou Rebut",
     NuevoReciboT: "Crear nuevo recibo Temporal",
@@ -103,9 +110,17 @@ export default {
     RecibosSinTratamiento: "Recibos sin tratamiento",
     RecibosPendientes: "Recibos Pendientes y en curso",
     RecibosAnulados: "Recibos anulados por Reale u Oficina",
+    RecibosCobrados: "Recibos cobrados por Reale u Oficina",
     RecibosUrgentes: "Recibos Urgentes con más de 25 días sin resolver",
     FiltroRapido: "Filtro Rápido",
     FiltrosDeEstado: "Filtros de Estado",
     SeleccionarFechas: "Seleccionar Fechas"
+  },
+  menu: {
+    Recibos: "Rebuts",
+    Polizas: "Polizas",
+    Clientes: "Clients",
+    Siniestros: "Siniestros",
+    Usuarios: "Usuarios"
   }
 }

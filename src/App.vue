@@ -24,19 +24,6 @@
         </q-toolbar>
       </q-header>
       <q-page-container>
-        <!-- MENU LEFT -->
-        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="left" v-if="user.logged" v-model="menu.left">
-          <q-btn class="full-width" flat icon="home" inline to="/"></q-btn>
-          <q-list bordered padding>
-            <q-expansion-item :icon="option.icon" :key="i" :label="option.name" expand-separator v-for="(option,i) in menu.leftList">
-              <q-item :key="i" :to="subs.to" v-for="(subs,i) in option.subs">
-                <q-item-section>{{subs.name}}</q-item-section>
-              </q-item>
-            </q-expansion-item>
-          </q-list>
-        </q-drawer>
-        <!-- MENU RIGHT -->
-        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="right" v-if="user.logged" v-model="menu.right"></q-drawer>
         <!-- DIALOGO USUARIO -->
         <div class="justify-around">
           <q-dialog v-model="user.dialog">
@@ -66,12 +53,26 @@
                 </div>
               </q-card-section>
               <q-card-actions align="right">
-                <q-btn :label="$q.lang.Cancelar" @click="close" color="negative" flat/>
-                <q-btn :label="$q.lang.Aceptar" @click="login" color="primary" flat/>
+                <q-btn :label="$q.lang.label.cancel" @click="close" color="negative" flat/>
+                <q-btn :label="$q.lang.label.ok" @click="login" color="primary" flat/>
               </q-card-actions>
             </q-card>
           </q-dialog>
         </div>
+        <!-- MENU RIGHT -->
+        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="right" v-if="user.logged" v-model="menu.right"></q-drawer>
+        <!-- MENU LEFT -->
+        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="left" v-model="menu.left">
+          <q-btn class="full-width" flat icon="home" inline to="/"></q-btn>
+          <q-list :separator="true" bordered>
+            <q-item :key="i" :to="option.to" clickable v-for="(option,i) in menu.leftList" v-ripple>
+              <q-item-section avatar>
+                <q-icon :name="option.icon" color="primary"/>
+              </q-item-section>
+              <q-item-section>{{$q.lang.menu[option.name]}}</q-item-section>
+            </q-item>
+          </q-list>
+        </q-drawer>
         <!-- ROUTER VIEW -->
         <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in">
           <router-view/>
@@ -91,45 +92,31 @@ export default {
         left: false,
         right: false,
         leftList: [
-          // {
-          //   icon: "euro_symbol",
-          //   name: this.$q.lang.menu.Recibos,
-          //   subs: [
-          //     {
-          //       name: this.$q.lang.menu.GestionDeRecibos,
-          //       to: "/recibos/gestion"
-          //     },
-          //     {name: this.$q.lang.menu.BajasProvisionales, to: "/recibos/bajas"}
-          //   ]
-          // },
-          // {
-          //   icon: "timeline",
-          //   name: this.$q.lang.menu.Polizas,
-          //   subs: [
-          //     {
-          //       name: this.$q.lang.menu.NuevaProduccion,
-          //       to: "/polizas/produccion"
-          //     },
-          //     {name: this.$q.lang.menu.BajasDefinitivas, to: "/polizas/bajas"}
-          //   ]
-          // },
-          // {
-          //   icon: "contacts",
-          //   name: this.$q.lang.menu.Clientes,
-          //   subs: [
-          //     {name: this.$q.lang.menu.ListaDeClientes, to: "/clientes/lista"}
-          //   ]
-          // },
-          // {
-          //   icon: "healing",
-          //   name: this.$q.lang.menu.Siniestros,
-          //   subs: [{name: this.$q.lang.menu.Siniestros, to: "/siniestro/lista"}]
-          // },
-          // {
-          //   icon: "person",
-          //   name: this.$q.lang.menu.Usuarios,
-          //   subs: [{name: this.$q.lang.menu.GestionDeUsuarios, to: "/usuarios"}]
-          // }
+          {
+            icon: "euro_symbol",
+            name: "Recibos",
+            to: "/recibos"
+          },
+          {
+            icon: "timeline",
+            name: "Polizas",
+            to: "/recibos"
+          },
+          {
+            icon: "contacts",
+            name: "Clientes",
+            to: "/recibos"
+          },
+          {
+            icon: "healing",
+            name: "Siniestros",
+            to: "/recibos"
+          },
+          {
+            icon: "person",
+            name: "Usuarios",
+            to: "/recibos"
+          }
         ]
       },
       user: {
@@ -171,25 +158,24 @@ export default {
     }
   },
   watch: {
-    lang (lang) {
-      import(`./lang/${lang}`).then(lang => {
-        this.$q.lang.set(lang.default)
-        console.log(lang)
-      })
-    },
+    lang(lang) {
+      import(`./lang/${lang}`).then((lang) => {
+        this.$q.lang.set(lang.default);
+      });
+    }
   },
   beforeMount() {
     // Remove on final version
     // this.lang="es"
     if (window.location.hostname == "localhost") {
-      localStorage.url = "localhost";
+      localStorage.url = "servidor";
     } else {
       this.url = localStorage.url = window.location.hostname;
     }
     // || ^^ Remove on final version
   },
-  created(){
-    this.lang="es"
+  created() {
+    this.lang = "es";
   }
 };
 </script>

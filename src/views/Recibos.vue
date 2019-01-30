@@ -134,7 +134,6 @@ export default {
         cobrado:
           "data.Estado.includes('COBRADO') || (data.MIEstado.includes('COBRADO') && data.Importe == data.Cobrado)"
       },
-
       // CLIENT
       client: {
         columns: null,
@@ -145,7 +144,6 @@ export default {
         dialog: false,
         selected: false
       },
-
       // RECIBO
       recibo: {
         selected: null,

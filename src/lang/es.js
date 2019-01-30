@@ -90,8 +90,6 @@ export default {
   },
 
   // NUEVA TRADUCCION
-  Aceptar: "Aceptar",
-  Cancelar: "Cancelar",
   login: {
     InicioSesion: "Inicio de sesión",
     Usuario: "Usuario",
@@ -121,17 +119,9 @@ export default {
   },
   menu: {
     Recibos: "Recibos",
-    GestionDeRecibos: "Gestión de Recibos",
-    BajasProvisionales: "Baja provisionales",
     Polizas: "Polizas",
-    NuevaProduccion: "Nueva Producción",
-    BajasDefinitivas: "Bajas Definitivas",
     Clientes: "Clientes",
-    ListaDeClientes: "Lista de clientes",
     Siniestros: "Siniestros",
-    ListaDeSiniestros: "Lista de siniestros",
-    Usuarios:"Usuarios",
-    GestionDeUsuarios: "Gestion de usuarios"
-
+    Usuarios:"Usuarios"
   }
 }
