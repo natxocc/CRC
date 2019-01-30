@@ -1,6 +1,6 @@
 module.exports = {
   publicPath: './',
-  assetsDir: 'reale',
+  assetsDir: 'crc',
   productionSourceMap: false,
   lintOnSave: false
 }
