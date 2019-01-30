@@ -1,6 +1,6 @@
 {
-  "name": "CRC",
-  "version": "0.1.0",
+  "name": "@natxocc/crc",
+  "version": "0.0.1",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -50,5 +50,24 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "description": "Programa de control de rebuts Reale",
+  "main": "babel.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natxocc/CRC.git"
+  },
+  "keywords": [
+    "CRC",
+    "Reale"
+  ],
+  "author": "NatxoCC",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/natxocc/CRC/issues"
+  },
+  "homepage": "https://github.com/natxocc/CRC#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
 }
