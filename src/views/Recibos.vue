@@ -1,94 +1,105 @@
 <template>
   <div class="container">
+    <!-- TABS -->
+    <q-tabs active-bg-color="purple" active-color="white" class="bg-teal text-yellow" dense indicator-color="transparent" inline-label top-indicator v-model="tab">
+      <q-route-tab :label="$q.lang.recibo.Gestion" icon="assignment_turned_in" name="todos" to="/recibos/todos"/>
+      <q-route-tab :label="$q.lang.recibo.Bajas" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
+      <q-route-tab :label="$q.lang.recibo.Filtrado" icon="assignment_ind" name="filtrado" to="/recibos/filtrado"/>
+    </q-tabs>
     <!-- SELECT FILTERS -->
-    <div class="row">
-      <div class="col-xs-12 col-md-5" style="padding: 10px">
-        <q-input :label="$q.lang.recibo.FiltroRapido" dense type="text" v-model="quickFilter">
-          <q-icon name="filter_list" slot="prepend"/>
-          <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
-        </q-input>
+    <transition appear class="group" enter-active-class="fade" leave-active-class="fade">
+      <div v-if="tab=='todos'">
+        <div class="row text-center">
+          <div class="col-xs-12 col-md-5" style="padding: 10px">
+            <q-input :label="$q.lang.recibo.FiltroRapido" dense type="text" v-model="quickFilter">
+              <q-icon name="filter_list" slot="prepend"/>
+              <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
+            </q-input>
+          </div>
+          <div class="col-xs-12 col-md-5" style="padding: 10px">
+            <q-select :label="$q.lang.recibo.FiltrosDeEstado" :options="filters.Estados" @input="callData" dense expandBesides multiple optionsDense v-model="filters.EstadosSel"/>
+          </div>
+          <div class="col-xs-12 col-md-2" style="padding: 10px">
+            <q-toggle :label="$q.lang.recibo.TodosLosRegistros" @input="callData" v-model="filters.alldata">
+              <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.TodosLosRegistrosT}}</q-tooltip>
+            </q-toggle>
+          </div>
+        </div>
+        <!-- MINI TOOLBAR -->
+        <q-bar class="bg-primary text-white">
+          <q-btn :disabled="recibo.selected" dense flat icon="add">
+            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevoReciboT}}</q-tooltip>
+            {{$q.lang.recibo.NuevoRecibo}}
+          </q-btn>
+          <q-btn :disabled="!recibo.selected" @click="deleteRecord" color="warning" dense flat icon="delete">
+            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarReciboT}}</q-tooltip>
+            {{$q.lang.recibo.EliminarRecibo}}
+          </q-btn>
+          <q-btn :disabled="!recibo.selected" dense flat icon="add">
+            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevaGestionT}}</q-tooltip>
+            {{$q.lang.recibo.NuevaGestion}}
+          </q-btn>
+          <q-btn :disabled="!recibo.selectedSub" dense flat icon="edit">
+            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EditarGestionT}}</q-tooltip>
+            {{$q.lang.recibo.EditarGestion}}
+          </q-btn>
+          <q-btn :disabled="!recibo.selectedSub" color="warning" dense flat icon="delete">
+            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarGestionT}}</q-tooltip>
+            {{$q.lang.recibo.EliminarGestion}}
+          </q-btn>
+          <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected">
+            <q-tooltip anchor="top middle" self="bottom middle">Crear nuevo Cliente</q-tooltip>Nuevo Cliente
+          </q-btn>
+          <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
+            <q-tooltip anchor="top middle" self="bottom middle">Información de Contacto</q-tooltip>
+            <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
+          </q-btn>
+          <q-space/>
+          <div>
+            <!-- AYUDA -->
+            <q-btn color="primary" icon="help_outline" size="sm">
+              <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
+              <q-popup-proxy>
+                <q-list dense>
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label>{{$q.lang.recibo.RecibosSinTratamiento}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item style="background-color: #fcf18e;">
+                    <q-item-section>
+                      <q-item-label>{{$q.lang.recibo.RecibosPendientes}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item style="background-color: #88c9ff">
+                    <q-item-section>
+                      <q-item-label>{{$q.lang.recibo.RecibosAnulados}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item style="background-color: rgb(182, 255, 191)">
+                    <q-item-section>
+                      <q-item-label>{{$q.lang.recibo.RecibosCobrados}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item style="background-color: rgb(252, 151, 151);">
+                    <q-item-section>
+                      <q-item-label>{{$q.lang.recibo.RecibosUrgentes}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item style="background-color: #a8a8a7;">
+                    <q-item-section>
+                      <q-item-label>{{$q.lang.recibo.RecibosError}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-popup-proxy>
+            </q-btn>
+            <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
+          </div>
+        </q-bar>
       </div>
-      <div class="col-xs-12 col-md-5" style="padding: 10px">
-        <q-select :label="$q.lang.recibo.FiltrosDeEstado" :options="filters.Estados" @input="callData" dense expandBesides multiple optionsDense v-model="filters.EstadosSel"/>
-      </div>
-      <div class="col-xs-12 col-md-2" style="padding: 10px">
-        <q-toggle :label="$q.lang.recibo.TodosLosRegistros" @input="callData" v-model="filters.alldata">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.TodosLosRegistrosT}}</q-tooltip>
-        </q-toggle>
-      </div>
-    </div>
-    <!-- MINI TOOLBAR -->
-    <q-bar class="bg-primary text-white">
-      <q-btn :disabled="recibo.selected" dense flat icon="add">
-        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevoReciboT}}</q-tooltip>
-        {{$q.lang.recibo.NuevoRecibo}}
-      </q-btn>
-      <q-btn :disabled="!recibo.selected" @click="deleteRecord" color="warning" dense flat icon="delete">
-        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarReciboT}}</q-tooltip>
-        {{$q.lang.recibo.EliminarRecibo}}
-      </q-btn>
-      <q-btn :disabled="!recibo.selected" dense flat icon="add">
-        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevaGestionT}}</q-tooltip>
-        {{$q.lang.recibo.NuevaGestion}}
-      </q-btn>
-      <q-btn :disabled="!recibo.selectedSub" dense flat icon="edit">
-        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EditarGestionT}}</q-tooltip>
-        {{$q.lang.recibo.EditarGestion}}
-      </q-btn>
-      <q-btn :disabled="!recibo.selectedSub" color="warning" dense flat icon="delete">
-        <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarGestionT}}</q-tooltip>
-        {{$q.lang.recibo.EliminarGestion}}
-      </q-btn>
-      <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected">
-        <q-tooltip anchor="top middle" self="bottom middle">Crear nuevo Cliente</q-tooltip>Nuevo Cliente
-      </q-btn>
-      <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
-        <q-tooltip anchor="top middle" self="bottom middle">Información de Contacto</q-tooltip>
-        <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
-      </q-btn>
-      <q-space/>
-      <div>
-        <!-- AYUDA -->
-        <q-btn color="primary" icon="help_outline" size="sm">
-          <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
-          <q-popup-proxy>
-            <q-list dense>
-            <q-item>
-              <q-item-section>
-                <q-item-label>{{$q.lang.recibo.RecibosSinTratamiento}}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item style="background-color: #fcf18e;">
-              <q-item-section>
-                <q-item-label>{{$q.lang.recibo.RecibosPendientes}}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item style="background-color: #88c9ff">
-              <q-item-section>
-                <q-item-label>{{$q.lang.recibo.RecibosAnulados}}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item style="background-color: rgb(182, 255, 191)">
-              <q-item-section>
-                <q-item-label>{{$q.lang.recibo.RecibosCobrados}}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item style="background-color: rgb(252, 151, 151);">
-              <q-item-section>
-                <q-item-label>{{$q.lang.recibo.RecibosUrgentes}}</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item style="background-color: #a8a8a7;">
-              <q-item-section>
-                <q-item-label>{{$q.lang.recibo.RecibosError}}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-          </q-popup-proxy>
-        </q-btn>
-        <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
-      </div>
-    </q-bar>
+    </transition>
+
     <!-- TABLA DE DATOS -->
     <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub" table="Recibos"/>
     <!-- DIALOGO DE CLIENTES -->
@@ -150,8 +161,9 @@ export default {
       recibo: {
         selected: null,
         selectedSub: false
-      }
+      },
       // GESTION
+      tab: this.$route.params.recibo
     };
   },
   methods: {

@@ -98,12 +98,12 @@ export default {
           {
             icon: "euro_symbol",
             name: "Recibos",
-            to: "/recibos"
+            to: "/recibos/todos"
           },
           {
             icon: "timeline",
             name: "Polizas",
-            to: "/recibos"
+            to: "/polizas"
           },
           {
             icon: "contacts",
