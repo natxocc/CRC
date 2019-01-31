@@ -761,24 +761,47 @@ class db
         exit();
     }
 
+
     /**
-     * reportUrgents
+     * reportRecibos
      *
-     * @param  mixed $post (days)
+     * @param  mixed $post (days, to, subject, message, lang)
      *
      * @return void
      */
-    function reportUrgents($post)
+    function reportRecibos($post)
     {
+        header("Content-Type: application/json;charset=utf-8");
+        $defaultLang = isset($post['lang']) ? $post['lang'] : 'es';
+        require_once $defaultLang . '.php';
         $date = $this->sanitize($post['days']);
         $today = date('Y-m-d', strtotime('-' . $date . ' day', strtotime(date('Y-m-d'))));
+        //Recibos Urgentes
         $sqlquery = "SELECT * from Recibos WHERE (FechaEfecto<'$today') AND (Estado LIKE 'PENDIENTE%') AND (MIEstado = '' OR MIEstado LIKE 'PENDIENTE%')";
         $sql = $this->db->prepare($sqlquery);
         $sql->execute();
         $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
-        $return['count'] = $sql->rowCount();
-        $return['data'] = $fetch;
-        echo json_encode($return, JSON_PRETTY_PRINT);
-        exit();
+        $result['count']['Urgentes'] = $sql->rowCount();
+        $result['data']['Urgentes'] = $fetch;
+        //
+        $sqlquery = "SELECT * from Recibos WHERE (FechaEfecto<'$today') AND (Estado LIKE 'COBRADO%') AND (MIEstado LIKE 'ANULADO%')";
+        $sql = $this->db->prepare($sqlquery);
+        $sql->execute();
+        $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
+        $result['count']['Anulados'] = $sql->rowCount();
+        $result['data']['Anulados'] = $fetch;
+        // Template
+        $post['message'] = '<h3><strong>'. $lang['Resumen'] .'</strong></h3><p>'. $lang['Recibos'] .'<strong><span style="text-decoration: underline;"><span style="color: #ff0000;"><em>'. $lang['Urgentes'] .'</em></span></span></strong>:</p><ul>';
+        foreach ($result['data']['Urgentes'] as $key => $value) {
+            $post['message'].="<li>".$lang['Recibo'].$value['CodigoRecibo']." || ". $lang['Poliza'] . $value['CodigoPoliza']." || ". $lang['Cliente'] . $value['NombreTomador'] ."</li>";
+        }
+        $post['message'] .= '</ul><p>' . $lang['Recibos'] . '<span style="text-decoration: underline; color: #800080;"><strong><em><span>'.  $lang['Anulados'] . '</span></em></strong></span>:</p><ul>';
+        foreach ($result['data']['Anulados'] as $key => $value) {
+            $post['message'] .= "<li>" . $lang['Recibo'] . $value['CodigoRecibo'] . " || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
+        }
+        $post['message'] .= '</ul><p>&nbsp;</p><p><strong><span style="color: #008000;">CRC Reale</span></strong></p>';
+        $post['subject'] .= " (" . date('Y-m-d') . ")";
+        $this->sendMail($post);
+        //echo json_encode($post['message'], JSON_PRETTY_PRINT);
     }
 }

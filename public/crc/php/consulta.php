@@ -43,7 +43,7 @@ if ($cmd == "updateRecibos") $db->updateRecibos();
 if ($cmd == "updatePolizas") $db->updatePolizas();
 if ($cmd == "polizasMediador") $db->polizasMediador();
 if ($cmd == "getRecibos") $db->getRecibos($post);
-if ($cmd == "reportUrgents") $db->reportUrgents($post);
+if ($cmd == "reportRecibos") $db->reportRecibos($post);
 
 // Consultas db
 if ($cmd == "login") $db->login($post);
