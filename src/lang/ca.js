@@ -89,14 +89,15 @@ export default {
     noResults: 'No s\'han trobat nodes'
   },
   // NUEVA TRADUCCION
-  login: {
-    InicioSesion: "Inicio de sesión",
-    Usuario: "Usuari",
+  inicio: {
+    InicioSesion: "Inici de sesió",
+    Usuario: "Usuario",
     Clave: "Clave",
-    Recordarme: "Recordarme"
+    Recordarme: "Recordarme",
+    CambiarIdiomaT: "Pulsa para cambiar el idioma"
   },
   recibo: {
-    NuevoRecibo: "Nou Rebut",
+    NuevoRecibo: "Nuevo Recibo",
     NuevoReciboT: "Crear nuevo recibo Temporal",
     EliminarRecibo: "Eliminar Recibo",
     EliminarReciboT: "Eliminar recibo de la base de datos",
@@ -112,14 +113,22 @@ export default {
     RecibosAnulados: "Recibos anulados por Reale u Oficina",
     RecibosCobrados: "Recibos cobrados por Reale u Oficina",
     RecibosUrgentes: "Recibos Urgentes con más de 25 días sin resolver",
+    RecibosError: "Recibos que tienen un error de gestión",
     FiltroRapido: "Filtro Rápido",
     FiltrosDeEstado: "Filtros de Estado",
-    SeleccionarFechas: "Seleccionar Fechas"
+    TodosLosRegistrosT: "Por defecto se filtran los últimos 13 meses",
+    TodosLosRegistros: "Mostrar Todos los Recibos",
+    Gestion: "Gestión",
+    GestionT: "Gestión de recibos",
+    Bajas: "Bajas",
+    BajasT: "Listado de Anulaciones Temporales",
+    Filtrado: "Filtrado",
+    FiltradoT: "Recibos específicos"
   },
   menu: {
     Recibos: "Rebuts",
-    Polizas: "Polizas",
-    Clientes: "Clients",
+    Polizas: "Pólisses",
+    Clientes: "Clientes",
     Siniestros: "Siniestros",
     Usuarios: "Usuarios"
   }

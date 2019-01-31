@@ -118,13 +118,20 @@ export default {
     FiltroRapido: "Filtro Rápido",
     FiltrosDeEstado: "Filtros de Estado",
     TodosLosRegistrosT: "Por defecto se filtran los últimos 13 meses",
-    TodosLosRegistros: "Mostrar Todos los Recibos"
+    TodosLosRegistros: "Mostrar Todos los Recibos",
+    Gestion: "Gestión",
+    GestionT: "Gestión de recibos",
+    Bajas: "Bajas",
+    BajasT: "Listado de Anulaciones Temporales",
+    Filtrado: "Filtrado",
+    FiltradoT: "Recibos específicos",
+    BajasT: "Listado de Anulaciones Temporales"
   },
   menu: {
     Recibos: "Recibos",
     Polizas: "Polizas",
     Clientes: "Clientes",
     Siniestros: "Siniestros",
-    Usuarios:"Usuarios"
+    Usuarios: "Usuarios"
   }
 }
