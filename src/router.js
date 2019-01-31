@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Recibos from './views/Recibos.vue'
+import Page404 from './views/404.vue'
 
 
 Vue.use(Router)
@@ -14,9 +15,14 @@ export default new Router({
       component: Home
     },
     {
-      path: '/recibos',
+      path: '/recibos/:recibo',
       name: 'Recibos',
       component: Recibos
+    },
+    {
+      path: '*',
+      name: '404',
+      component: Page404
     }
   ]
 })
