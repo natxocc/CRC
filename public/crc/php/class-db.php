@@ -793,11 +793,11 @@ class db
         // Template
         $post['message'] = '<font face="calibri"><h3><strong>' . $lang['Resumen'] . '</strong></h3><p>' . $lang['Recibos'] . '<strong><span style="text-decoration: underline;"><span style="color: #ff0000;"><em>' . $lang['Urgentes'] . '</em></span></span></strong>:</p><ul>';
         foreach ($result['data']['Urgentes'] as $key => $value) {
-            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='http ://totsegur.synology.me/recibos/" . $value['CodigoRecibo'] . ">" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
+            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='http://totsegur.synology.me/recibos/" . $value['CodigoRecibo'] . ">" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
         }
         $post['message'] .= '</ul><p>' . $lang['Recibos'] . '<span style="text-decoration: underline; color: #800080;"><strong><em><span>' . $lang['Anulados'] . '</span></em></strong></span>:</p><ul>';
         foreach ($result['data']['Anulados'] as $key => $value) {
-            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='http ://totsegur.synology.me/recibos/" . $value['CodigoRecibo'] . ">" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
+            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='http://totsegur.synology.me/recibos/" . $value['CodigoRecibo'] . ">" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
         }
         $post['message'] .= '</ul><p>&nbsp;</p><p><strong><span style="color: #008000;">CRC Reale</span></strong></p></font>';
         $post['subject'] .= $lang['Resumen']." (" . date('Y-m-d') . ")";
