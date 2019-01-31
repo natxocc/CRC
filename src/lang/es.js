@@ -90,11 +90,12 @@ export default {
   },
 
   // NUEVA TRADUCCION
-  login: {
+  inicio: {
     InicioSesion: "Inicio de sesión",
     Usuario: "Usuario",
     Clave: "Clave",
-    Recordarme: "Recordarme"
+    Recordarme: "Recordarme",
+    CambiarIdiomaT: "Pulsa para cambiar el idioma"
   },
   recibo: {
     NuevoRecibo: "Nuevo Recibo",

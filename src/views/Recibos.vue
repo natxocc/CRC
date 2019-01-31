@@ -12,7 +12,7 @@
         <q-select :label="$q.lang.recibo.FiltrosDeEstado" :options="filters.Estados" @input="callData" dense expandBesides multiple optionsDense v-model="filters.EstadosSel"/>
       </div>
       <div class="col-xs-12 col-md-2" style="padding: 10px">
-        <q-toggle :label="$q.lang.recibo.TodosLosRegistros" v-model="filters.alldata" @input="callData">
+        <q-toggle :label="$q.lang.recibo.TodosLosRegistros" @input="callData" v-model="filters.alldata">
           <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.TodosLosRegistrosT}}</q-tooltip>
         </q-toggle>
       </div>
@@ -49,9 +49,10 @@
       <q-space/>
       <div>
         <!-- AYUDA -->
-        <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
-        <q-btn-dropdown color="primary" icon="help_outline" size="sm" split>
-          <q-list dense>
+        <q-btn color="primary" icon="help_outline" size="sm">
+          <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
+          <q-popup-proxy>
+            <q-list dense>
             <q-item>
               <q-item-section>
                 <q-item-label>{{$q.lang.recibo.RecibosSinTratamiento}}</q-item-label>
@@ -83,7 +84,9 @@
               </q-item-section>
             </q-item>
           </q-list>
-        </q-btn-dropdown>
+          </q-popup-proxy>
+        </q-btn>
+        <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
       </div>
     </q-bar>
     <!-- TABLA DE DATOS -->
