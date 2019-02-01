@@ -1,6 +1,6 @@
 <?php
 defined('SECURITY_TOKEN') or exit('No direct script access allowed');
-// Class DB
+// Class db
 
 class db
 {
@@ -38,7 +38,6 @@ class db
         }
     }
 
-
     /**
      * connect
      *
@@ -54,7 +53,6 @@ class db
             echo "ERROR: " . $e->GetMessage();
         }
     }
-
 
     /**
      * getRealIP
@@ -115,7 +113,6 @@ class db
         exit();
     }
 
-
     /**
      * logout
      *
@@ -151,7 +148,6 @@ class db
         $sql->execute();
         exit();
     }
-
 
     /**
      * getUser
@@ -205,7 +201,6 @@ class db
         }
         exit();
     }
-
 
     /**
      * sendMail
@@ -368,6 +363,7 @@ class db
             $result['data'] = $subtable['temp'];
         }
         echo json_encode($result, JSON_NUMERIC_CHECK);
+        return $result['data'];
         exit();
     }
 
@@ -399,12 +395,13 @@ class db
         $sql->bindParam(":idvalue", $post['idvalue']);
         try {
             $sql->execute();
+            return true;
         } catch (Exception $e) {
             echo $e;
+            return false;
         }
         exit('End');
     }
-
 
     /**
      * deleteRecord
@@ -426,24 +423,24 @@ class db
         $sql->bindParam(":idvalue", $post['idvalue']);
         try {
             $sql->execute();
+            return true;
         } catch (Exception $e) {
             echo $e;
+            return false;
         }
         exit();
     }
 
-
     /**
      * insertRecord
      *
-     * @param  mixed $post (table, user, data:[])
+     * @param  mixed $post (table, data:[])
      *
      * @return void
      */
     function insertRecord($post)
     {
         $table = $this->sanitize($post['table']);
-        $user = $this->sanitize($post['user']);
         $comma = $fields = $values = "";
         foreach ($post['data'] as $key => $value) {
             $fields .= $comma . $key;
@@ -451,368 +448,55 @@ class db
             $comma = ",";
         }
         $sqlquery = "INSERT INTO `" . $table . "` ($fields) VALUES ($values)";
-        if ($_SESSION['isAdmin'] <> 1) {
-            $sqlquery .= " WHERE Usuario ='$user'";
-        }
         $sql = $this->db->prepare($sqlquery);
         try {
             $sql->execute();
+            return true;
         } catch (Exception $e) {
             echo $e;
+            return false;
         }
         exit();
     }
 
+    // $syno->saveConfig(['data' => ['pepe' => ['uno' => 'ii', 'dos' => 'dos'], 'juan' => 'oo'], 'file' => '../../Config.php']);
 
-
-
-    /// REALE ---------------------------------------
-
-
-
-
-
-
-
-
+    // Hay que crear un Config.php en la raiz y darles permisos de escritura
     /**
-     * updateRecibos (empresa) = 4 o 10
+     * loadConfig
+     *
+     * @param  mixed $post
      *
      * @return void
      */
-    function updateRecibos($empresa)
+    function loadConfig($post)
     {
-        // Actualiza Fecha inicial y final
-        $dateini = date("Y-m", strtotime("-1 month", strtotime(date('Y-m-d')))) . "-01";
-        $dateend = date("Y-m-d");
-        $wsdl = "https://lba.realeonline.net/Reale.B2b.Services.Multitarificadores.IisHost/DescargaCompletaRecibos.svc?wsdl";
-        $consulta = new SoapClient($wsdl, array(
-            'uri' => "",
-            'location' => $wsdl,
-            'trace' => true,
-            'exceptions' => false
-        ));
-        $parametros = array(
-            'Empresa' => $empresa,
-            'Clave' => '12345',
-            'Identificador' => 'ag34764w@TTLY9XPR',
-            'FechaInicial' => $dateini,
-            'FechaFinal' => $dateend,
-            'IncluirPendientes' => true,
-            'IncluirAnulados' => true,
-            'IncluirCobrados' => true,
-            'IncluirDevueltos' => true,
-            'IncluirNuevos' => true,
-        );
-        $resultado = $consulta->DescargarNew($parametros);
-        //echo json_encode($resultado);
-        $resultado = $resultado->ListaRecibos->ReciboAmpliado;
-        // var_dump($resultado);
-        //echo json_encode($resultado);
-        foreach ($resultado as $key => $value) {
-            // Conversiones de Fechas
-            $FE = $value->FechaEfecto;
-            $FS = $value->Situacion;
-            $FV = $value->FechaVencimiento;
-            $FechaEfecto = substr($FE, 6, 4) . "-" . substr($FE, 3, 2) . "-" . substr($FE, 0, 2);
-            $FechaSituacion = substr($FS, 6, 4) . "-" . substr($FS, 3, 2) . "-" . substr($FS, 0, 2);
-            $FechaVencimiento = substr($FV, 0, 4) . "-" . substr($FV, 5, 2) . "-" . substr($FV, 8, 2);
-            // Prueba de insertar nuevos registros
-            try {
-                $sql = $this->db->prepare("INSERT INTO Recibos(
-                CodigoPoliza,
-                CodigoRamo,
-                CodigoRecibo,
-                NombreTomador,
-                FechaEfecto,
-                Importe,
-                Situacion,
-                Estado,
-                CodigoMediador,
-                SubCodigoMediador,
-                CodigoGestor,
-                FechaVencimiento,
-                ImporteBonificacion,
-                ImporteNeto,
-                FormaPago
-            ) VALUES(
-                \"$value->CodigoPoliza\",
-                \"$value->CodigoRamo\",
-                \"$value->CodigoRecibo\",
-                \"$value->NombreTomador\",
-                \"$FechaEfecto\",
-                \"$value->Importe\",
-                \"$FechaSituacion\",
-                \"$value->Estado\",
-                \"$value->CodigoMediador\",
-                \"$value->SubCodigoMediador\",
-                \"$value->CodigoGestor\",
-                \"$FechaVencimiento\",
-                \"$value->ImporteBonificacion\",
-                \"$value->ImporteNeto\",
-                \"$value->FormaPago\"
-                )");
-                $sql->execute();
-                $result['success'] = true;
-                $result['type'] = 'insert';
-                // Prueba de actualizar el registro actual
-            } catch (Exception $e) {
-                $sql = $this->db->prepare("UPDATE Recibos SET 
-                CodigoPoliza = \"$value->CodigoPoliza\",
-                CodigoRamo = \"$value->CodigoRamo\",
-                CodigoRecibo = \"$value->CodigoRecibo\",
-                NombreTomador = \"$value->NombreTomador\",
-                FechaEfecto = \"$FechaEfecto\",
-                Importe = \"$value->Importe\",
-                Situacion = \"$FechaSituacion\",
-                Estado = \"$value->Estado\",
-                CodigoMediador = \"$value->CodigoMediador\",
-                SubCodigoMediador = \"$value->SubCodigoMediador\",
-                CodigoGestor = \"$value->CodigoGestor\",
-                FechaVencimiento = \"$FechaVencimiento\",
-                ImporteBonificacion = \"$value->ImporteBonificacion\",
-                ImporteNeto = \"$value->ImporteNeto\",
-                FormaPago = \"$value->FormaPago\"
-                WHERE CodigoRecibo = \"$value->CodigoRecibo\"
-                ");
-                $sql->execute();
-                $result['success'] = true;
-                $result['type'] = 'update';
+        $config = parse_ini_file($post['file'], true);
+        $_SESSION['Config'] = $config;
+    }
+
+    /**
+     * saveConfig
+     *
+     * @param  mixed $post
+     *
+     * @return void
+     */
+    function saveConfig($post)
+    {
+        $config = $post['data'];
+        $file = $post['file'];
+        $fileContent = '';
+        if (!empty($config)) {
+            foreach ($config as $i => $v) {
+                if (is_array($v)) {
+                    foreach ($v as $t => $m) {
+                        $fileContent .= $i . "[" . $t . "] = " . (is_numeric($m) ? $m : '"' . $m . '"') . "\n\r";
+                    }
+                } else $fileContent .= $i . " = " . (is_numeric($v) ? $v : '"' . $v . '"') . "\n\r";
+
             }
         }
-        echo "Fin de actualización de Recibos";
-        exit();
-    }
-
-
-    /**
-     * getRecibos
-     *
-     * @param  mixed $post (poliza)
-     *
-     * @return void
-     */
-    function getRecibos($post)
-    {
-        $wsdl = "https://lba.realeonline.net/Reale.B2b.Services.Multitarificadores.IisHost/ConsultaRecibos.svc?wsdl";
-        $consulta = new SoapClient($wsdl, array(
-            'uri' => "",
-            'location' => $wsdl,
-            'trace' => true,
-            'exceptions' => false
-        ));
-        $parametros = array(
-            'Empresa' => 4,
-            'Identificador' => 'ag34764w@TTLY9XPR',
-            'CodigoPoliza' => $post['poliza'],
-        );
-        $resultado = $consulta->ObtenerListaRecibosPoliza($parametros);
-        // var_dump($resultado);
-        echo json_encode($resultado);
-        exit();
-    }
- 
-    // Actualizar Polizas
-    function updatePolizas()
-    {
-        $dateini = date("Y-m", strtotime("-1 month", strtotime(date('Y-m-d')))) . "-01";
-        $dateend = date("Y-m-d");
-        $wsdl = "https://lba.realeonline.net/Reale.B2b.Services.Multitarificadores.IisHost/DescargaPolizas.svc?wsdl";
-        $consulta = new SoapClient($wsdl, array(
-            'uri' => "",
-            'location' => $wsdl,
-            'trace' => true,
-            'exceptions' => false
-        ));
-        $parametros = array(
-            'Empresa' => 4,
-            'Clave' => '12345',
-            'Identificador' => 'ag34764w@TTLY9XPR',
-            'FechaInicial' => $dateini,
-            'FechaFinal' => $dateend,
-            'TipoSuplemento1' => "NP"
-        );
-        $resultado = $consulta->Descargar($parametros);
-        $resultado = $resultado->ListaPolizas->Poliza;
-        echo json_encode($resultado, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
-        foreach ($resultado as $key => $value) {
-            // Conversiones de Fechas
-            $TD = array("CIF ", "NIF ", "NIE ");
-            $FechaAlta = substr($value->DatosGenerales->FechaAlta, 0, 10);
-            $FechaBaja = substr($value->DatosGenerales->FechaBaja, 0, 10);
-            $FechaVencimientoSuplemento = substr($value->DatosGenerales->FechaVencimientoSuplemento, 0, 10);
-            $OrigenUsuario = 'Auto';
-            $Documento = str_replace($TD, '', $value->DatosGenerales->DatosTomador->Documento);
-            $CodigoPoliza = $value->DatosGenerales->CodigoPoliza;
-            $CodigoRecibo = $value->DatosGenerales->CodigoRecibo;
-            $Apellidos = $value->DatosGenerales->DatosTomador->Apellidos;
-            $Nombre = $value->DatosGenerales->DatosTomador->Nombre;
-            $NombreCompleto = $value->DatosGenerales->DatosTomador->Nombre . " " . $value->DatosGenerales->DatosTomador->Apellidos;
-            $CodigoMediador = $value->DatosGenerales->CodigoMediador;
-            $Ramo = $value->DatosGenerales->Ramo;
-            $Modalidad = $value->DatosGenerales->Modalidad;
-            $CodigoModelo = $value->DatosAutos->CodigoModelo;
-            $Matricula = $value->DatosAutos->Matricula;
-            $SubCodigoMediador = $value->DatosGenerales->SubCodigoMediador;
-            $Importe = $value->DatosGenerales->ImporteNetoRecibo + $value->DatosGenerales->ImporteBonificacionRecibo;
-            $TipoInformacion = $value->DatosGenerales->TipoInformacion;
-            // Prueba de insertar nuevos registros
-            try {
-                $sql = $this->db->prepare("INSERT INTO Polizas(
-                FechaAlta,
-                FechaBaja,
-                FechaVencimientoSuplemento,
-                OrigenUsuario,
-                Documento,
-                CodigoPoliza,
-                CodigoRecibo,
-                Apellidos,
-                Nombre,
-                NombreCompleto,
-                CodigoMediador,
-                Ramo,
-                Modalidad,
-                CodigoModelo,
-                Matricula,
-                SubCodigoMediador,
-                Importe,
-                TipoInformacion
-            ) VALUES(
-                \"$FechaAlta\",
-                \"$FechaBaja\",
-                \"$FechaVencimientoSuplemento\",
-                \"$OrigenUsuario\",
-                \"$Documento\",
-                \"$CodigoPoliza\",
-                \"$CodigoRecibo\",
-                \"$Apellidos\",
-                \"$Nombre\",
-                \"$NombreCompleto\",
-                \"$CodigoMediador\",
-                \"$Ramo\",
-                \"$Modalidad\",
-                \"$CodigoModelo\",
-                \"$Matricula\",
-                \"$SubCodigoMediador\",
-                \"$Importe\",
-                \"$TipoInformacion\"
-                )");
-                $sql->execute();
-                $result['success'] = true;
-                $result['type'] = 'insert';
-                // Prueba de actualizar el registro actual
-            } catch (Exception $e) {
-                $sql = $this->db->prepare("UPDATE Polizas SET 
-                FechaAlta=\"$FechaAlta\",
-                FechaBaja=\"$FechaBaja\",
-                FechaVencimientoSuplemento=\"$FechaVencimientoSuplemento\",
-                OrigenUsuario=\"$OrigenUsuario\",
-                Documento=\"$Documento\",
-                CodigoPoliza=\"$CodigoPoliza\",
-                CodigoRecibo=\"$CodigoRecibo\",
-                Apellidos=\"$Apellidos\",
-                Nombre=\"$Nombre\",
-                NombreCompleto=\"$NombreCompleto\",
-                CodigoMediador=\"$CodigoMediador\",
-                Ramo=\"$Ramo\",
-                Modalidad=\"$Modalidad\",
-                CodigoModelo=\"$CodigoModelo\",
-                Matricula=\"$Matricula\",
-                SubCodigoMediador=\"$SubCodigoMediador\",
-                Importe=\"$Importe\",
-                TipoInformacion=\"$TipoInformacion\"
-                WHERE CodigoPoliza = \"$CodigoPoliza\"
-                ");
-                $sql->execute();
-                $result['success'] = true;
-                $result['type'] = 'update';
-            }
-        }
-
-        echo "Fin de actualización de Pólizas";
-        exit();
-    }
-
-
-    /**
-     * polizasMediador
-     *
-     * @return void
-     */
-    function polizasMediador()
-    {
-
-        $wsdl = "https://lba.realeonline.net/Reale.B2b.Services.Multitarificadores.IisHost/ConsultaPolizas.svc?wsdl";
-        $consulta = new SoapClient($wsdl, array(
-            'uri' => "",
-            'location' => $wsdl,
-            'trace' => true,
-            'exceptions' => false
-        ));
-        $parametros = array(
-            'Empresa' => 4,
-            'Identificador' => 'ag34764w@TTLY9XPR',
-            'CodigoMediador' => "34764"
-        );
-        $resultado = $consulta->ObtenerListaPolizasMediador($parametros);
-        //$resultado = $resultado->ListaPolizas->Poliza;
-        echo json_encode($resultado, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
-        echo "Fin de actualización de Pólizas";
-        exit();
-    }
-
-
-    /**
-     * reportRecibos
-     *
-     * @param  mixed $post (days, to, subject, message, lang)
-     *
-     * @return void
-     */
-    function reportRecibos($post)
-    {
-        $defaultLang = isset($post['lang']) ? $post['lang'] : 'es';
-        $importeTotal = $importeParcial = $importeExtorno = 0;
-        $url = "http://totsegur.synology.me/recibos/";
-        require_once $defaultLang . '.php';
-        $date = $this->sanitize($post['days']);
-        $today = date('Y-m-d', strtotime('-' . $date . ' day', strtotime(date('Y-m-d'))));
-        //Recibos Urgentes
-        $sqlquery = "SELECT * from Recibos WHERE (FechaEfecto<'$today') AND (Estado LIKE 'PENDIENTE%') AND (MIEstado = '' OR MIEstado LIKE 'PENDIENTE%') ORDER BY FechaEfecto DESC";
-        $sql = $this->db->prepare($sqlquery);
-        $sql->execute();
-        $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
-        $result['count']['Urgentes'] = $sql->rowCount();
-        $result['data']['Urgentes'] = $fetch;
-        //
-        $sqlquery = "SELECT * from Recibos WHERE (FechaEfecto<'$today') AND (Estado LIKE 'COBRADO%') AND (MIEstado LIKE 'ANULADO%') ORDER BY FechaEfecto DESC";
-        $sql = $this->db->prepare($sqlquery);
-        $sql->execute();
-        $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
-        $result['count']['Anulados'] = $sql->rowCount();
-        $result['data']['Anulados'] = $fetch;
-        // Template
-        $post['message'] = '<font face="calibri"><h3><strong>' . $lang['Resumen'] . '</strong></h3><p>' . $lang['Recibos'] . '<strong><span style="text-decoration: underline;"><span style="color: #ff0000;"><em>' . $lang['Urgentes'] . '</em></span></span></strong>:</p><ul>';
-        foreach ($result['data']['Urgentes'] as $key => $value) {
-            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='$url" . $value['CodigoRecibo'] . "'>" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Importe'] . $value['Importe'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
-            $importeParcial = $value['Importe'] > 0 ? $importeParcial + $value['Importe'] : $importeParcial;
-            $importeExtorno = $value['Importe'] < 0 ? $importeExtorno + $value['Importe'] : $importeExtorno;
-        }
-        $importeTotal = $importeTotal + $importeParcial;
-        $post['message'] .= "</ul><p>&nbsp;</p></br><b>" . $lang['Acumulado'] . " € </b>" . $importeParcial . " <b>" . $lang['Extornos'] . "</b>" . $importeExtorno . " €";
-        $post['message'] .= '<p>' . $lang['Recibos'] . '<span style="text-decoration: underline; color: #800080;"><strong><em><span>' . $lang['Anulados'] . '</span></em></strong></span>:</p><ul>';
-        $importeParcial = $importeExtorno = 0;
-        foreach ($result['data']['Anulados'] as $key => $value) {
-            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='$url" . $value['CodigoRecibo'] . "'>" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
-            $importeParcial = $value['Importe'] > 0 ? $importeParcial + $value['Importe'] : $importeParcial;
-            $importeExtorno = $value['Importe'] < 0 ? $importeExtorno + $value['Importe'] : $importeExtorno;
-        }
-        $importeTotal = $importeTotal + $importeParcial;
-        $post['message'] .= "</ul><p>&nbsp;</p></br><b>" . $lang['Acumulado'] . " € </b>" . $importeParcial . " <b>" . $lang['Extornos'] . "</b>" . $importeExtorno . " €";
-        $post['message'] .= "</br><p>&nbsp;</p><b>" . " TOTAL: </b>" . $importeTotal . " €";
-        $post['message'] .= '</br><p><strong><span style="color: #008000;">CRC Reale</span></strong></p></font>';
-        $post['subject'] = $lang['Resumen'] . " (" . date('Y-m-d') . ")";
-        $this->sendMail($post);
-        //echo json_encode($post['message'], JSON_PRETTY_PRINT);
+        return file_put_contents($file, $fileContent, LOCK_EX);
     }
 }
