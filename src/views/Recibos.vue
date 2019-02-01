@@ -1,10 +1,10 @@
 <template>
   <div class="container">
     <!-- TABS -->
-    <q-tabs active-bg-color="purple" active-color="white" class="bg-teal text-yellow" dense indicator-color="transparent" inline-label top-indicator v-model="tab">
+    <q-tabs active-bg-color="primary" active-color="white" class="bg-secondary text-primary" dense indicator-color="transparent" inline-label top-indicator v-model="tab">
       <q-route-tab :label="$q.lang.recibo.Gestion" icon="assignment_turned_in" name="todos" to="/recibos/todos"/>
       <q-route-tab :label="$q.lang.recibo.Bajas" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
-      <q-tab :label="calculos.importe" class="text-white" disabled icon="euro_symbol"/>
+      <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
     <!-- SELECT FILTERS -->
     <transition appear class="group" enter-active-class="fade" leave-active-class="fade">
