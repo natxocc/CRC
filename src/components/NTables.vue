@@ -2,41 +2,42 @@
   <div style="text-align: left">
     <!-- TABLA DE DATOS -->
     <ag-grid-vue
-      style="height: 500px;"
-      class="ag-theme-balham"
       :animateRows="true"
       :columnDefs="columnDefs"
       :columnTypes="columnTypes"
-      :masterDetail="masterDetail"
+      :defaultColDef="defaultColDef"
       :detailCellRendererParams="detailCellRendererParams"
-      :enableRangeSelection="true"
       :enableCellChangeFlash="true"
+      :enableRangeSelection="true"
       :floatingFilter="false"
       :localeText="localeText"
-      multiSortKey="ctrl"
-      :rowData="rowData"
-      rowGroupPanelShow="always"
+      :masterDetail="masterDetail"
       :rowClassRules="rowClassRules"
+      :rowData="rowData"
+      :sideBar="sideBar"
+      :sizeColsToFix="true"
+      :statusBar="statusBar"
+      :suppressColumnVirtualisation="true"
       :suppressDragLeaveHidesColumns="true"
       :suppressMakeColumnVisibleAfterUnGroup="true"
       :suppressSizeToFit="true"
-      :suppressColumnVirtualisation="true"
-      :sizeColsToFix="true"
-      :statusBar="statusBar"
-      :defaultColDef="defaultColDef"
-      :sideBar="sideBar"
-      @row-data-changed="onRowDataChanged"
-      @selection-changed="onSelectionChanged"
-      @grid-ready="onGridReady"
       @cell-clicked="onCellClicked"
       @cell-value-changed="onCellValueChanged"
+      @filter-changed="onFilterChanged"
+      @grid-ready="onGridReady"
+      @row-data-changed="onRowDataChanged"
+      @selection-changed="onSelectionChanged"
+      class="ag-theme-balham"
+      multiSortKey="ctrl"
+      rowGroupPanelShow="always"
+      style="height: 500px;"
     ></ag-grid-vue>
   </div>
 </template>
 
 <script>
 //           :rowMultiSelectWithClick="false"
-import { AgGridVue } from "ag-grid-vue";
+import {AgGridVue} from "ag-grid-vue";
 import Vue from "vue";
 import axios from "axios";
 import localeText from "../lang/es.tables";
@@ -95,10 +96,10 @@ export default {
       },
       statusBar: {
         statusPanels: [
-          { statusPanel: "agTotalRowCountComponent", align: "left" },
-          { statusPanel: "agFilteredRowCountComponent" },
-          { statusPanel: "agSelectedRowCountComponent" },
-          { statusPanel: "agAggregationComponent" }
+          {statusPanel: "agTotalRowCountComponent", align: "left"},
+          {statusPanel: "agFilteredRowCountComponent"},
+          {statusPanel: "agSelectedRowCountComponent"},
+          {statusPanel: "agAggregationComponent"}
         ]
       },
       sideBar: {
@@ -132,6 +133,7 @@ export default {
     onRowDataChanged(params) {
       if (params.api && params.columnApi) {
         this.gridApi = params.api;
+        this.columnApi = params.columnApi;
         this.gridApi.sizeColumnsToFit();
         this.createSubtable();
         this.autoFilter();
@@ -149,7 +151,14 @@ export default {
     autoFilter() {
       if (this.gridApi) {
         this.gridApi.setFilterModel(this.filters);
+        this.onFilterChanged();
       }
+    },
+    onFilterChanged(event) {
+      this.$emit(
+        "gridData",
+        this.gridApi.rowModel.rootNode.childrenAfterFilter
+      );
     },
     onCellClicked(event) {
       this.$emit("cellClicked", event);
@@ -181,7 +190,7 @@ export default {
             self.$emit("rowSelectedSub", row);
           }
         },
-        getDetailRowData: params => {
+        getDetailRowData: (params) => {
           params.successCallback(params.data.callRecords);
         },
         template: function(params) {

@@ -4,7 +4,7 @@
     <q-tabs active-bg-color="purple" active-color="white" class="bg-teal text-yellow" dense indicator-color="transparent" inline-label top-indicator v-model="tab">
       <q-route-tab :label="$q.lang.recibo.Gestion" icon="assignment_turned_in" name="todos" to="/recibos/todos"/>
       <q-route-tab :label="$q.lang.recibo.Bajas" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
-      <q-route-tab :label="$q.lang.recibo.Filtrado" icon="assignment_ind" name="filtrado" to="/recibos/filtrado"/>
+      <q-tab :label="calculos.importe" class="text-white" disabled icon="euro_symbol"/>
     </q-tabs>
     <!-- SELECT FILTERS -->
     <transition appear class="group" enter-active-class="fade" leave-active-class="fade">
@@ -101,7 +101,19 @@
     </transition>
 
     <!-- TABLA DE DATOS -->
-    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub" table="Recibos"/>
+    <n-tables
+      :columnDefs="columnDefs"
+      :columnDefsSub="columnDefsSub"
+      :filters="tableFilters"
+      :masterDetail="true"
+      :quickFilter="quickFilter"
+      :rowClassRules="rowClassRules"
+      :rowData="rowData"
+      @gridData="gridData"
+      @rowSelected="rowSelected"
+      @rowSelectedSub="rowSelectedSub"
+      table="Recibos"
+    />
     <!-- DIALOGO DE CLIENTES -->
     <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" :table="null" @cancel="client.dialog=false" @onSave="saveData"></n-dialog>
   </div>
@@ -163,7 +175,19 @@ export default {
         selectedSub: false
       },
       // GESTION
-      tab: this.$route.params.recibo
+      tab: this.$route.params.recibo,
+      // CALCULOS
+      calculos: {
+        importe: null,
+        cobrado: null
+      },
+      // Table Filters
+      tableFilters: {
+        MIEstado: {
+          type: "contains",
+          filter: "ANULADO"
+        }
+      }
     };
   },
   methods: {
@@ -273,10 +297,34 @@ export default {
             }
           });
       }
+    },
+    gridData(data) {
+      let sumCobrado = 0;
+      let sumImporte = 0;
+      for (let i = 0; i < data.length; i++) {
+        sumCobrado = sumCobrado + data[i].data.Cobrado;
+
+        sumImporte = sumImporte + data[i].data.Importe;
+      }
+      this.calculos.importe = Number(sumImporte).toFixed(0);
+      this.calculos.cobrado = Number(sumCobrado).toFixed(0);
     }
   },
   beforeMount() {
     this.callData();
+  },
+  watch: {
+    tab: function() {
+      if (this.tab == "bajas") {
+        this.tableFilters.MIEstado = ["ANULADO", "ANULADO por ajuste"];
+        // this.tableFilters.MIEstado = {};
+        // this.tableFilters.MIEstado.type = "contains";
+        // this.tableFilters.MIEstado.filter = "ANULADO";
+      }
+      if (this.tab == "todos") {
+        this.tableFilters.MIEstado = null
+      }
+    }
   }
 };
 </script>

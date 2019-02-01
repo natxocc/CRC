@@ -771,8 +771,9 @@ class db
      */
     function reportRecibos($post)
     {
-        header("Content-Type: application/json;charset=utf-8");
         $defaultLang = isset($post['lang']) ? $post['lang'] : 'es';
+        $importeTotal = $importeParcial = $importeExtorno = 0;
+        $url = "http://totsegur.synology.me/recibos/";
         require_once $defaultLang . '.php';
         $date = $this->sanitize($post['days']);
         $today = date('Y-m-d', strtotime('-' . $date . ' day', strtotime(date('Y-m-d'))));
@@ -793,14 +794,24 @@ class db
         // Template
         $post['message'] = '<font face="calibri"><h3><strong>' . $lang['Resumen'] . '</strong></h3><p>' . $lang['Recibos'] . '<strong><span style="text-decoration: underline;"><span style="color: #ff0000;"><em>' . $lang['Urgentes'] . '</em></span></span></strong>:</p><ul>';
         foreach ($result['data']['Urgentes'] as $key => $value) {
-            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='http://totsegur.synology.me/recibos/" . $value['CodigoRecibo'] . "'>" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
+            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='$url" . $value['CodigoRecibo'] . "'>" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Importe'] . $value['Importe'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
+            $importeParcial = $value['Importe'] > 0 ? $importeParcial + $value['Importe'] : $importeParcial;
+            $importeExtorno = $value['Importe'] < 0 ? $importeExtorno + $value['Importe'] : $importeExtorno;
         }
-        $post['message'] .= '</ul><p>' . $lang['Recibos'] . '<span style="text-decoration: underline; color: #800080;"><strong><em><span>' . $lang['Anulados'] . '</span></em></strong></span>:</p><ul>';
+        $importeTotal = $importeTotal + $importeParcial;
+        $post['message'] .= "</ul><p>&nbsp;</p></br><b>" . $lang['Acumulado'] . " € </b>" . $importeParcial . " <b>" . $lang['Extornos'] . "</b>" . $importeExtorno . " €";
+        $post['message'] .= '<p>' . $lang['Recibos'] . '<span style="text-decoration: underline; color: #800080;"><strong><em><span>' . $lang['Anulados'] . '</span></em></strong></span>:</p><ul>';
+        $importeParcial = $importeExtorno = 0;
         foreach ($result['data']['Anulados'] as $key => $value) {
-            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='http://totsegur.synology.me/recibos/" . $value['CodigoRecibo'] . "'>" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
+            $post['message'] .= "<li>" . $lang['Fecha'] . $value['FechaEfecto'] . " || " . $lang['Recibo'] . "<a href='$url" . $value['CodigoRecibo'] . "'>" . $value['CodigoRecibo'] . "</a> || " . $lang['Poliza'] . $value['CodigoPoliza'] . " || " . $lang['Cliente'] . $value['NombreTomador'] . "</li>";
+            $importeParcial = $value['Importe'] > 0 ? $importeParcial + $value['Importe'] : $importeParcial;
+            $importeExtorno = $value['Importe'] < 0 ? $importeExtorno + $value['Importe'] : $importeExtorno;
         }
-        $post['message'] .= '</ul><p>&nbsp;</p><p><strong><span style="color: #008000;">CRC Reale</span></strong></p></font>';
-        $post['subject'] .= $lang['Resumen']." (" . date('Y-m-d') . ")";
+        $importeTotal = $importeTotal + $importeParcial;
+        $post['message'] .= "</ul><p>&nbsp;</p></br><b>" . $lang['Acumulado'] . " € </b>" . $importeParcial . " <b>" . $lang['Extornos'] . "</b>" . $importeExtorno . " €";
+        $post['message'] .= "</br><p>&nbsp;</p><b>" . " TOTAL: </b>" . $importeTotal . " €";
+        $post['message'] .= '</br><p><strong><span style="color: #008000;">CRC Reale</span></strong></p></font>';
+        $post['subject'] = $lang['Resumen'] . " (" . date('Y-m-d') . ")";
         $this->sendMail($post);
         //echo json_encode($post['message'], JSON_PRETTY_PRINT);
     }
