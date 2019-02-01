@@ -23,6 +23,7 @@
               </q-list>
             </q-popup-proxy>
           </q-btn>
+          <q-btn @click="sendBug" dense flat icon="bug_report" round/>
           <q-btn @click="userClick" dense flat icon="person" round/>
         </q-toolbar>
       </q-header>
@@ -158,6 +159,9 @@ export default {
       } else {
         this.user.dialog = true;
       }
+    },
+    sendBug() {
+      window.open('https://github.com/natxocc/CRC/issues', '_system')
     }
   },
   watch: {

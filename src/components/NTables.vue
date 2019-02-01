@@ -136,7 +136,7 @@ export default {
         this.columnApi = params.columnApi;
         this.gridApi.sizeColumnsToFit();
         this.createSubtable();
-        this.autoFilter();
+        //this.autoFilter();
       }
     },
     autoSizeColumns() {
@@ -151,14 +151,17 @@ export default {
     autoFilter() {
       if (this.gridApi) {
         this.gridApi.setFilterModel(this.filters);
+        console.log(this.filters)
         this.onFilterChanged();
       }
     },
     onFilterChanged(event) {
-      this.$emit(
-        "gridData",
-        this.gridApi.rowModel.rootNode.childrenAfterFilter
-      );
+      if (this.gridApi) {
+        this.$emit(
+          "gridData",
+          this.gridApi.rowModel.rootNode.childrenAfterFilter
+        );
+      }
     },
     onCellClicked(event) {
       this.$emit("cellClicked", event);

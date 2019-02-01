@@ -183,10 +183,7 @@ export default {
       },
       // Table Filters
       tableFilters: {
-        MIEstado: {
-          type: "contains",
-          filter: "ANULADO"
-        }
+        MIEstado: null
       }
     };
   },
@@ -316,13 +313,15 @@ export default {
   watch: {
     tab: function() {
       if (this.tab == "bajas") {
-        this.tableFilters.MIEstado = ["ANULADO", "ANULADO por ajuste"];
+        this.tableFilters.MIEstado = ["ANULADO"];
+        console.log('bajas')
         // this.tableFilters.MIEstado = {};
         // this.tableFilters.MIEstado.type = "contains";
         // this.tableFilters.MIEstado.filter = "ANULADO";
       }
       if (this.tab == "todos") {
         this.tableFilters.MIEstado = null
+         console.log('todos')
       }
     }
   }
