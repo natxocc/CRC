@@ -99,7 +99,7 @@ export default {
           {
             icon: "euro_symbol",
             name: "Recibos",
-            to: "/recibos/todos"
+            to: "/recibos/gestion"
           },
           {
             icon: "timeline",
