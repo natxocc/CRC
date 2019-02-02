@@ -90,11 +90,12 @@ export default {
   },
 
   // NUEVA TRADUCCION
-  login: {
+  inicio: {
     InicioSesion: "Inicio de sesión",
     Usuario: "Usuario",
     Clave: "Clave",
-    Recordarme: "Recordarme"
+    Recordarme: "Recordarme",
+    CambiarIdiomaT: "Pulsa para cambiar el idioma"
   },
   recibo: {
     NuevoRecibo: "Nuevo Recibo",
@@ -117,13 +118,19 @@ export default {
     FiltroRapido: "Filtro Rápido",
     FiltrosDeEstado: "Filtros de Estado",
     TodosLosRegistrosT: "Por defecto se filtran los últimos 13 meses",
-    TodosLosRegistros: "Mostrar Todos los Recibos"
+    TodosLosRegistros: "Mostrar Todos los Recibos",
+    Gestion: "Gestión",
+    GestionT: "Gestión de recibos",
+    Bajas: "Bajas",
+    BajasT: "Listado de Anulaciones Temporales",
+    ano: "Año",
+    mes: "Mes"
   },
   menu: {
     Recibos: "Recibos",
     Polizas: "Polizas",
     Clientes: "Clientes",
     Siniestros: "Siniestros",
-    Usuarios:"Usuarios"
+    Usuarios: "Usuarios"
   }
 }

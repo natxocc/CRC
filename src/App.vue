@@ -9,17 +9,21 @@
             <strong>CRC</strong> Reale
           </q-toolbar-title>
           <q-space/>
-          <q-btn-dropdown :label="lang" color="primary" size="sm" split>
-            <q-list dense>
-              <q-item @click="lang='ca'" clickable>
-                <q-item-section>CATALÀ</q-item-section>
-              </q-item>
-              <q-item @click="lang='es'" clickable>
-                <q-item-section>ESPAÑOL</q-item-section>
-              </q-item>
-              <q-separator/>
-            </q-list>
-          </q-btn-dropdown>
+          <q-btn :label="lang" color="secondary" text-color="primary" size="sm">
+            <q-tooltip>{{$q.lang.inicio.CambiarIdiomaT}}</q-tooltip>
+            <q-menu>
+              <q-list dense>
+                <q-item @click="lang='ca'" clickable v-close-menu>
+                  <q-item-section>CATALÀ</q-item-section>
+                </q-item>
+                <q-item @click="lang='es'" clickable v-close-menu>
+                  <q-item-section>ESPAÑOL</q-item-section>
+                </q-item>
+                <q-separator/>
+              </q-list>
+            </q-menu>
+          </q-btn>
+          <q-btn @click="sendBug" dense flat icon="bug_report" round/>
           <q-btn @click="userClick" dense flat icon="person" round/>
         </q-toolbar>
       </q-header>
@@ -30,25 +34,25 @@
             <q-card>
               <q-card-section class="row items-center">
                 <q-avatar color="primary" icon="person" text-color="white"/>
-                <span class="q-ml-sm text-h4">{{$q.lang.login.InicioSesion}}</span>
+                <span class="q-ml-sm text-h4">{{$q.lang.inicio.InicioSesion}}</span>
               </q-card-section>
               <q-card-section class="row items-center">
                 <div class="row q-col-gutter-x-2 q-col-gutter-y-sm">
                   <div class="col-12">
-                    <q-input :label="$q.lang.login.Usuario" type="text" v-model="user.name">
+                    <q-input :label="$q.lang.inicio.Usuario" type="text" v-model="user.name">
                       <q-icon name="person" slot="prepend"/>
                       <q-icon @click="user.name = ''" class="cursor-pointer" name="close" slot="append"/>
                     </q-input>
                   </div>
                   <div class="col-12">
-                    <q-input :label="$q.lang.login.Clave" :type="user.passShow ? 'text' : 'password'" v-model="user.pass">
+                    <q-input :label="$q.lang.inicio.Clave" :type="user.passShow ? 'text' : 'password'" v-model="user.pass">
                       <q-icon name="lock" slot="prepend"/>
                       <q-icon @click="user.pass = ''" class="cursor-pointer" name="close" slot="append"/>
                       <q-icon :name="user.passShow ? 'visibility' : 'visibility_off'" @click="user.passShow=!user.passShow" class="cursor-pointer" slot="append"/>
                     </q-input>
                   </div>
                   <div class="col-12">
-                    <q-checkbox :label="$q.lang.login.Recordarme" dense v-model="user.remember"/>
+                    <q-checkbox :label="$q.lang.inicio.Recordarme" dense v-model="user.remember"/>
                   </div>
                 </div>
               </q-card-section>
@@ -95,17 +99,17 @@ export default {
           {
             icon: "euro_symbol",
             name: "Recibos",
-            to: "/recibos"
+            to: "/recibos/gestion"
           },
           {
             icon: "timeline",
             name: "Polizas",
-            to: "/recibos"
+            to: "/polizas"
           },
           {
             icon: "contacts",
             name: "Clientes",
-            to: "/recibos"
+            to: "/clientes"
           },
           {
             icon: "healing",
@@ -155,6 +159,9 @@ export default {
       } else {
         this.user.dialog = true;
       }
+    },
+    sendBug() {
+      window.open('https://github.com/natxocc/CRC/issues', '_system')
     }
   },
   watch: {
