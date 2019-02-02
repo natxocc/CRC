@@ -35,17 +35,16 @@ foreach ($REQUEST as $key => $value) {
 }
 $cmd = $post['cmd'];
 
-require_once "class-db.php";
-$db = new db(DBTYPE, DBHOST, DBNAME, DBUSER, DBPASS);
-
 // Consultas Reale
-if ($cmd == "updateRecibos") $db->updateRecibos();
-if ($cmd == "updatePolizas") $db->updatePolizas();
-if ($cmd == "polizasMediador") $db->polizasMediador();
-if ($cmd == "getRecibos") $db->getRecibos($post);
-if ($cmd == "reportRecibos") $db->reportRecibos($post);
+require_once "class-reale.php";
+$reale = new reale();
+if ($cmd == "updateRecibos") $reale->updateRecibos($post);
+if ($cmd == "updatePolizas") $reale->updatePolizas();
+if ($cmd == "polizasMediador") $reale->polizasMediador();
+if ($cmd == "getRecibos") $reale->getRecibos($post);
+if ($cmd == "reportRecibos") $reale->reportRecibos($post);
 
-// Consultas db
+// Consultas db (Class-db included in Class-reale)
 if ($cmd == "login") $db->login($post);
 // Comprueba si está conectado
 // ---------------INICIO
