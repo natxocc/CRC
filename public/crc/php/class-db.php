@@ -378,7 +378,6 @@ class db
     {
         $table = $this->sanitize($post['table']);
         $idkey = $this->sanitize($post['idkey']);
-        // $user = $this->sanitize($post['user']);
         $sqlquery = "UPDATE `" . $table . "` SET ";
         $comma = "";
         foreach ($post['data'] as $key => $value) {

@@ -115,18 +115,7 @@
       </q-bar>
     </div>
     <!-- TABLA DE DATOS -->
-    <n-tables
-      :columnDefs="columnDefs"
-      :columnDefsSub="columnDefsSub"
-      :masterDetail="true"
-      :quickFilter="quickFilter"
-      :rowClassRules="rowClassRules"
-      :rowData="rowData"
-      @gridData="gridData"
-      @rowSelected="rowSelected"
-      @rowSelectedSub="rowSelectedSub"
-      table="Recibos"
-    />
+    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub" table="Recibos"/>
     <!-- DIALOGO DE CLIENTES -->
     <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" :table="null" @cancel="client.dialog=false" @onSave="saveDataClient"></n-dialog>
   </div>
@@ -367,7 +356,6 @@ export default {
       let sumImporte = 0;
       for (let i = 0; i < data.length; i++) {
         sumCobrado = sumCobrado + data[i].data.Cobrado;
-
         sumImporte = sumImporte + data[i].data.Importe;
       }
       this.calculos.importe = Number(sumImporte).toFixed(1);
@@ -392,9 +380,9 @@ export default {
   beforeMount() {
     this.init();
     let year = new Date().getFullYear();
-    let years=[];
-    for (let i=0;i<20;i++){
-      years[i] = year -i;
+    let years = [];
+    for (let i = 0; i < 20; i++) {
+      years[i] = year - i;
     }
     this.filter.years = years;
   },

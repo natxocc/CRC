@@ -9,17 +9,14 @@ class synology
     /**
      * login
      *
-     * @param  mixed $post
+     * @param  mixed $post (user, pass)
      *
      * @return void
      */
     function login($post)
     {
-        if (!isset($post['user']) && !isset($post['pass'])) exit('No users and password');
-        $user = $post['user'];
-        $pass = $post['pass'];
         $return = array();
-        $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=3&method=login&account=' . $user . '&passwd=' . $pass . '&session=FileStation&format=sid');
+        $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=3&method=login&account=' . $post['user'] . '&passwd=' . $post['pass'] . '&session=FileStation&format=sid');
         if ($data) {
             $result = json_decode($data);
             $success = $result->success;
@@ -27,8 +24,8 @@ class synology
             if ($success) {
                 $sid = $result->data->sid;
                 $_SESSION['sid'] = $result->data->sid;
-                $_SESSION['user'] = $user;
-                $_SESSION['pass'] = $pass;
+                $_SESSION['user'] = $post['user'];
+                $_SESSION['pass'] = $post['pass'];
                 $_SESSION['IPaddress'] = $ip;
                 $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
                 $_SESSION['logged'] = $success;
@@ -51,28 +48,31 @@ class synology
     /**
      * logout
      *
-     * @param  mixed $post
+     * @param  mixed $post (sid)
      *
      * @return void
      */
     public function logout($post)
     {
-        if (!isset($post['sid'])) exit('No sid');
-        $sid = $post['sid'];
-        $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&_sid=' . $sid);
+        $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&_sid=' . $post['sid']);
         session_unset();
         session_destroy();
         session_start();
         session_regenerate_id(true);
         echo "Desconectado";
     }
-    // get User information
+
+    /**
+     * getUserInfo
+     *
+     * @param  mixed $post (sid)
+     *
+     * @return void
+     */
     function getUserInfo($post)
     {
-        if (!isset($post['sid'])) exit('No sid');
-        $sid = $post['sid'];
         $return = array();
-        $data = file_get_contents('http://localhost:5000/webapi/entry.cgi?api=SYNO.Core.NormalUser&method=get&version=1&_sid=' . $sid);
+        $data = file_get_contents('http://localhost:5000/webapi/entry.cgi?api=SYNO.Core.NormalUser&method=get&version=1&_sid=' . $post['sid']);
         $result = json_decode($data);
         if ($result->success) {
             $return['user'] = $result->data->username;
@@ -86,7 +86,6 @@ class synology
             return false;
             exit();
         }
-
     }
 
     /**
@@ -157,7 +156,6 @@ class synology
                         $fileContent .= $i . "[" . $t . "] = " . (is_numeric($m) ? $m : '"' . $m . '"') . "\n\r";
                     }
                 } else $fileContent .= $i . " = " . (is_numeric($v) ? $v : '"' . $v . '"') . "\n\r";
-
             }
         }
         return file_put_contents($file, $fileContent, LOCK_EX);

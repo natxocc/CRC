@@ -109,7 +109,7 @@ export default {
           {
             icon: "contacts",
             name: "Clientes",
-            to: "/recibos"
+            to: "/clientes"
           },
           {
             icon: "healing",
