@@ -122,7 +122,9 @@ export default {
     Gestion: "Gestión",
     GestionT: "Gestión de recibos",
     Bajas: "Bajas",
-    BajasT: "Listado de Anulaciones Temporales"
+    BajasT: "Listado de Anulaciones Temporales",
+    ano: "Año",
+    mes: "Mes"
   },
   menu: {
     Recibos: "Recibos",

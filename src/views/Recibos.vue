@@ -6,100 +6,114 @@
       <q-route-tab :label="$q.lang.recibo.Bajas" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
       <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
-    <!-- SELECT FILTERS -->
-    <transition appear class="group" enter-active-class="fade" leave-active-class="fade">
-      <div v-if="tab=='gestion'">
-        <div class="row text-center">
-          <div class="col-xs-12 col-md-5" style="padding: 10px">
-            <q-input :label="$q.lang.recibo.FiltroRapido" dense type="text" v-model="quickFilter">
-              <q-icon name="filter_list" slot="prepend"/>
-              <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
-            </q-input>
-          </div>
-          <div class="col-xs-12 col-md-5" style="padding: 10px">
-            <q-select :label="$q.lang.recibo.FiltrosDeEstado" :options="filter.Estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.EstadosSel"/>
-          </div>
-          <div class="col-xs-12 col-md-2" style="padding: 10px">
-            <q-toggle :label="$q.lang.recibo.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
-              <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.TodosLosRegistrosT}}</q-tooltip>
-            </q-toggle>
-          </div>
+    <!-- SELECT FILTERS GESTION -->
+    <div v-if="tab=='gestion'">
+      <div class="row text-center">
+        <div class="col-xs-12 col-md-5" style="padding: 10px">
+          <q-input :label="$q.lang.recibo.FiltroRapido" dense type="text" v-model="quickFilter">
+            <q-icon name="filter_list" slot="prepend"/>
+            <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
+          </q-input>
         </div>
-        <!-- MINI TOOLBAR -->
-        <q-bar class="bg-primary text-white">
-          <q-btn :disabled="recibo.selected" dense flat icon="add">
-            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevoReciboT}}</q-tooltip>
-            {{$q.lang.recibo.NuevoRecibo}}
-          </q-btn>
-          <q-btn :disabled="!recibo.selected" @click="deleteRecord" color="warning" dense flat icon="delete">
-            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarReciboT}}</q-tooltip>
-            {{$q.lang.recibo.EliminarRecibo}}
-          </q-btn>
-          <q-btn :disabled="!recibo.selected" dense flat icon="add">
-            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevaGestionT}}</q-tooltip>
-            {{$q.lang.recibo.NuevaGestion}}
-          </q-btn>
-          <q-btn :disabled="!recibo.selectedSub" dense flat icon="edit">
-            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EditarGestionT}}</q-tooltip>
-            {{$q.lang.recibo.EditarGestion}}
-          </q-btn>
-          <q-btn :disabled="!recibo.selectedSub" color="warning" dense flat icon="delete">
-            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarGestionT}}</q-tooltip>
-            {{$q.lang.recibo.EliminarGestion}}
-          </q-btn>
-          <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected">
-            <q-tooltip anchor="top middle" self="bottom middle">Crear nuevo Cliente</q-tooltip>Nuevo Cliente
-          </q-btn>
-          <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
-            <q-tooltip anchor="top middle" self="bottom middle">Información de Contacto</q-tooltip>
-            <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
-          </q-btn>
-          <q-space/>
-          <div>
-            <!-- AYUDA -->
-            <q-btn color="primary" icon="help_outline" size="sm">
-              <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
-              <q-popup-proxy>
-                <q-list dense>
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label>{{$q.lang.recibo.RecibosSinTratamiento}}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item style="background-color: #fcf18e;">
-                    <q-item-section>
-                      <q-item-label>{{$q.lang.recibo.RecibosPendientes}}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item style="background-color: #88c9ff">
-                    <q-item-section>
-                      <q-item-label>{{$q.lang.recibo.RecibosAnulados}}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item style="background-color: rgb(182, 255, 191)">
-                    <q-item-section>
-                      <q-item-label>{{$q.lang.recibo.RecibosCobrados}}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item style="background-color: rgb(252, 151, 151);">
-                    <q-item-section>
-                      <q-item-label>{{$q.lang.recibo.RecibosUrgentes}}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item style="background-color: #a8a8a7;">
-                    <q-item-section>
-                      <q-item-label>{{$q.lang.recibo.RecibosError}}</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-popup-proxy>
-            </q-btn>
-            <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
-          </div>
-        </q-bar>
+        <div class="col-xs-12 col-md-5" style="padding: 10px">
+          <q-select :label="$q.lang.recibo.FiltrosDeEstado" :options="filter.Estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.EstadosSel"/>
+        </div>
+        <div class="col-xs-12 col-md-2" style="padding: 10px">
+          <q-toggle :label="$q.lang.recibo.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
+            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.TodosLosRegistrosT}}</q-tooltip>
+          </q-toggle>
+        </div>
       </div>
-    </transition>
-
+    </div>
+    <!-- SELECT FILTERS BAJAS -->
+    <div v-if="tab=='bajas'">
+      <div class="row text-center">
+        <div class="col-xs-12 col-sm-4" style="padding: 10px">
+          <q-input :label="$q.lang.recibo.FiltroRapido" dense type="text" v-model="quickFilter">
+            <q-icon name="filter_list" slot="prepend"/>
+            <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
+          </q-input>
+        </div>
+        <div class="col-xs-12 col-sm-4" style="padding: 10px">
+          <q-select :label="$q.lang.recibo.ano" :options="filter.years" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.year"/>
+        </div>
+        <div class="col-xs-12 col-sm-4" style="padding: 10px">
+          <q-select :label="$q.lang.recibo.mes" :options="filter.months" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.month"/>
+        </div>
+      </div>
+      <!-- MINI TOOLBAR -->
+      <q-bar class="bg-primary text-white">
+        <q-btn :disabled="recibo.selected" dense flat icon="add">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevoReciboT}}</q-tooltip>
+          {{$q.lang.recibo.NuevoRecibo}}
+        </q-btn>
+        <q-btn :disabled="!recibo.selected" @click="deleteRecord" color="warning" dense flat icon="delete">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarReciboT}}</q-tooltip>
+          {{$q.lang.recibo.EliminarRecibo}}
+        </q-btn>
+        <q-btn :disabled="!recibo.selected" dense flat icon="add">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevaGestionT}}</q-tooltip>
+          {{$q.lang.recibo.NuevaGestion}}
+        </q-btn>
+        <q-btn :disabled="!recibo.selectedSub" dense flat icon="edit">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EditarGestionT}}</q-tooltip>
+          {{$q.lang.recibo.EditarGestion}}
+        </q-btn>
+        <q-btn :disabled="!recibo.selectedSub" color="warning" dense flat icon="delete">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarGestionT}}</q-tooltip>
+          {{$q.lang.recibo.EliminarGestion}}
+        </q-btn>
+        <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected">
+          <q-tooltip anchor="top middle" self="bottom middle">Crear nuevo Cliente</q-tooltip>Nuevo Cliente
+        </q-btn>
+        <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
+          <q-tooltip anchor="top middle" self="bottom middle">Información de Contacto</q-tooltip>
+          <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
+        </q-btn>
+        <q-space/>
+        <div>
+          <!-- AYUDA -->
+          <q-btn color="primary" icon="help_outline" size="sm">
+            <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
+            <q-popup-proxy>
+              <q-list dense>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.recibo.RecibosSinTratamiento}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: #fcf18e;">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.recibo.RecibosPendientes}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: #88c9ff">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.recibo.RecibosAnulados}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: rgb(182, 255, 191)">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.recibo.RecibosCobrados}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: rgb(252, 151, 151);">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.recibo.RecibosUrgentes}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: #a8a8a7;">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.recibo.RecibosError}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-popup-proxy>
+          </q-btn>
+          <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
+        </div>
+      </q-bar>
+    </div>
     <!-- TABLA DE DATOS -->
     <n-tables
       :columnDefs="columnDefs"
@@ -147,6 +161,22 @@ export default {
         EstadosSel: ["PENDIENTE"],
         Estados: ["PENDIENTE", "DEVUELTO", "COBRADO", "ANULADO", "EMITIDO"],
         alldata: false,
+        years: ["2020", "2019", "2018", "2017"],
+        months: [
+          "",
+          "01",
+          "02",
+          "03",
+          "04",
+          "05",
+          "06",
+          "07",
+          "08",
+          "09",
+          "10",
+          "11",
+          "12"
+        ],
         month: ("0" + (new Date().getMonth() + 1)).slice(-2),
         year: new Date().getFullYear()
       },
@@ -251,7 +281,6 @@ export default {
         "-" +
         this.filter.month +
         "%')";
-      console.log(where);
       showLoading();
       axios
         .post("http://" + localStorage.url + "/crc/php/consulta.php", {
@@ -341,26 +370,11 @@ export default {
 
         sumImporte = sumImporte + data[i].data.Importe;
       }
-      this.calculos.importe = Number(sumImporte).toFixed(0);
-      this.calculos.cobrado = Number(sumCobrado).toFixed(0);
-    }
-  },
-  beforeMount() {
-    switch (this.$route.params.recibo) {
-      case "bajas":
-        this.callDataBajas();
-        break;
-      case "gestion":
-        this.callDataGestion();
-        break;
-      default:
-        console.log("numero");
-        this.callDataRecibo();
-        break;
-    }
-  },
-  watch: {
-    tab: function() {
+      this.calculos.importe = Number(sumImporte).toFixed(1);
+      this.calculos.cobrado = Number(sumCobrado).toFixed(1);
+    },
+    // INITIALIZATION
+    init() {
       switch (this.$route.params.recibo) {
         case "bajas":
           this.callDataBajas();
@@ -374,6 +388,18 @@ export default {
           break;
       }
     }
+  },
+  beforeMount() {
+    this.init();
+    let year = new Date().getFullYear();
+    let years=[];
+    for (let i=0;i<20;i++){
+      years[i] = year -i;
+    }
+    this.filter.years = years;
+  },
+  watch: {
+    $route: "init"
   }
 };
 </script>

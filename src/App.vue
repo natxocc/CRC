@@ -9,19 +9,19 @@
             <strong>CRC</strong> Reale
           </q-toolbar-title>
           <q-space/>
-          <q-btn :label="lang" color="primary" size="sm">
+          <q-btn :label="lang" color="secondary" text-color="primary" size="sm">
             <q-tooltip>{{$q.lang.inicio.CambiarIdiomaT}}</q-tooltip>
-            <q-popup-proxy>
+            <q-menu>
               <q-list dense>
-                <q-item @click="lang='ca'" clickable>
+                <q-item @click="lang='ca'" clickable v-close-menu>
                   <q-item-section>CATALÀ</q-item-section>
                 </q-item>
-                <q-item @click="lang='es'" clickable>
+                <q-item @click="lang='es'" clickable v-close-menu>
                   <q-item-section>ESPAÑOL</q-item-section>
                 </q-item>
                 <q-separator/>
               </q-list>
-            </q-popup-proxy>
+            </q-menu>
           </q-btn>
           <q-btn @click="sendBug" dense flat icon="bug_report" round/>
           <q-btn @click="userClick" dense flat icon="person" round/>
