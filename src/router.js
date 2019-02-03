@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Recibos from './views/Recibos.vue'
 import Clientes from './views/Clientes.vue'
+import Polizas from './views/Polizas.vue'
 import Page404 from './views/404.vue'
 
 
@@ -24,6 +25,11 @@ export default new Router({
       path: '/clientes',
       name: 'Clientes',
       component: Clientes
+    },
+    {
+      path: '/polizas/:poliza',
+      name: 'Polizas',
+      component: Polizas
     },
     {
       path: '*',

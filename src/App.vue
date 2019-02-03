@@ -10,7 +10,6 @@
           </q-toolbar-title>
           <q-space/>
           <q-btn :label="lang" color="secondary" size="sm" text-color="primary">
-            <q-tooltip>{{$q.lang.inicio.CambiarIdiomaT}}</q-tooltip>
             <q-menu>
               <q-list dense>
                 <q-item @click="lang='ca'" clickable v-close-menu>
@@ -34,18 +33,18 @@
             <q-card>
               <q-card-section class="row items-center">
                 <q-avatar color="primary" icon="person" text-color="white"/>
-                <span class="q-ml-sm text-h4">{{$q.lang.inicio.InicioSesion}}</span>
+                <span class="q-ml-sm text-h4">{{$q.lang.InicioSesion}}</span>
               </q-card-section>
               <q-card-section class="row items-center">
                 <div class="row q-col-gutter-x-2 q-col-gutter-y-sm">
                   <div class="col-12">
-                    <q-input :label="$q.lang.inicio.Usuario" type="text" v-model="user.user">
+                    <q-input :label="$q.lang.Usuario" type="text" v-model="user.user">
                       <q-icon name="person" slot="prepend"/>
                       <q-icon @click="user.user = ''" class="cursor-pointer" name="close" slot="append"/>
                     </q-input>
                   </div>
                   <div class="col-12">
-                    <q-input :label="$q.lang.inicio.Clave" :type="user.passShow ? 'text' : 'password'" @keyup.enter="login " v-model="user.pass">
+                    <q-input :label="$q.lang.Clave" :type="user.passShow ? 'text' : 'password'" @keyup.enter="login " v-model="user.pass">
                       <q-icon name="lock" slot="prepend"/>
                       <q-icon @click="user.pass = ''" class="cursor-pointer" name="close" slot="append"/>
                       <q-icon :name="user.passShow ? 'visibility' : 'visibility_off'" @click="user.passShow=!user.passShow" class="cursor-pointer" slot="append"/>
@@ -74,7 +73,7 @@
           </div>
           <div class="row text-center">
             <div class="col">
-              <q-btn @click="logout" class="q-mt-md" color="secondary">{{$q.lang.inicio.CerrarSesion}}</q-btn>
+              <q-btn @click="logout" class="q-mt-md" color="secondary">{{$q.lang.CerrarSesion}}</q-btn>
             </div>
           </div>
         </q-drawer>
@@ -99,8 +98,6 @@
   </div>
 </template>
 <script>
-// import languages from './lang/index.json'
-// import('./lang/es')
 import axios from "axios";
 export default {
   data() {
@@ -118,7 +115,7 @@ export default {
           {
             icon: "timeline",
             name: this.$q.lang.menu.Polizas,
-            to: "/polizas"
+            to: "/polizas/altas"
           },
           {
             icon: "contacts",
@@ -157,7 +154,8 @@ export default {
         .post(localStorage.url, {
           cmd: "login",
           user: self.user.user,
-          pass: self.user.pass
+          pass: self.user.pass,
+          lang: self.lang
         })
         .then(function(response) {
           console.log(response);
@@ -171,15 +169,16 @@ export default {
             self.user.mail = response.data.info.data.email;
             self.$q.notify({
               message:
-                self.$q.lang.inicio.Bienvenido +
+                self.$q.lang.Bienvenido +
                 " " +
                 response.data.info.data.fullname,
               icon: "check",
               color: "positive"
             });
           } else {
+            localStorage.lang = self.lang;
             self.$q.notify({
-              message: self.$q.lang.inicio.UsuarioClaveIncorrecta,
+              message: self.$q.lang.UsuarioClaveIncorrecta,
               icon: "close",
               color: "negative"
             });
@@ -188,7 +187,7 @@ export default {
         .catch(function(response) {
           console.log(response);
           self.$q.notify({
-            message: self.$q.lang.inicio.ErrorRed,
+            message: self.$q.lang.ErrorRed,
             color: "negative"
           });
         });
@@ -199,12 +198,13 @@ export default {
       axios
         .post(localStorage.url, {
           cmd: "logout",
-          sid: localStorage.sid
+          sid: localStorage.sid,
+          lang: localStorage.lang
         })
         .then(function(response) {
           if (response.data.success) {
             self.$q.notify({
-              message: self.$q.lang.inicio.Desconectado,
+              message: self.$q.lang.Desconectado,
               icon: "flash_off",
               color: "positive"
             });
@@ -237,7 +237,7 @@ export default {
         })
         .catch(function(response) {
           self.$q.notify({
-            message: self.$q.lang.inicio.ErrorRed,
+            message: self.$q.lang.ErrorRed,
             color: "negative"
           });
         });
@@ -256,6 +256,7 @@ export default {
       import(`./lang/${lang}`).then((lang) => {
         this.$q.lang.set(lang.default);
       });
+      localStorage.lang = this.lang;
     }
   },
   watch: {
@@ -270,6 +271,8 @@ export default {
       localStorage.url =
         "http://" + window.location.hostname + "/crc/php/post.php";
     if (localStorage.sid) this.isLogged();
+    // LANG
+    if (localStorage.lang!="es") this.lang = localStorage.lang;
   },
   created() {}
 };

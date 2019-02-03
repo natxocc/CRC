@@ -2,67 +2,94 @@
   <div class="container">
     <!-- TABS -->
     <q-tabs active-bg-color="primary" active-color="white" class="bg-secondary text-primary" dense indicator-color="transparent" inline-label top-indicator v-model="tab">
-      <q-route-tab :label="$q.lang.recibo.Gestion" icon="assignment_turned_in" name="gestion" to="/recibos/gestion"/>
-      <q-route-tab :label="$q.lang.recibo.Bajas" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
+      <q-route-tab :label="$q.lang.Gestion" icon="assignment_turned_in" name="gestion" to="/recibos/gestion"/>
+      <q-route-tab :label="$q.lang.Bajas" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
       <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
     <!-- SELECT FILTERS GESTION -->
     <div v-if="tab=='gestion'">
       <div class="row text-center">
         <div class="col-xs-12 col-md-5" style="padding: 10px">
-          <q-input :label="$q.lang.recibo.FiltroRapido" dense type="text" v-model="quickFilter">
+          <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
             <q-icon name="filter_list" slot="prepend"/>
             <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
           </q-input>
         </div>
         <div class="col-xs-12 col-md-5" style="padding: 10px">
-          <q-select :label="$q.lang.recibo.FiltrosDeEstado" :options="filter.Estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.EstadosSel"/>
+          <q-select :label="$q.lang.FiltrosDeEstado" :options="filter.Estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.EstadosSel"/>
         </div>
         <div class="col-xs-12 col-md-2" style="padding: 10px">
-          <q-toggle :label="$q.lang.recibo.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
-            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.TodosLosRegistrosT}}</q-tooltip>
+          <q-toggle :label="$q.lang.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
+            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.TodosLosRegistrosT}}</q-tooltip>
           </q-toggle>
         </div>
       </div>
-    </div>
-    <!-- SELECT FILTERS BAJAS -->
-    <div v-if="tab=='bajas'">
-      <div class="row text-center">
-        <div class="col-xs-12 col-sm-4" style="padding: 10px">
-          <q-input :label="$q.lang.recibo.FiltroRapido" dense type="text" v-model="quickFilter">
-            <q-icon name="filter_list" slot="prepend"/>
-            <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
-          </q-input>
-        </div>
-        <div class="col-xs-12 col-sm-4" style="padding: 10px">
-          <q-select :label="$q.lang.recibo.ano" :options="filter.years" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.year"/>
-        </div>
-        <div class="col-xs-12 col-sm-4" style="padding: 10px">
-          <q-select :label="$q.lang.recibo.mes" :options="filter.months" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.month"/>
-        </div>
-      </div>
-      <!-- MINI TOOLBAR -->
+      <!-- MINI TOOLBAR-->
       <q-bar class="bg-primary text-white">
-        <q-btn :disabled="recibo.selected" dense flat icon="add">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevoReciboT}}</q-tooltip>
-          {{$q.lang.recibo.NuevoRecibo}}
+        <q-btn dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.NuevoT}}</q-tooltip>
+          {{$q.lang.NuevoRecibo}}
         </q-btn>
-        <q-btn :disabled="!recibo.selected" @click="deleteRecord" color="warning" dense flat icon="delete">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarReciboT}}</q-tooltip>
-          {{$q.lang.recibo.EliminarRecibo}}
+        <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selected">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.EliminarReciboT}}</q-tooltip>
+          {{$q.lang.EliminarRecibo}}
         </q-btn>
-        <q-btn :disabled="!recibo.selected" dense flat icon="add">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.NuevaGestionT}}</q-tooltip>
-          {{$q.lang.recibo.NuevaGestion}}
+        <q-btn dense flat icon="add" v-if="recibo.selected">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.NuevaGestionT}}</q-tooltip>
+          {{$q.lang.NuevaGestion}}
         </q-btn>
-        <q-btn :disabled="!recibo.selectedSub" dense flat icon="edit">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EditarGestionT}}</q-tooltip>
-          {{$q.lang.recibo.EditarGestion}}
+
+        <q-btn color="warning" dense flat icon="delete" v-if="recibo.selectedSub">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.EliminarGestionT}}</q-tooltip>
+          {{$q.lang.EliminarGestion}}
         </q-btn>
-        <q-btn :disabled="!recibo.selectedSub" color="warning" dense flat icon="delete">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.recibo.EliminarGestionT}}</q-tooltip>
-          {{$q.lang.recibo.EliminarGestion}}
+        <q-btn dense flat icon="edit" v-if="recibo.selectedSub">
+          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.EditarGestionT}}</q-tooltip>
+          {{$q.lang.EditarGestion}}
         </q-btn>
+        <q-space/>
+        <!-- AYUDA -->
+        <div>
+          <q-btn color="primary" icon="help_outline" size="sm">
+            <q-popup-proxy>
+              <q-list dense>
+                <q-item>
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.RecibosSinTratamiento}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: #fcf18e;">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.RecibosPendientes}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: #88c9ff">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.RecibosAnulados}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: rgb(182, 255, 191)">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.RecibosCobrados}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: rgb(252, 151, 151);">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.RecibosUrgentes}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item style="background-color: #a8a8a7;">
+                  <q-item-section>
+                    <q-item-label>{{$q.lang.RecibosError}}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-popup-proxy>
+          </q-btn>
+        </div>
+      </q-bar>
+      <!-- LINE CLIENTES -->
+      <div class="row textcenter">
         <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected">
           <q-tooltip anchor="top middle" self="bottom middle">Crear nuevo Cliente</q-tooltip>Nuevo Cliente
         </q-btn>
@@ -70,52 +97,27 @@
           <q-tooltip anchor="top middle" self="bottom middle">Información de Contacto</q-tooltip>
           <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
         </q-btn>
-        <q-space/>
-        <div>
-          <!-- AYUDA -->
-          <q-btn color="primary" icon="help_outline" size="sm">
-            <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
-            <q-popup-proxy>
-              <q-list dense>
-                <q-item>
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.recibo.RecibosSinTratamiento}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: #fcf18e;">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.recibo.RecibosPendientes}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: #88c9ff">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.recibo.RecibosAnulados}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: rgb(182, 255, 191)">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.recibo.RecibosCobrados}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: rgb(252, 151, 151);">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.recibo.RecibosUrgentes}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: #a8a8a7;">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.recibo.RecibosError}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-popup-proxy>
-          </q-btn>
-          <q-tooltip>{{$q.lang.recibo.AyudaReciboT}}</q-tooltip>
+      </div>
+    </div>
+    <!-- SELECT FILTERS BAJAS -->
+    <div v-if="tab=='bajas'">
+      <div class="row text-center">
+        <div class="col-xs-12 col-sm-4" style="padding: 10px">
+          <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
+            <q-icon name="filter_list" slot="prepend"/>
+            <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
+          </q-input>
         </div>
-      </q-bar>
+        <div class="col-xs-12 col-sm-4" style="padding: 10px">
+          <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.year"/>
+        </div>
+        <div class="col-xs-12 col-sm-4" style="padding: 10px">
+          <q-select :label="$q.lang.mes" :options="filter.months" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.month"/>
+        </div>
+      </div>
     </div>
     <!-- TABLA DE DATOS -->
-    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub" table="Recibos"/>
+    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub" />
     <!-- DIALOGO DE CLIENTES -->
     <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" :table="null" @cancel="client.dialog=false" @onSave="saveDataClient"></n-dialog>
   </div>
@@ -371,7 +373,6 @@ export default {
           this.callDataGestion();
           break;
         default:
-          console.log("numero");
           this.callDataRecibo();
           break;
       }

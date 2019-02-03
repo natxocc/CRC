@@ -73,39 +73,51 @@ class db
     /**
      * login
      *
-     * @param  mixed $post (user, pass)
+     * @param  mixed $post (user, pass) or (sid)
      *
-     * @return void
+     * @return void result or true/false
      */
     function login($post)
     {
-        $return = array();
-        $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=3&method=login&account=' . $post['user'] . '&passwd=' . $post['pass'] . '&session=FileStation&format=sid');
-        if ($data) {
-            $result = json_decode($data);
-            $success = $result->success;
-            $ip = $this->getRealIP();
-            if ($success) {
-                $sid = $result->data->sid;
-                $_SESSION['sid'] = $result->data->sid;
-                $_SESSION['user'] = $post['user'];
-                $_SESSION['pass'] = $post['pass'];
-                $_SESSION['IPaddress'] = $ip;
-                $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
-                $_SESSION['logged'] = $success;
-                $return['sid'] = $sid;
-                $return['success'] = $success;
-                echo json_encode($return);
-            } else {
-                echo $result['error']=true;
-                session_unset();
-                session_destroy();
-                session_start();
-                session_regenerate_id(true);
-                exit();
+        if (isset($post['sid'])) {
+            $result = $this->getUserInfo($post['sid']);
+            echo json_encode($result);
+        } else {
+            $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=3&method=login&account=' . $post['user'] . '&passwd=' . $post['pass'] . '&session=FileStation&format=sid');
+            if ($data) {
+                $result = json_decode($data);
+                $ip = $this->getRealIP();
+                if ($result->success) {
+                    $_SESSION['sid'] = $result->data->sid;
+                    $_SESSION['IPaddress'] = $ip;
+                    $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
+                    $_SESSION['logged'] = $result->success;
+                    $result->info = $this->getUserInfo($result->data->sid);
+                    $result->users = $this->updateUser($post['user'], $result->info->data->email);
+                    echo json_encode($result);
+                } else {
+                    echo json_encode($result);
+                    session_unset();
+                    session_destroy();
+                    session_start();
+                    session_regenerate_id(true);
+                    exit();
+                }
             }
         }
+    }
 
+    function updateUser($user, $mail)
+    {
+        $date = date("Y-m-d H:i:s");
+        try {
+            $this->db->exec("INSERT INTO Usuarios (Usuario, CorreoElectronico, UltimaConexion) VALUES ('$user', '$mail', '$date')");
+        } catch (Exception $e) {
+            $this->db->exec("UPDATE Usuarios SET CorreoElectronico = '$mail', UltimaConexion = '$date' WHERE Usuario = '$user'");
+        }
+        $sql = $this->db->query("SELECT Usuario, CorreoElectronico FROM Usuarios");
+        $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 
     /**
@@ -118,11 +130,12 @@ class db
     public function logout($post)
     {
         $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&_sid=' . $post['sid']);
+        $return['success'] = true;
         session_unset();
         session_destroy();
         session_start();
         session_regenerate_id(true);
-        echo "Desconectado";
+        echo json_encode($return);
     }
 
     /**
@@ -132,20 +145,15 @@ class db
      *
      * @return void
      */
-    function getUserInfo($post)
+    function getUserInfo($sid)
     {
         $return = array();
-        $data = file_get_contents('http://localhost:5000/webapi/entry.cgi?api=SYNO.Core.NormalUser&method=get&version=1&_sid=' . $post['sid']);
+        $data = file_get_contents('http://localhost:5000/webapi/entry.cgi?api=SYNO.Core.NormalUser&method=get&version=1&_sid=' . $sid);
         $result = json_decode($data);
         if ($result->success) {
-            $return['user'] = $result->data->username;
-            $return['name'] = $result->data->fullname;
-            $return['mail'] = $result->data->email;
-            $return['success'] = $result->success;
-            echo json_encode($return);
-            return $result->success;
+            return $result;
+            exit();
         } else {
-            echo "Error";
             return false;
             exit();
         }
@@ -153,15 +161,11 @@ class db
 
     function isLogged($post)
     {
-        if (!isset($post['sid'])) exit();
-        $logged = $sql = $result = "";
-        if (isset($_SESSION['logged'])) {
-            if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
-                echo $result['success']=true;
-                return true;
-            } else {
-                return false;
-            }
+        if (!isset($_SESSION['logged'])) return false;
+        if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
+            return true;
+        } else {
+            return false;
         }
         exit();
     }

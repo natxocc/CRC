@@ -93,7 +93,7 @@ class db
                     $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
                     $_SESSION['logged'] = $result->success;
                     $result->info = $this->getUserInfo($result->data->sid);
-                    $result->users = $this->updateUser($post['user'], $result->info->data->email);
+                    $result->users = $this->updateUser($post['user'], $result->info->data->email, $post['lang']);
                     echo json_encode($result);
                 } else {
                     echo json_encode($result);
@@ -107,13 +107,13 @@ class db
         }
     }
 
-    function updateUser($user, $mail)
+    function updateUser($user, $mail, $lang)
     {
         $date = date("Y-m-d H:i:s");
         try {
-            $this->db->exec("INSERT INTO Usuarios (Usuario, CorreoElectronico, UltimaConexion) VALUES ('$user', '$mail', '$date')");
+            $this->db->exec("INSERT INTO Usuarios (Usuario, CorreoElectronico, UltimaConexion, Idioma) VALUES ('$user', '$mail', '$date', '$lang')");
         } catch (Exception $e) {
-            $this->db->exec("UPDATE Usuarios SET CorreoElectronico = '$mail', UltimaConexion = '$date' WHERE Usuario = '$user'");
+            $this->db->exec("UPDATE Usuarios SET CorreoElectronico = '$mail', UltimaConexion = '$date', Idioma = '$lang' WHERE Usuario = '$user'");
         }
         $sql = $this->db->query("SELECT Usuario, CorreoElectronico FROM Usuarios");
         $result = $sql->fetchAll(PDO::FETCH_ASSOC);

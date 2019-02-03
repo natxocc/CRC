@@ -13,13 +13,10 @@ header("Content-Type: application/json;charset=utf-8");
 // Esta parte a eliminar en produccion
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
-// if ($_SERVER['HTTP_REFERER'] == 'http://localhost:8080/') {
-// if ($_SERVER['SERVER_NAME'] == 'http://localhost:8080/') {
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Access-Control-Allow-Credentials: true');
-// }
 // FIN DE BLOQUE
 // ---------------FIN
 // Captura los datos enviados

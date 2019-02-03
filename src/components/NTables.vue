@@ -48,7 +48,6 @@ export default {
     columnDefs: null,
     columnDefsSub: null,
     rowData: null,
-    table: null,
     masterDetail: null,
     rowClassRules: null,
     filters: null,
@@ -205,7 +204,13 @@ export default {
       };
     }
   },
-  beforeMount() {},
+  beforeMount() {
+    // if (localStorage.lang != "es") {
+    //   import(`./lang/${lang}.tables`).then((lang) => {
+    //     this.localeText = lang.default;
+    //   });
+    // }
+  },
   created() {},
   watch: {
     quickFilter: function() {

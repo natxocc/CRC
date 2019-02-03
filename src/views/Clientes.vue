@@ -3,7 +3,7 @@
     <!-- SELECT FILTERS GESTION -->
     <div class="row text-center">
       <div class="col-xs-12" style="padding: 10px">
-        <q-input :label="$q.lang.recibo.FiltroRapido" dense type="text" v-model="quickFilter">
+        <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
           <q-icon name="filter_list" slot="prepend"/>
           <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
         </q-input>
