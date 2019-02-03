@@ -218,7 +218,7 @@ export default {
     saveDataClient() {
       let self = this;
       axios
-        .post("http://" + localStorage.url + "/crc/php/consulta.php", {
+        .post(localStorage.url, {
           cmd: "updateRecord",
           table: "Clientes",
           idkey: "NIF",
@@ -247,7 +247,7 @@ export default {
       if (!this.filter.alldata) where += whereMore;
       showLoading();
       axios
-        .post("http://" + localStorage.url + "/crc/php/consulta.php", {
+        .post(localStorage.url, {
           cmd: "getRecords",
           table: "Recibos",
           subtable: "RecibosGestion",
@@ -272,7 +272,7 @@ export default {
         "%')";
       showLoading();
       axios
-        .post("http://" + localStorage.url + "/crc/php/consulta.php", {
+        .post(localStorage.url, {
           cmd: "getRecords",
           table: "Recibos",
           where: where,
@@ -292,7 +292,7 @@ export default {
       let where = "(CodigoRecibo='" + this.$route.params.recibo + "')";
       showLoading();
       axios
-        .post("http://" + localStorage.url + "/crc/php/consulta.php", {
+        .post(localStorage.url, {
           cmd: "getRecords",
           table: "Recibos",
           where: where,
@@ -326,7 +326,7 @@ export default {
       if (params[0].NombreTomador) {
         let where = "NombreCompleto = '" + params[0].NombreTomador + "'";
         axios
-          .post("http://" + localStorage.url + "/crc/php/consulta.php", {
+          .post(localStorage.url, {
             cmd: "getRecords",
             table: "Clientes",
             where: where,

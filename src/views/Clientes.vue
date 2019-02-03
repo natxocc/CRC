@@ -10,7 +10,7 @@
       </div>
     </div>
     <!-- TABLA DE DATOS -->
-    <n-tables :columnDefs="columnDefs" :quickFilter="quickFilter" :rowData="rowData" table="Clientes"/>
+    <n-tables :columnDefs="columnDefs" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" table="Clientes"/>
   </div>
 </template>
 
@@ -35,7 +35,8 @@ export default {
       // TABLE
       columnDefs: [],
       rowData: null,
-      quickFilter: null
+      quickFilter: null,
+      rowClassRules: {}
     };
   },
   methods: {
@@ -43,7 +44,7 @@ export default {
       let self = this;
       showLoading();
       axios
-        .post("http://" + localStorage.url + "/crc/php/consulta.php", {
+        .post(localStorage.url, {
           cmd: "getRecords",
           table: "Clientes",
           subtable: false,

@@ -95,7 +95,12 @@ export default {
     Usuario: "Usuario",
     Clave: "Clave",
     Recordarme: "Recordarme",
-    CambiarIdiomaT: "Pulsa para cambiar el idioma"
+    CambiarIdiomaT: "Pulsa para cambiar el idioma",
+    UsuarioClaveIncorrecta:"Usuario o clave incorrecta",
+    Bienvenido:"Bienvenid@ ",
+    Desconectado:"Desconectado correctamente",
+    ErrorRed:"Error de Red",
+    CerrarSesion: "Cerrar Sesion"
   },
   recibo: {
     NuevoRecibo: "Nuevo Recibo",

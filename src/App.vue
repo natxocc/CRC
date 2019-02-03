@@ -9,7 +9,7 @@
             <strong>CRC</strong> Reale
           </q-toolbar-title>
           <q-space/>
-          <q-btn :label="lang" color="secondary" text-color="primary" size="sm">
+          <q-btn :label="lang" color="secondary" size="sm" text-color="primary">
             <q-tooltip>{{$q.lang.inicio.CambiarIdiomaT}}</q-tooltip>
             <q-menu>
               <q-list dense>
@@ -24,7 +24,7 @@
             </q-menu>
           </q-btn>
           <q-btn @click="sendBug" dense flat icon="bug_report" round/>
-          <q-btn @click="userClick" dense flat icon="person" round/>
+          <q-btn @click="menuUser" dense flat icon="person" round/>
         </q-toolbar>
       </q-header>
       <q-page-container>
@@ -39,20 +39,17 @@
               <q-card-section class="row items-center">
                 <div class="row q-col-gutter-x-2 q-col-gutter-y-sm">
                   <div class="col-12">
-                    <q-input :label="$q.lang.inicio.Usuario" type="text" v-model="user.name">
+                    <q-input :label="$q.lang.inicio.Usuario" type="text" v-model="user.user">
                       <q-icon name="person" slot="prepend"/>
-                      <q-icon @click="user.name = ''" class="cursor-pointer" name="close" slot="append"/>
+                      <q-icon @click="user.user = ''" class="cursor-pointer" name="close" slot="append"/>
                     </q-input>
                   </div>
                   <div class="col-12">
-                    <q-input :label="$q.lang.inicio.Clave" :type="user.passShow ? 'text' : 'password'" v-model="user.pass">
+                    <q-input :label="$q.lang.inicio.Clave" :type="user.passShow ? 'text' : 'password'" @keyup.enter="login " v-model="user.pass">
                       <q-icon name="lock" slot="prepend"/>
                       <q-icon @click="user.pass = ''" class="cursor-pointer" name="close" slot="append"/>
                       <q-icon :name="user.passShow ? 'visibility' : 'visibility_off'" @click="user.passShow=!user.passShow" class="cursor-pointer" slot="append"/>
                     </q-input>
-                  </div>
-                  <div class="col-12">
-                    <q-checkbox :label="$q.lang.inicio.Recordarme" dense v-model="user.remember"/>
                   </div>
                 </div>
               </q-card-section>
@@ -64,7 +61,23 @@
           </q-dialog>
         </div>
         <!-- MENU RIGHT -->
-        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="right" v-if="user.logged" v-model="menu.right"></q-drawer>
+        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="right" v-model="menu.right">
+          <div class="row text-center">
+            <div class="col">
+              <q-chip :label="user.name" color="primary" icon="person" outline square text-color="white"/>
+            </div>
+          </div>
+          <div class="row text-center">
+            <div class="col">
+              <q-chip :label="user.mail" color="primary" icon="email" outline square text-color="white"/>
+            </div>
+          </div>
+          <div class="row text-center">
+            <div class="col">
+              <q-btn @click="logout" class="q-mt-md" color="secondary">{{$q.lang.inicio.CerrarSesion}}</q-btn>
+            </div>
+          </div>
+        </q-drawer>
         <!-- MENU LEFT -->
         <q-drawer :bordered="true" :elevated="true" :overlay="true" side="left" v-model="menu.left">
           <q-btn class="full-width" flat icon="home" inline to="/"></q-btn>
@@ -88,6 +101,7 @@
 <script>
 // import languages from './lang/index.json'
 // import('./lang/es')
+import axios from "axios";
 export default {
   data() {
     return {
@@ -98,38 +112,37 @@ export default {
         leftList: [
           {
             icon: "euro_symbol",
-            name: "Recibos",
+            name: this.$q.lang.menu.Recibos,
             to: "/recibos/gestion"
           },
           {
             icon: "timeline",
-            name: "Polizas",
+            name: this.$q.lang.menu.Polizas,
             to: "/polizas"
           },
           {
             icon: "contacts",
-            name: "Clientes",
+            name: this.$q.lang.menu.Clientes,
             to: "/clientes"
           },
           {
             icon: "healing",
-            name: "Siniestros",
+            name: this.$q.lang.menu.Siniestros,
             to: "/recibos"
           },
           {
             icon: "person",
-            name: "Usuarios",
+            name: this.$q.lang.menu.Usuarios,
             to: "/recibos"
           }
         ]
       },
       user: {
-        logged: false,
-        name: "",
-        pass: "",
-        passShow: true,
-        sid: "",
-        remember: false,
+        user: null,
+        pass: null,
+        name: null,
+        mail: null,
+        passShow: false,
         dialog: false
       }
     };
@@ -139,50 +152,125 @@ export default {
       this.user.dialog = false;
     },
     login() {
-      if (this.user.remember) {
-        localStorage.user = this.user.name;
-        localStorage.pass = this.user.pass;
-        localStorage.sid = this.user.sid;
-        localStorage.logged = this.user.logged;
-      } else {
-        sessionStorage.user = this.user.name;
-        sessionStorage.pass = this.user.pass;
-        sessionStorage.sid = this.user.sid;
-        sessionStorage.logged = this.user.logged;
-      }
+      let self = this;
+      axios
+        .post(localStorage.url, {
+          cmd: "login",
+          user: self.user.user,
+          pass: self.user.pass
+        })
+        .then(function(response) {
+          console.log(response);
+          if (response.data.success) {
+            localStorage.sid = response.data.data.sid;
+            localStorage.logged = true;
+            localStorage.setItem("users", JSON.stringify(response.data.users));
+            localStorage.mail = response.data.info.data.email;
+            localStorage.username = response.data.info.data.fullname;
+            self.user.name = response.data.info.data.fullname;
+            self.user.mail = response.data.info.data.email;
+            self.$q.notify({
+              message:
+                self.$q.lang.inicio.Bienvenido +
+                " " +
+                response.data.info.data.fullname,
+              icon: "check",
+              color: "positive"
+            });
+          } else {
+            self.$q.notify({
+              message: self.$q.lang.inicio.UsuarioClaveIncorrecta,
+              icon: "close",
+              color: "negative"
+            });
+          }
+        })
+        .catch(function(response) {
+          console.log(response);
+          self.$q.notify({
+            message: self.$q.lang.inicio.ErrorRed,
+            color: "negative"
+          });
+        });
       this.user.dialog = false;
-      this.user.logged = true;
     },
-    userClick() {
-      if (this.user.logged) {
+    logout() {
+      let self = this;
+      axios
+        .post(localStorage.url, {
+          cmd: "logout",
+          sid: localStorage.sid
+        })
+        .then(function(response) {
+          if (response.data.success) {
+            self.$q.notify({
+              message: self.$q.lang.inicio.Desconectado,
+              icon: "flash_off",
+              color: "positive"
+            });
+          }
+        });
+      localStorage.removeItem("logged");
+      localStorage.removeItem("sid");
+      localStorage.removeItem("mail");
+      localStorage.removeItem("username");
+      this.menu.right = false;
+    },
+    isLogged() {
+      let self = this;
+      axios
+        .post(localStorage.url, {
+          cmd: "login",
+          sid: localStorage.sid
+        })
+        .then(function(response) {
+          console.log(response.data);
+          if (!response.data.success) {
+            localStorage.removeItem("logged");
+            localStorage.removeItem("sid");
+            localStorage.removeItem("mail");
+            localStorage.removeItem("username");
+          } else {
+            self.user.name = localStorage.username;
+            self.user.mail = localStorage.mail;
+          }
+        })
+        .catch(function(response) {
+          self.$q.notify({
+            message: self.$q.lang.inicio.ErrorRed,
+            color: "negative"
+          });
+        });
+    },
+    menuUser() {
+      if (localStorage.logged) {
         this.menu.right = !this.menu.right;
       } else {
         this.user.dialog = true;
       }
     },
     sendBug() {
-      window.open('https://github.com/natxocc/CRC/issues', '_system')
-    }
-  },
-  watch: {
-    lang(lang) {
+      window.open("https://github.com/natxocc/CRC/issues", "_system");
+    },
+    getLang(lang) {
       import(`./lang/${lang}`).then((lang) => {
         this.$q.lang.set(lang.default);
       });
     }
   },
-  beforeMount() {
-    // Remove on final version
-    // this.lang="es"
-    if (window.location.hostname == "localhost") {
-      localStorage.url = "servidor";
-    } else {
-      this.url = localStorage.url = window.location.hostname;
+  watch: {
+    lang(lang) {
+      this.getLang(lang);
     }
-    // || ^^ Remove on final version
   },
-  created() {
-    this.lang = "es";
-  }
+  beforeMount() {
+    //CHECK USER
+    localStorage.url = "http://servidor/crc/php/post.php";
+    if (window.location.hostname != "localhost")
+      localStorage.url =
+        "http://" + window.location.hostname + "/crc/php/post.php";
+    if (localStorage.sid) this.isLogged();
+  },
+  created() {}
 };
 </script>
