@@ -160,7 +160,7 @@ class db
     }
 
     function isLogged($post)
-    {s
+    {
         if (!isset($_SESSION['logged'])) return false;
         if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
             return true;
