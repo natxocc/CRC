@@ -132,6 +132,8 @@ export default {
   Bajas: "Baixes",
   ano: "Any",
   mes: "Mes",
+  Liquidacion: "Liquidació",
+  Anticipo: "Bestretes",
   //REGISTROS
   Nuevo: "Nou",
   Editar: "Editar",
