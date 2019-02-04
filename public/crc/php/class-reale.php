@@ -1,7 +1,6 @@
 <?php
 defined('SECURITY_TOKEN') or exit('No direct script access allowed');
 
-// Class reale
 class reale
 {
 

@@ -154,8 +154,7 @@ export default {
         .post(localStorage.url, {
           cmd: "login",
           user: self.user.user,
-          pass: self.user.pass,
-          lang: self.lang
+          pass: self.user.pass
         })
         .then(function(response) {
           console.log(response);
@@ -198,8 +197,7 @@ export default {
       axios
         .post(localStorage.url, {
           cmd: "logout",
-          sid: localStorage.sid,
-          lang: localStorage.lang
+          sid: localStorage.sid
         })
         .then(function(response) {
           if (response.data.success) {
@@ -216,32 +214,32 @@ export default {
       localStorage.removeItem("username");
       this.menu.right = false;
     },
-    isLogged() {
-      let self = this;
-      axios
-        .post(localStorage.url, {
-          cmd: "login",
-          sid: localStorage.sid
-        })
-        .then(function(response) {
-          console.log(response.data);
-          if (!response.data.success) {
-            localStorage.removeItem("logged");
-            localStorage.removeItem("sid");
-            localStorage.removeItem("mail");
-            localStorage.removeItem("username");
-          } else {
-            self.user.name = localStorage.username;
-            self.user.mail = localStorage.mail;
-          }
-        })
-        .catch(function(response) {
-          self.$q.notify({
-            message: self.$q.lang.ErrorRed,
-            color: "negative"
-          });
-        });
-    },
+    // isLogged() {
+    //   let self = this;
+    //   axios
+    //     .post(localStorage.url, {
+    //       cmd: "login",
+    //       sid: localStorage.sid
+    //     })
+    //     .then(function(response) {
+    //       console.log(response.data);
+    //       if (!response.data.success) {
+    //         localStorage.removeItem("logged");
+    //         localStorage.removeItem("sid");
+    //         localStorage.removeItem("mail");
+    //         localStorage.removeItem("username");
+    //       } else {
+    //         self.user.name = localStorage.username;
+    //         self.user.mail = localStorage.mail;
+    //       }
+    //     })
+    //     .catch(function(response) {
+    //       self.$q.notify({
+    //         message: self.$q.lang.ErrorRed,
+    //         color: "negative"
+    //       });
+    //     });
+    // },
     menuUser() {
       if (localStorage.logged) {
         this.menu.right = !this.menu.right;
@@ -270,7 +268,7 @@ export default {
     if (window.location.hostname != "localhost")
       localStorage.url =
         "http://" + window.location.hostname + "/crc/php/post.php";
-    if (localStorage.sid) this.isLogged();
+    // if (localStorage.sid) this.isLogged();
     // LANG
     if (localStorage.lang!="es") this.lang = localStorage.lang;
   },
