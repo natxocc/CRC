@@ -33,7 +33,7 @@ export default {
   contains: "Conté",
   notContains: "No conté",
   startsWith: "Comença per",
-  endsWith: "AcaBa en",
+  endsWith: "Acaba en",
 
   // the header of the default group column
   group: "Agrupat",
