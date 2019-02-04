@@ -4,6 +4,8 @@
     <q-tabs active-bg-color="primary" active-color="white" class="bg-secondary text-primary" dense indicator-color="transparent" inline-label top-indicator v-model="tab">
       <q-route-tab :label="$q.lang.Gestion" icon="assignment_turned_in" name="gestion" to="/recibos/gestion"/>
       <q-route-tab :label="$q.lang.Bajas" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
+      <q-route-tab :label="$q.lang.Liquidacion" icon="credit_card" name="liq" to="/recibos/liq"/>
+      <q-route-tab :label="$q.lang.Anticipo" icon="done_all" name="ant" to="/recibos/ant"/>
       <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
     <!-- SELECT FILTERS GESTION -->
@@ -116,8 +118,25 @@
         </div>
       </div>
     </div>
+    <!-- SELECT FILTERS LIQUIDACION -->
+    <div v-if="tab=='liq'">
+      <div class="row text-center">
+        <div class="col-xs-12 col-sm-4" style="padding: 10px">
+          <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
+            <q-icon name="filter_list" slot="prepend"/>
+            <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
+          </q-input>
+        </div>
+        <div class="col-xs-12 col-sm-4" style="padding: 10px">
+          <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.year"/>
+        </div>
+        <div class="col-xs-12 col-sm-4" style="padding: 10px">
+          <q-select :label="$q.lang.semana" :options="filter.weeks" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.week"/>
+        </div>
+      </div>
+    </div>
     <!-- TABLA DE DATOS -->
-    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub" />
+ <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO DE CLIENTES -->
     <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" :table="null" @cancel="client.dialog=false" @onSave="saveDataClient"></n-dialog>
   </div>
@@ -152,7 +171,8 @@ export default {
         EstadosSel: ["PENDIENTE"],
         Estados: ["PENDIENTE", "DEVUELTO", "COBRADO", "ANULADO", "EMITIDO"],
         alldata: false,
-        years: ["2020", "2019", "2018", "2017"],
+        years: [],
+        weeks: [],
         months: [
           "",
           "01",
@@ -169,7 +189,8 @@ export default {
           "12"
         ],
         month: ("0" + (new Date().getMonth() + 1)).slice(-2),
-        year: new Date().getFullYear()
+        year: new Date().getFullYear(),
+        week: 1
       },
       rowClassRules: {
         error:
@@ -200,8 +221,7 @@ export default {
       tab: this.$route.params.recibo,
       // CALCULOS
       calculos: {
-        importe: null,
-        cobrado: null
+        importe: null
       }
     };
   },
@@ -296,6 +316,58 @@ export default {
           self.rowData = response.data.data;
         });
     },
+    callDataLiq() {
+      let self = this;
+      let dateini = this.getMonday(this.filter.year, this.filter.week);
+      let dateend = new Date(dateini);
+      dateend.setDate(dateini.getDate() + 6);
+      dateini = dateini.toISOString().substr(0, 10);
+      dateend = dateend.toISOString().substr(0, 10);
+      // console.log(dateini + "--" + dateend);
+      let where =
+        "(Estado LIKE 'COBRADO') AND (Situacion>='" +
+        dateini +
+        "' AND Situacion<='" +
+        dateend +
+        "')";
+      showLoading();
+      axios
+        .post(localStorage.url, {
+          cmd: "getRecords",
+          table: "Recibos",
+          where: where,
+          orderby: "Situacion DESC",
+          subtable: false,
+          id: false
+        })
+        .then(function(response) {
+          self.columnDefs = response.data.columns;
+          self.columnDefsSub = response.data.columnsSub;
+          hideLoading();
+          self.rowData = response.data.data;
+        });
+    },
+    callDataAnt() {
+      let self = this;
+      let where =
+        "(Estado LIKE 'PENDIENTE') AND (Cobrado>0 AND Cobrado<>Importe)";
+      showLoading();
+      axios
+        .post(localStorage.url, {
+          cmd: "getRecords",
+          table: "Recibos",
+          where: where,
+          orderby: "Situacion DESC",
+          subtable: false,
+          id: false
+        })
+        .then(function(response) {
+          self.columnDefs = response.data.columns;
+          self.columnDefsSub = response.data.columnsSub;
+          hideLoading();
+          self.rowData = response.data.data;
+        });
+    },
     callDataRecibo() {
       let self = this;
       let where = "(CodigoRecibo='" + this.$route.params.recibo + "')";
@@ -367,8 +439,10 @@ export default {
         sumCobrado = sumCobrado + data[i].data.Cobrado;
         sumImporte = sumImporte + data[i].data.Importe;
       }
-      this.calculos.importe = Number(sumImporte).toFixed(1);
-      this.calculos.cobrado = Number(sumCobrado).toFixed(1);
+      this.calculos.importe =
+        (this.$route.params.recibo == "ant")
+          ? Number(sumCobrado).toFixed(2)
+          : Number(sumImporte).toFixed(1);
     },
     // INITIALIZATION
     init() {
@@ -379,10 +453,29 @@ export default {
         case "gestion":
           this.callDataGestion();
           break;
+          case "liq":
+          this.callDataLiq();
+          break;
+        case "ant":
+          this.callDataAnt();
+          break;
         default:
           this.callDataRecibo();
           break;
       }
+    },
+    getMonday(year, week) {
+      // Jan 1 of 'year'
+      var d = new Date(year, 0, 1),
+        offset = d.getTimezoneOffset();
+      d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+      d.setTime(
+        d.getTime() +
+          7 * 24 * 60 * 60 * 1000 * (week + (year == d.getFullYear() ? -1 : 0))
+      );
+      d.setTime(d.getTime() + (d.getTimezoneOffset() - offset) * 60 * 1000);
+      d.setDate(d.getDate() - 3);
+      return d;
     }
   },
   beforeMount() {
@@ -393,6 +486,11 @@ export default {
       years[i] = year - i;
     }
     this.filter.years = years;
+    let weeks = [];
+    for (let i = 0; i < 55; i++) {
+      weeks[i] = i + 1;
+    }
+    this.filter.weeks = weeks;
   },
   watch: {
     $route: "init"
