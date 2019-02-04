@@ -132,4 +132,10 @@ export default {
   Bajas: "Baixes",
   ano: "Any",
   mes: "Mes",
+  //REGISTROS
+  Nuevo: "Nou",
+  Editar: "Editar",
+  Guardar: "Guardar",
+  Cerrar: "Tancar",
+  DatosGuardados: "Dades enregistrades"
 }

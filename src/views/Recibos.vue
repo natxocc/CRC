@@ -227,7 +227,14 @@ export default {
           idvalue: self.client.data["NIF"],
           data: self.client.data
         })
-        .then(function(response) {});
+        .then(function(response) {
+          if(response.data==true) {
+            self.$q.notify({
+            message: self.$q.lang.DatosGuardados,
+            color: "positive"
+          });
+          }
+        });
     },
     callDataGestion() {
       let self = this;

@@ -339,7 +339,8 @@ class db
         $sql = $this->db->prepare($sqlquery);
         $sql->bindParam(":idvalue", $post['idvalue']);
         try {
-            $sql->execute();
+            $result = $sql->execute();
+            echo json_encode($result);
             return true;
         } catch (Exception $e) {
             echo $e;
