@@ -168,6 +168,18 @@ export default {
     Fecha: "Data",
     Operacion: "Operació"
   },
+  // OPCIONES
+  options: [
+    "P1 PENDIENTES (en curso)",
+    "P2 PENDIENTES (asesoría)",
+    "P3 PENDIENTES (RJ)",
+    "C1 COBRADO (Metálico)",
+    "C2 COBRADO (Tarjeta)",
+    "C3 COBRADO (Transferencia)",
+    "C4 COBRADO (Banco)",
+    "A1 ANULADO (Ajuste)",
+    "A2 ANULADO (Baja)",
+  ],
   // PAGINA PRINCIPAL
   InicioSesion: "Inici de sesió",
   Usuario: "Usuari",
