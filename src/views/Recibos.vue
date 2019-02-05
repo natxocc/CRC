@@ -136,7 +136,7 @@
       </div>
     </div>
     <!-- TABLA DE DATOS -->
- <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
+    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO DE CLIENTES -->
     <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" :table="null" @cancel="client.dialog=false" @onSave="saveDataClient"></n-dialog>
   </div>
@@ -248,11 +248,11 @@ export default {
           data: self.client.data
         })
         .then(function(response) {
-          if(response.data==true) {
+          if (response.data == true) {
             self.$q.notify({
-            message: self.$q.lang.DatosGuardados,
-            color: "positive"
-          });
+              message: self.$q.lang.DatosGuardados,
+              color: "positive"
+            });
           }
         });
     },
@@ -282,7 +282,8 @@ export default {
           subtable: "RecibosGestion",
           id: "CodigoRecibo",
           orderby: "Situacion DESC",
-          where: where
+          where: where,
+          lang: this.$q.lang.db
         })
         .then(function(response) {
           self.columnDefs = response.data.columns;
@@ -307,7 +308,8 @@ export default {
           where: where,
           orderby: false,
           subtable: false,
-          id: false
+          id: false,
+          lang: this.$q.lang.db
         })
         .then(function(response) {
           self.columnDefs = response.data.columns;
@@ -323,6 +325,8 @@ export default {
       dateend.setDate(dateini.getDate() + 6);
       dateini = dateini.toISOString().substr(0, 10);
       dateend = dateend.toISOString().substr(0, 10);
+      console.log(dateini)
+      console.log(dateend)
       // console.log(dateini + "--" + dateend);
       let where =
         "(Estado LIKE 'COBRADO') AND (Situacion>='" +
@@ -338,7 +342,8 @@ export default {
           where: where,
           orderby: "Situacion DESC",
           subtable: false,
-          id: false
+          id: false,
+          lang: this.$q.lang.db
         })
         .then(function(response) {
           self.columnDefs = response.data.columns;
@@ -359,7 +364,8 @@ export default {
           where: where,
           orderby: "Situacion DESC",
           subtable: false,
-          id: false
+          id: false,
+          lang: this.$q.lang.db
         })
         .then(function(response) {
           self.columnDefs = response.data.columns;
@@ -379,7 +385,8 @@ export default {
           where: where,
           orderby: false,
           subtable: false,
-          id: false
+          id: false,
+          lang: this.$q.lang.db
         })
         .then(function(response) {
           self.columnDefs = response.data.columns;
@@ -413,7 +420,8 @@ export default {
             where: where,
             orderby: false,
             subtable: false,
-            id: false
+            id: false,
+            lang: this.$q.lang.db
           })
           .then(function(response) {
             if (response.data.data.length) {
@@ -440,7 +448,7 @@ export default {
         sumImporte = sumImporte + data[i].data.Importe;
       }
       this.calculos.importe =
-        (this.$route.params.recibo == "ant")
+        this.$route.params.recibo == "ant"
           ? Number(sumCobrado).toFixed(2)
           : Number(sumImporte).toFixed(1);
     },
@@ -453,7 +461,7 @@ export default {
         case "gestion":
           this.callDataGestion();
           break;
-          case "liq":
+        case "liq":
           this.callDataLiq();
           break;
         case "ant":
@@ -465,7 +473,6 @@ export default {
       }
     },
     getMonday(year, week) {
-      // Jan 1 of 'year'
       var d = new Date(year, 0, 1),
         offset = d.getTimezoneOffset();
       d.setDate(d.getDate() + 4 - (d.getDay() || 7));

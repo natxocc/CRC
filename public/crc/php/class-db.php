@@ -217,23 +217,24 @@ class db
     /**
      * getColumns
      *
-     * @param  mixed $post (table)
+     * @param  mixed $post (table) OPTIONAL: [lang]
      *
      * @return columns
-     * @return :type, hide, pinned, headerName, headerTooltip, field, tooltipField 
+     * @return :type, hide, pinned, headerName, headerTooltip, field, tooltipField OPTIONS: 
      */
-    public function getColumns($table)
+    public function getColumns($table, $lang = false)
     {
+        //var_dump($lang);
         $sql = $this->db->prepare("SHOW FULL COLUMNS FROM $table");
         $sql->execute();
         $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
         foreach ($fetch as $key => $value) {
             $result[$key]['type'] = "generalColumn";
-            $columnName = explode("|", $fetch[$key]['Comment']);
-            $result[$key]['headerName'] = $columnName[0];
             $result[$key]['headerTooltip'] = $fetch[$key]['Field'];
             $result[$key]['tooltipField'] = "";
             $result[$key]['field'] = $fetch[$key]['Field'];
+            $columnName = explode("|", $fetch[$key]['Comment']);
+            $result[$key]['headerName'] = isset($lang[$fetch[$key]['Field']]) ? $lang[$fetch[$key]['Field']] : $columnName[0];
             if (isset($columnName[1])) {
                 if (strstr($columnName[1], "H")) $result[$key]['hide'] = true;
                 if (strstr($columnName[1], "L")) $result[$key]['pinned'] = 'left';
@@ -272,7 +273,7 @@ class db
     function getRecords($post)
     {
         $table = $this->sanitize($post['table']);
-        $result['columns'] = $this->getColumns($table);
+        $result['columns'] = $this->getColumns($table, $post['lang']);
         $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
         $where = $post['where'] ? " WHERE " . $this->sanitize($post['where'], false) : "";
         $sqlquery .= $where;
