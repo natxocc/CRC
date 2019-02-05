@@ -1,7 +1,6 @@
 <?php
 defined('SECURITY_TOKEN') or exit('No direct script access allowed');
 
-// Class reale
 class reale
 {
 
@@ -71,7 +70,7 @@ class reale
           $db->updateRecord($post);
         }
       }
-      echo "Fin de actualización de Recibos de empresa ".$empresa."\n\r";
+      echo "Fin de actualización de Recibos de empresa " . $empresa . "\n\r";
     }
 
     echo "Fin de actualización de Recibos";
@@ -102,7 +101,8 @@ class reale
       'Identificador' => 'ag34764w@TTLY9XPR',
       'FechaInicial' => $dateini,
       'FechaFinal' => $dateend,
-      'TipoSuplemento1' => "NP"
+      'TipoSuplemento1' => "NP",
+      'TipoSuplemento2' => "AN"
     );
     $resultado = $consulta->Descargar($parametros);
     $resultado = $resultado->ListaPolizas->Poliza;
