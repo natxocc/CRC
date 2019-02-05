@@ -129,6 +129,7 @@ export default {
     ImporteBonificacion: "Importe Bonificación",
     ImporteNeto: "Importe Neto",
     FormaPago: "Forma Pago",
+    CIA: "Compañia",
     BitManual: "Bit Manual",
     // POLIZAS
     FechaAlta: "Fecha Alta",
@@ -171,15 +172,15 @@ export default {
   },
   // OPCIONES
   options: [
-    "P1 PENDIENTES (en curso)",
-    "P2 PENDIENTES (asesoría)",
-    "P3 PENDIENTES (RJ)",
-    "C1 COBRADO (Metálico)",
-    "C2 COBRADO (Tarjeta)",
-    "C3 COBRADO (Transferencia)",
-    "C4 COBRADO (Banco)",
-    "A1 ANULADO (Ajuste)",
-    "A2 ANULADO (Baja)",
+    "PCU PENDIENTE (en curso)",
+    "PAS PENDIENTE (asesoría)",
+    "PRJ PENDIENTE (RJ)",
+    "CME COBRADO (Metálico)",
+    "CTA COBRADO (Tarjeta)",
+    "CTR COBRADO (Transferencia)",
+    "CBA COBRADO (Banco)",
+    "AAJ ANULADO (Ajuste)",
+    "ABA ANULADO (Baja)",
   ],
   // PAGINA PRINCIPAL
   InicioSesion: "Inicio de sesión",

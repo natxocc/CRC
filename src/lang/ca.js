@@ -128,6 +128,7 @@ export default {
     ImporteBonificacion: "Import Bonificació",
     ImporteNeto: "Import Net",
     FormaPago: "Forma Pagament",
+    CIA: "Companyia",
     BitManual: "Bit Manual",
     // POLIZAS
     FechaAlta: "Data Alta",
@@ -168,17 +169,17 @@ export default {
     Fecha: "Data",
     Operacion: "Operació"
   },
-  // OPCIONES
-  options: [
-    "P1 PENDIENTES (en curso)",
-    "P2 PENDIENTES (asesoría)",
-    "P3 PENDIENTES (RJ)",
-    "C1 COBRADO (Metálico)",
-    "C2 COBRADO (Tarjeta)",
-    "C3 COBRADO (Transferencia)",
-    "C4 COBRADO (Banco)",
-    "A1 ANULADO (Ajuste)",
-    "A2 ANULADO (Baja)",
+  // MiEstados
+  MiEstados: [
+    { PCU: "PENDENT (en curso)" },
+    { PAS: "PENDENT (assesoría)" },
+    { PRJ: "PENDENT (RJ)" },
+    { CME: "COBRAT (Metàlic)" },
+    { CTA: "COBRAT (Tarja)" },
+    { CTR: "COBRAT (Transferència)" },
+    { CBA: "COBRAT (Banco)" },
+    { AAJ: "ANUL·LAT (Ajust)" },
+    { ABA: "ANUL·LAT (Baixa)" },
   ],
   // PAGINA PRINCIPAL
   InicioSesion: "Inici de sesió",
