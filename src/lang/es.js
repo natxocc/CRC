@@ -191,6 +191,14 @@ export default {
     { value: "ANULADO", label: "ANULADO" },
     { value: "EMITIDO", label: "EMITIDO" }
   ],
+  ayuda: [
+    "Recibos sin tratamiento",
+    "Recibos Pendientes y en curso",
+    "Recibos anulados por Reale u Oficina",
+    "Recibos cobrados por Reale u Oficina",
+    "Recibos Urgentes con más de 25 días sin resolver",
+    "Recibos que tienen un error de gestión"
+  ],
   // PAGINA PRINCIPAL
   InicioSesion: "Inicio de sesión",
   Usuario: "Usuario",
@@ -207,12 +215,6 @@ export default {
   EditarGestion: "Editar",
   EliminarGestion: "Eliminar Gestión",
   EliminarGestionT: "Eliminar gestión del recibo",
-  RecibosSinTratamiento: "Recibos sin tratamiento",
-  RecibosPendientes: "Recibos Pendientes y en curso",
-  RecibosAnulados: "Recibos anulados por Reale u Oficina",
-  RecibosCobrados: "Recibos cobrados por Reale u Oficina",
-  RecibosUrgentes: "Recibos Urgentes con más de 25 días sin resolver",
-  RecibosError: "Recibos que tienen un error de gestión",
   FiltroRapido: "Filtro Rápido",
   FiltrosDeEstado: "Filtros de Estado",
   TodosLosRegistrosT: "Por defecto se filtran los últimos 13 meses",

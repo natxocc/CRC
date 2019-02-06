@@ -190,6 +190,14 @@ export default {
     { value: "ANULADO", label: "ANUL·LAT" },
     { value: "EMITIDO", label: "EMÉS" }
   ],
+  ayuda: [
+    "Rebuts sense tractament",
+    "Rebuts Pendents i en curs",
+    "Rebuts anul·lats per Reale o oficina",
+    "Rebuts cobrats per Reale o oficina",
+    "Rebuts Urgents amb més de 25 dies sense resoldre",
+    "Rebuts que tenen un error de gestió"
+  ],
   // PAGINA PRINCIPAL
   InicioSesion: "Inici de sesió",
   Usuario: "Usuari",
@@ -206,12 +214,7 @@ export default {
   EditarGestion: "Editar",
   EditarGestionT: "Editar gestió de rebut seleccionat",
   EliminarGestion: "Eliminar Gestió",
-  RecibosSinTratamiento: "Rebuts sense tractament",
-  RecibosPendientes: "Rebuts Pendents i en curs",
-  RecibosAnulados: "Rebuts anul·lats per Reale o oficina",
-  RecibosCobrados: "Rebuts cobrats per Reale o oficina",
-  RecibosUrgentes: "Rebuts Urgents amb més de 25 dies sense resoldre",
-  RecibosError: "Rebuts que tenen un error de gestió",
+
   FiltroRapido: "Filtre Ràpid",
   FiltrosDeEstado: "Filtres de estat",
   TodosLosRegistrosT: "Per defecte, es mostren els últims 13 messos",

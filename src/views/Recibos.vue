@@ -8,75 +8,58 @@
       <q-route-tab :label="$q.lang.ControlCaja" icon="done_all" name="ant" to="/recibos/ant"/>
       <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
-    <!-- SELECT FILTERS GESTION -->
-    <div v-if="tab=='gestion'">
+    <!-- SELECT FILTERS -->
+    <div>
       <div class="row text-center">
-        <div class="col-xs-12 col-md-5" style="padding: 10px">
+        <div class="col-xs-12 col-md-4" style="padding: 10px">
           <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
             <q-icon name="filter_list" slot="prepend"/>
             <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
           </q-input>
         </div>
-        <div class="col-xs-12 col-md-5" style="padding: 10px">
-          <q-select :label="$q.lang.FiltrosDeEstado" :options="filter.Estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.EstadosSel"/>
-        </div>
-        <div class="col-xs-12 col-md-2" style="padding: 10px">
-          <q-toggle :label="$q.lang.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
-            <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.TodosLosRegistrosT}}</q-tooltip>
-          </q-toggle>
-        </div>
+        <template v-if="this.$route.params.recibo=='gestion'">
+          <div class="col-xs-12 col-md-4" style="padding: 10px">
+            <q-select :label="$q.lang.FiltrosDeEstado" :options="filter.Estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.EstadosSel"/>
+          </div>
+          <div class="col-xs-12 col-md-4" style="padding: 10px">
+            <q-toggle :label="$q.lang.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
+              <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.TodosLosRegistrosT}}</q-tooltip>
+            </q-toggle>
+          </div>
+        </template>
+        <template v-else-if="this.$route.params.recibo=='bajas'">
+          <div class="col-xs-12 col-md-4" style="padding: 10px">
+            <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.year"/>
+          </div>
+          <div class="col-xs-12 col-md-4" style="padding: 10px">
+            <q-select :label="$q.lang.mes" :options="filter.months" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.month"/>
+          </div>
+        </template>
+        <template v-else-if="this.$route.params.recibo=='liq'">
+          <div class="col-xs-12 col-md-4" style="padding: 10px">
+            <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.year"/>
+          </div>
+          <div class="col-xs-12 col-md-4" style="padding: 10px">
+            <q-select :label="$q.lang.semana" :options="filter.weeks" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.week"/>
+          </div>
+        </template>
       </div>
       <!-- MINI TOOLBAR-->
       <q-bar class="bg-primary text-white">
-        <q-btn dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">
-          {{$q.lang.NuevoRecibo}}
-        </q-btn>
-        <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selected">
-          {{$q.lang.EliminarRecibo}}
-        </q-btn>
-        <q-btn dense flat icon="add" v-if="recibo.selected">
-          {{$q.lang.NuevaGestion}}
-        </q-btn>
-        <q-btn color="warning" dense flat icon="delete" v-if="recibo.selectedSub">
-          {{$q.lang.EliminarGestion}}
-        </q-btn>
-        <q-btn dense flat icon="edit" v-if="recibo.selectedSub">
-          {{$q.lang.EditarGestion}}
-        </q-btn>
+        <q-btn dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">{{$q.lang.NuevoRecibo}}</q-btn>
+        <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selected">{{$q.lang.EliminarRecibo}}</q-btn>
+        <q-btn dense flat icon="add" v-if="recibo.selected">{{$q.lang.NuevaGestion}}</q-btn>
+        <q-btn color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
+        <q-btn dense flat icon="edit" v-if="recibo.selectedSub">{{$q.lang.EditarGestion}}</q-btn>
         <q-space/>
         <!-- AYUDA -->
         <div>
           <q-btn color="primary" icon="help_outline" size="sm">
             <q-popup-proxy>
               <q-list dense>
-                <q-item>
+                <q-item :key="key" :style="{'background-color': helpColors[key]}" v-for="(value, key) in $q.lang.ayuda">
                   <q-item-section>
-                    <q-item-label>{{$q.lang.RecibosSinTratamiento}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: #fcf18e;">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.RecibosPendientes}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: #88c9ff">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.RecibosAnulados}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: rgb(182, 255, 191)">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.RecibosCobrados}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: rgb(252, 151, 151);">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.RecibosUrgentes}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-                <q-item style="background-color: #a8a8a7;">
-                  <q-item-section>
-                    <q-item-label>{{$q.lang.RecibosError}}</q-item-label>
+                    <q-item-label>{{value}}</q-item-label>
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -86,45 +69,10 @@
       </q-bar>
       <!-- LINE CLIENTES -->
       <div class="row textcenter">
-        <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected">
-        </q-btn>
+        <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected"></q-btn>
         <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
           <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
         </q-btn>
-      </div>
-    </div>
-    <!-- SELECT FILTERS BAJAS -->
-    <div v-if="tab=='bajas'">
-      <div class="row text-center">
-        <div class="col-xs-12 col-sm-4" style="padding: 10px">
-          <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
-            <q-icon name="filter_list" slot="prepend"/>
-            <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
-          </q-input>
-        </div>
-        <div class="col-xs-12 col-sm-4" style="padding: 10px">
-          <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.year"/>
-        </div>
-        <div class="col-xs-12 col-sm-4" style="padding: 10px">
-          <q-select :label="$q.lang.mes" :options="filter.months" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.month"/>
-        </div>
-      </div>
-    </div>
-    <!-- SELECT FILTERS LIQUIDACION -->
-    <div v-if="tab=='liq'">
-      <div class="row text-center">
-        <div class="col-xs-12 col-sm-4" style="padding: 10px">
-          <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
-            <q-icon name="filter_list" slot="prepend"/>
-            <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
-          </q-input>
-        </div>
-        <div class="col-xs-12 col-sm-4" style="padding: 10px">
-          <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.year"/>
-        </div>
-        <div class="col-xs-12 col-sm-4" style="padding: 10px">
-          <q-select :label="$q.lang.semana" :options="filter.weeks" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.week"/>
-        </div>
       </div>
     </div>
     <!-- TABLA DE DATOS -->
@@ -160,7 +108,10 @@ export default {
       rowData: null,
       quickFilter: null,
       filter: {
-        EstadosSel: ["PENDIENTE"],
+        EstadosSel: [
+          {value: "PENDIENTE", label: "PENDIENTE"},
+          {value: "DEVUELTO", label: "DEVUELTO"}
+        ],
         Estados: this.$q.lang.estados,
         alldata: false,
         years: [],
@@ -172,13 +123,13 @@ export default {
       },
       rowClassRules: {
         error:
-          "data.Estado.includes('COBRADO') && data.MIEstado.includes('ANULADO')",
+          "data.Estado.includes('COBRADO') && data.Gestion.includes('ANULADO')",
         pendiente:
-          "data.Estado.includes('PENDIENTE') && data.MIEstado.includes('PENDIENTE')",
+          "data.Estado.includes('PENDIENTE') && data.Gestion.includes('PENDIENTE')",
         anulado:
-          "data.Estado.includes('ANULADO') || (data.MIEstado.includes('ANULADO') && !data.Estado.includes('COBRADO'))",
+          "data.Estado.includes('ANULADO') || (data.Gestion.includes('ANULADO') && !data.Estado.includes('COBRADO'))",
         cobrado:
-          "data.Estado.includes('COBRADO') || (data.MIEstado.includes('COBRADO') && data.Importe == data.Cobrado)"
+          "data.Estado.includes('COBRADO') || (data.Gestion.includes('COBRADO') && data.Importe == data.Cobrado)"
       },
       // CLIENT
       client: {
@@ -200,7 +151,14 @@ export default {
       // CALCULOS
       calculos: {
         importe: null
-      }
+      },
+      helpColors: [
+        "#fcf18e",
+        "#88c9ff",
+        "rgb(182, 255, 191)",
+        "rgb(252, 151, 151)",
+        "#a8a8a7"
+      ]
     };
   },
   methods: {
@@ -252,6 +210,7 @@ export default {
         " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')"
       ];
       if (!this.filter.alldata) where += whereMore;
+      console.log(where);
       showLoading();
       axios
         .post(localStorage.url, {
@@ -273,7 +232,7 @@ export default {
     callDataBajas() {
       let self = this;
       let where =
-        "(MIEstado LIKE 'ANULADO') AND (FechaEfecto LIKE '" +
+        "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" +
         this.filter.year +
         "-" +
         this.filter.month +
@@ -464,6 +423,8 @@ export default {
     }
   },
   beforeMount() {
+    this.filter.EstadosSel[0].label = this.$q.lang.estados[0].label;
+    this.filter.EstadosSel[1].label = this.$q.lang.estados[1].label;
     this.init();
     let year = new Date().getFullYear();
     let years = [];
@@ -476,9 +437,9 @@ export default {
       weeks[i] = i + 1;
     }
     for (let i = 0; i < 12; i++) {
-      months[i+1] = ("0" + (i + 1)).slice(-2);
+      months[i + 1] = ("0" + (i + 1)).slice(-2);
     }
-    months[0]="";
+    months[0] = "";
     this.filter.months = months;
     this.filter.weeks = weeks;
     this.filter.years = years;

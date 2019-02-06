@@ -72,6 +72,7 @@ class reale
         $post['data']['ImporteBonificacion'] = $value->ImporteBonificacion;
         $post['data']['ImporteNeto'] = $value->ImporteNeto;
         $post['data']['FormaPago'] = $value->FormaPago;
+        $post['data']['Usuario'] = 0;
         $sql = $db->insertRecord($post);
         if (!$sql) {
           $post['idkey'] = "CodigoRecibo";
