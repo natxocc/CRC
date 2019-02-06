@@ -3,9 +3,9 @@
     <!-- TABS -->
     <q-tabs active-bg-color="primary" active-color="white" class="bg-secondary text-primary" dense indicator-color="transparent" inline-label top-indicator v-model="tab">
       <q-route-tab :label="$q.lang.Gestion" icon="assignment_turned_in" name="gestion" to="/recibos/gestion"/>
-      <q-route-tab :label="$q.lang.Bajas" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
+      <q-route-tab :label="$q.lang.BajasPendientes" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
       <q-route-tab :label="$q.lang.Liquidacion" icon="credit_card" name="liq" to="/recibos/liq"/>
-      <q-route-tab :label="$q.lang.Anticipo" icon="done_all" name="ant" to="/recibos/ant"/>
+      <q-route-tab :label="$q.lang.ControlCaja" icon="done_all" name="ant" to="/recibos/ant"/>
       <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
     <!-- SELECT FILTERS GESTION -->
@@ -29,24 +29,18 @@
       <!-- MINI TOOLBAR-->
       <q-bar class="bg-primary text-white">
         <q-btn dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.NuevoT}}</q-tooltip>
           {{$q.lang.NuevoRecibo}}
         </q-btn>
         <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selected">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.EliminarReciboT}}</q-tooltip>
           {{$q.lang.EliminarRecibo}}
         </q-btn>
         <q-btn dense flat icon="add" v-if="recibo.selected">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.NuevaGestionT}}</q-tooltip>
           {{$q.lang.NuevaGestion}}
         </q-btn>
-
         <q-btn color="warning" dense flat icon="delete" v-if="recibo.selectedSub">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.EliminarGestionT}}</q-tooltip>
           {{$q.lang.EliminarGestion}}
         </q-btn>
         <q-btn dense flat icon="edit" v-if="recibo.selectedSub">
-          <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.EditarGestionT}}</q-tooltip>
           {{$q.lang.EditarGestion}}
         </q-btn>
         <q-space/>
@@ -93,10 +87,8 @@
       <!-- LINE CLIENTES -->
       <div class="row textcenter">
         <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected">
-          <q-tooltip anchor="top middle" self="bottom middle">Crear nuevo Cliente</q-tooltip>Nuevo Cliente
         </q-btn>
         <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
-          <q-tooltip anchor="top middle" self="bottom middle">Información de Contacto</q-tooltip>
           <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
         </q-btn>
       </div>
@@ -173,21 +165,7 @@ export default {
         alldata: false,
         years: [],
         weeks: [],
-        months: [
-          "",
-          "01",
-          "02",
-          "03",
-          "04",
-          "05",
-          "06",
-          "07",
-          "08",
-          "09",
-          "10",
-          "11",
-          "12"
-        ],
+        months: [],
         month: ("0" + (new Date().getMonth() + 1)).slice(-2),
         year: new Date().getFullYear(),
         week: 1
@@ -325,8 +303,8 @@ export default {
       dateend.setDate(dateini.getDate() + 6);
       dateini = dateini.toISOString().substr(0, 10);
       dateend = dateend.toISOString().substr(0, 10);
-      console.log(dateini)
-      console.log(dateend)
+      console.log(dateini);
+      console.log(dateend);
       // console.log(dateini + "--" + dateend);
       let where =
         "(Estado LIKE 'COBRADO') AND (Situacion>='" +
@@ -489,15 +467,21 @@ export default {
     this.init();
     let year = new Date().getFullYear();
     let years = [];
+    let months = [];
+    let weeks = [];
     for (let i = 0; i < 20; i++) {
       years[i] = year - i;
     }
-    this.filter.years = years;
-    let weeks = [];
     for (let i = 0; i < 55; i++) {
       weeks[i] = i + 1;
     }
+    for (let i = 0; i < 12; i++) {
+      months[i+1] = ("0" + (i + 1)).slice(-2);
+    }
+    months[0]="";
+    this.filter.months = months;
     this.filter.weeks = weeks;
+    this.filter.years = years;
   },
   watch: {
     $route: "init"

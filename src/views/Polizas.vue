@@ -6,7 +6,7 @@
       <q-route-tab :label="$q.lang.Bajas" icon="assignment_returned" name="bajas" to="/polizas/bajas"/>
       <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
-    <!-- SELECT FILTERS GESTION -->
+    <!-- SELECT FILTERS GESTION ALTAS Y BAJAS-->
     <div class="row text-center">
       <div class="col-xs-12 col-sm-4" style="padding: 10px">
         <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
@@ -15,14 +15,14 @@
         </q-input>
       </div>
       <div class="col-xs-12 col-sm-4" style="padding: 10px">
-        <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataAltas" dense expandBesides optionsDense v-model="filter.year"/>
+        <q-select :label="$q.lang.ano" :options="filter.years" @input="init" dense expandBesides optionsDense v-model="filter.year"/>
       </div>
       <div class="col-xs-12 col-sm-4" style="padding: 10px">
-        <q-select :label="$q.lang.mes" :options="filter.months" @input="callDataAltas" dense expandBesides optionsDense v-model="filter.month"/>
+        <q-select :label="$q.lang.mes" :options="filter.months" @input="init" dense expandBesides optionsDense v-model="filter.month"/>
       </div>
     </div>
     <!-- TABLA DE DATOS -->
-    <n-tables :columnDefs="columnDefs" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" />
+    <n-tables :columnDefs="columnDefs" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData"/>
   </div>
 </template>
 
@@ -50,22 +50,8 @@ export default {
       quickFilter: null,
       rowClassRules: {},
       filter: {
-        years: ["2020", "2019", "2018", "2017"],
-        months: [
-          "",
-          "01",
-          "02",
-          "03",
-          "04",
-          "05",
-          "06",
-          "07",
-          "08",
-          "09",
-          "10",
-          "11",
-          "12"
-        ],
+        years: [],
+        months: [],
         month: ("0" + (new Date().getMonth() + 1)).slice(-2),
         year: new Date().getFullYear()
       },
@@ -81,7 +67,7 @@ export default {
     callDataAltas() {
       let self = this;
       let where =
-        "(FechaAlta LIKE '" +
+        "(TipoInformacion LIKE 'Nueva%' ) AND (FechaAlta LIKE '" +
         this.filter.year +
         "-" +
         this.filter.month +
@@ -94,7 +80,8 @@ export default {
           subtable: false,
           id: false,
           orderby: "FechaAlta DESC",
-          where: where
+          where: where,
+          lang: this.$q.lang.db
         })
         .then(function(response) {
           self.columnDefs = response.data.columns;
@@ -105,7 +92,7 @@ export default {
     callDataBajas() {
       let self = this;
       let where =
-        "(Estado LIKE 'ANULADO') AND (FechaAlta LIKE '" +
+        "(TipoInformacion LIKE 'Anula%' )  AND (FechaBaja LIKE '" +
         this.filter.year +
         "-" +
         this.filter.month +
@@ -117,8 +104,9 @@ export default {
           table: "Polizas",
           subtable: false,
           id: false,
-          orderby: "FechaAlta DESC",
-          where: where
+          orderby: "FechaBaja DESC",
+          where: where,
+          lang: this.$q.lang.db
         })
         .then(function(response) {
           self.columnDefs = response.data.columns;
@@ -156,9 +144,15 @@ export default {
     this.init();
     let year = new Date().getFullYear();
     let years = [];
+    let months = [];
     for (let i = 0; i < 20; i++) {
       years[i] = year - i;
     }
+    for (let i = 0; i < 12; i++) {
+      months[i + 1] = ("0" + (i + 1)).slice(-2);
+    }
+    months[0] = "";
+    this.filter.months = months;
     this.filter.years = years;
   },
   watch: {

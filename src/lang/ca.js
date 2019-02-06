@@ -113,7 +113,7 @@ export default {
     // RECIBOS
     Estado: "Estat",
     FechaEfecto: "Data Efecte",
-    MiEstado: "MEU Estat",
+    Gestion: "Gestió",
     FechaGestion: "Data Gestió",
     NombreTomador: "Nom",
     CodigoPoliza: "Pòlissa",
@@ -169,17 +169,17 @@ export default {
     Fecha: "Data",
     Operacion: "Operació"
   },
-  // MiEstados
-  MiEstados: [
-    { PCU: "PENDENT (en curso)" },
-    { PAS: "PENDENT (assesoría)" },
-    { PRJ: "PENDENT (RJ)" },
-    { CME: "COBRAT (Metàlic)" },
-    { CTA: "COBRAT (Tarja)" },
-    { CTR: "COBRAT (Transferència)" },
-    { CBA: "COBRAT (Banco)" },
-    { AAJ: "ANUL·LAT (Ajust)" },
-    { ABA: "ANUL·LAT (Baixa)" },
+  // GESTIO
+  gestion: [
+    { PECU: "PENDENT (En curs)" },
+    { PEAS: "PENDENT (Assesoria)" },
+    { PERJ: "PENDENT (RJ)" },
+    { COME: "COBRAT (Metàlic)" },
+    { COTA: "COBRAT (Tarja)" },
+    { COTR: "COBRAT (Transferència)" },
+    { COBA: "COBRAT (Banco)" },
+    { ANAJ: "ANUL·LAT (Ajust)" },
+    { ANBA: "ANUL·LAT (Baixa)" }
   ],
   // PAGINA PRINCIPAL
   InicioSesion: "Inici de sesió",
@@ -192,15 +192,11 @@ export default {
   CerrarSesion: "Tancar Sessió",
   // GENERAL
   NuevoRecibo: "Nou Rebut",
-  NuevoReciboT: "Crear nour rebut Temporal",
   EliminarRecibo: "Eliminar rebut",
-  EliminarReciboT: "Eliminar rebut de la base de dades",
   NuevaGestion: "Nova Gestió",
-  NuevaGestionT: "Gestionar Rebut seleccionat",
   EditarGestion: "Editar",
   EditarGestionT: "Editar gestió de rebut seleccionat",
   EliminarGestion: "Eliminar Gestió",
-  EliminarGestionT: "Eliminar gestió del rebut",
   RecibosSinTratamiento: "Rebuts sense tractament",
   RecibosPendientes: "Rebuts Pendents i en curs",
   RecibosAnulados: "Rebuts anul·lats per Reale o oficina",
@@ -214,11 +210,12 @@ export default {
   Gestion: "Gestió",
   Altas: "Altes",
   Bajas: "Baixes",
+  BajasPendientes: "Baixes pendents",
   ano: "Any",
   mes: "Mes",
   semana: "Setmana",
   Liquidacion: "Liquidació",
-  Anticipo: "Bestretes",
+  ControlCaja: "Control Caixa",
   //REGISTROS
   Nuevo: "Nou",
   Editar: "Editar",

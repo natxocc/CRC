@@ -114,7 +114,7 @@ export default {
     // RECIBOS
     Estado: "Estado",
     FechaEfecto: "Fecha Efecto",
-    MiEstado: "MI Estado",
+    Gestion: "Gestión",
     FechaGestion: "Fecha Gestion",
     NombreTomador: "Nombre",
     CodigoPoliza: "Poliza",
@@ -170,17 +170,17 @@ export default {
     Fecha: "Fecha",
     Operacion: "Operacion"
   },
-  // OPCIONES
-  options: [
-    "PCU PENDIENTE (en curso)",
-    "PAS PENDIENTE (asesoría)",
-    "PRJ PENDIENTE (RJ)",
-    "CME COBRADO (Metálico)",
-    "CTA COBRADO (Tarjeta)",
-    "CTR COBRADO (Transferencia)",
-    "CBA COBRADO (Banco)",
-    "AAJ ANULADO (Ajuste)",
-    "ABA ANULADO (Baja)",
+  // GESTION
+  gestion: [
+    { value: "PECU", label: "PENDIENTE (En curso)" },
+    { value: "PEAS", label: "PENDIENTE (Asesoría)" },
+    { value: "PERJ", label: "PENDIENTE (RJ)" },
+    { value: "COME", label: "COBRADO (Metálico)" },
+    { value: "COTA", label: "COBRADO (Tarjeta)" },
+    { value: "COTR", label: "COBRADO (Transferencia)" },
+    { value: "COBA", label: "COBRADO (Banco)" },
+    { value: "ANAJ", label: "ANULADO (Ajuste)" },
+    { value: "ANBA", label: "ANULADO (Baja)" }
   ],
   // PAGINA PRINCIPAL
   InicioSesion: "Inicio de sesión",
@@ -193,13 +193,9 @@ export default {
   CerrarSesion: "Cerrar Sesion",
   // GENERAL
   NuevoRecibo: "Nuevo Recibo",
-  NuevoReciboT: "Crear nuevo recibo Temporal",
   EliminarRecibo: "Eliminar Recibo",
-  EliminarReciboT: "Eliminar recibo de la base de datos",
   NuevaGestion: "Nueva Gestión",
-  NuevaGestionT: "Gestionar Recibo seleccionado",
   EditarGestion: "Editar",
-  EditarGestionT: "Editar gestión de recibo seleccionada",
   EliminarGestion: "Eliminar Gestión",
   EliminarGestionT: "Eliminar gestión del recibo",
   RecibosSinTratamiento: "Recibos sin tratamiento",
@@ -215,11 +211,12 @@ export default {
   Gestion: "Gestión",
   Altas: "Altas",
   Bajas: "Bajas",
+  BajasPendientes: "Bajas pendientes",
   ano: "Año",
   mes: "Mes",
   semana: "Semana",
   Liquidacion: "Liquidación",
-  Anticipo: "Anticipo",
+  ControlCaja: "Control Caja",
   //REGISTROS
   Nuevo: "Nuevo",
   Editar: "Editar",

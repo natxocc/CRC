@@ -341,10 +341,9 @@ class db
         $sql->bindParam(":idvalue", $post['idvalue']);
         try {
             $result = $sql->execute();
-            echo json_encode($result);
             return true;
         } catch (Exception $e) {
-            echo $e;
+            //echo $e;
             return false;
         }
         exit('End');
@@ -372,7 +371,7 @@ class db
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            echo $e;
+            //echo $e;
             return false;
         }
         exit();
@@ -400,7 +399,7 @@ class db
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            echo $e;
+            //echo $e;
             return false;
         }
         exit();

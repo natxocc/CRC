@@ -130,7 +130,7 @@ export default {
           {
             icon: "person",
             name: this.$q.lang.menu.Usuarios,
-            to: "/recibos"
+            to: "/usuarios"
           }
         ]
       },

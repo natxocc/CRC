@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <!-- SELECT FILTERS GESTION -->
+    <!-- SELECT FILTERS -->
     <div class="row text-center">
       <div class="col-xs-12" style="padding: 10px">
         <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
@@ -46,10 +46,10 @@ export default {
       axios
         .post(localStorage.url, {
           cmd: "getRecords",
-          table: "Clientes",
+          table: "Usuarios",
           subtable: false,
           id: false,
-          orderby: "NombreCompleto ASC",
+          orderby: "Usuario ASC",
           where: false,
           lang: this.$q.lang.db
         })
