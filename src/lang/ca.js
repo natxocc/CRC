@@ -171,15 +171,24 @@ export default {
   },
   // GESTIO
   gestion: [
-    { PECU: "PENDENT (En curs)" },
-    { PEAS: "PENDENT (Assesoria)" },
-    { PERJ: "PENDENT (RJ)" },
-    { COME: "COBRAT (Metàlic)" },
-    { COTA: "COBRAT (Tarja)" },
-    { COTR: "COBRAT (Transferència)" },
-    { COBA: "COBRAT (Banco)" },
-    { ANAJ: "ANUL·LAT (Ajust)" },
-    { ANBA: "ANUL·LAT (Baixa)" }
+    { value: "PEPE", label: "PENDENT (Pendent)" },
+    { value: "PEAS", label: "PENDENT (Assesoria)" },
+    { value: "PERJ", label: "PENDENT (RJ)" },
+    { value: "COME", label: "COBRAT (Metàlic)" },
+    { value: "COTA", label: "COBRAT (Tarja)" },
+    { value: "COTR", label: "COBRAT (Transfèrencia)" },
+    { value: "COBA", label: "COBRAT (Banc)" },
+    { value: "COOF", label: "COBRAT (Oficina)" },
+    { value: "ANAJ", label: "ANUL·LAT (Ajust)" },
+    { value: "ANBA", label: "ANUL·LAT (Baixa)" }
+  ],
+  // ESTADOS
+  estados: [
+    { value: "PENDIENTE", label: "PENDENT" },
+    { value: "DEVUELTO", label: "TORNAT" },
+    { value: "COBRADO", label: "COBRAT" },
+    { value: "ANULADO", label: "ANUL·LAT" },
+    { value: "EMITIDO", label: "EMÉS" }
   ],
   // PAGINA PRINCIPAL
   InicioSesion: "Inici de sesió",

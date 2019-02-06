@@ -161,7 +161,7 @@ export default {
       quickFilter: null,
       filter: {
         EstadosSel: ["PENDIENTE"],
-        Estados: ["PENDIENTE", "DEVUELTO", "COBRADO", "ANULADO", "EMITIDO"],
+        Estados: this.$q.lang.estados,
         alldata: false,
         years: [],
         weeks: [],
@@ -244,7 +244,7 @@ export default {
       let where = "(",
         or = "";
       for (let i = 0; i < this.filter.EstadosSel.length; i++) {
-        where += or + "Estado LIKE '" + this.filter.EstadosSel[i] + "%'";
+        where += or + "Estado LIKE '" + this.filter.EstadosSel[i].value + "%'";
         or = " OR ";
       }
       where += ")";

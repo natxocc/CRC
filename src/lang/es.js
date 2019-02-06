@@ -172,15 +172,24 @@ export default {
   },
   // GESTION
   gestion: [
-    { value: "PECU", label: "PENDIENTE (En curso)" },
+    { value: "PEPE", label: "PENDIENTE (Pendiente)" },
     { value: "PEAS", label: "PENDIENTE (Asesoría)" },
     { value: "PERJ", label: "PENDIENTE (RJ)" },
     { value: "COME", label: "COBRADO (Metálico)" },
     { value: "COTA", label: "COBRADO (Tarjeta)" },
     { value: "COTR", label: "COBRADO (Transferencia)" },
     { value: "COBA", label: "COBRADO (Banco)" },
+    { value: "COOF", label: "COBRAT (Oficina)" },
     { value: "ANAJ", label: "ANULADO (Ajuste)" },
     { value: "ANBA", label: "ANULADO (Baja)" }
+  ],
+  // ESTADOS
+  estados: [
+    { value: "PENDIENTE", label: "PENDIENTE" },
+    { value: "DEVUELTO", label: "DEVUELTO" },
+    { value: "COBRADO", label: "COBRADO" },
+    { value: "ANULADO", label: "ANULADO" },
+    { value: "EMITIDO", label: "EMITIDO" }
   ],
   // PAGINA PRINCIPAL
   InicioSesion: "Inicio de sesión",
