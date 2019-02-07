@@ -179,7 +179,9 @@ export default {
     { value: "COTA", label: "COBRADO (Tarjeta)" },
     { value: "COTR", label: "COBRADO (Transferencia)" },
     { value: "COBA", label: "COBRADO (Banco)" },
-    { value: "COOF", label: "COBRAT (Oficina)" },
+    { value: "AVME", label: "ANTICIPO (Metálico)" },
+    { value: "AVTR", label: "ANTICIPO (Transferencia)" },
+    { value: "AVPR", label: "PROVISIONAL" },
     { value: "ANAJ", label: "ANULADO (Ajuste)" },
     { value: "ANBA", label: "ANULADO (Baja)" }
   ],

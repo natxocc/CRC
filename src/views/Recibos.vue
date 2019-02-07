@@ -8,7 +8,7 @@
       <q-route-tab :label="$q.lang.ControlCaja" icon="done_all" name="ant" to="/recibos/ant"/>
       <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
-    <!-- SELECT FILTERS -->
+    <!-- SELECT FILTERS TOTALS-->
     <div>
       <div class="row text-center">
         <div class="col-xs-12 col-md-4" style="padding: 10px">
@@ -17,9 +17,10 @@
             <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
           </q-input>
         </div>
+        <!-- FILTER ONLY GESTION -->
         <template v-if="this.$route.params.recibo=='gestion'">
           <div class="col-xs-12 col-md-4" style="padding: 10px">
-            <q-select :label="$q.lang.FiltrosDeEstado" :options="filter.Estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.EstadosSel"/>
+            <q-select :label="$q.lang.FiltrosDeEstado" :options="filter.estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.estadosSel"/>
           </div>
           <div class="col-xs-12 col-md-4" style="padding: 10px">
             <q-toggle :label="$q.lang.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
@@ -27,6 +28,7 @@
             </q-toggle>
           </div>
         </template>
+        <!-- FILTER ONLY BAJAS -->
         <template v-else-if="this.$route.params.recibo=='bajas'">
           <div class="col-xs-12 col-md-4" style="padding: 10px">
             <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.year"/>
@@ -35,6 +37,7 @@
             <q-select :label="$q.lang.mes" :options="filter.months" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.month"/>
           </div>
         </template>
+        <!-- FILTER ONLY LIQ -->
         <template v-else-if="this.$route.params.recibo=='liq'">
           <div class="col-xs-12 col-md-4" style="padding: 10px">
             <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.year"/>
@@ -52,7 +55,7 @@
         <q-btn color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
         <q-btn dense flat icon="edit" v-if="recibo.selectedSub">{{$q.lang.EditarGestion}}</q-btn>
         <q-space/>
-        <!-- AYUDA -->
+        <!-- COLORS HELP -->
         <div>
           <q-btn color="primary" icon="help_outline" size="sm">
             <q-popup-proxy>
@@ -67,7 +70,7 @@
           </q-btn>
         </div>
       </q-bar>
-      <!-- LINE CLIENTES -->
+      <!-- LINE CLIENTS -->
       <div class="row textcenter">
         <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected"></q-btn>
         <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
@@ -94,7 +97,6 @@ function showLoading(options) {
 function hideLoading(options) {
   Loading.hide(options);
 }
-
 export default {
   components: {
     NTables,
@@ -108,11 +110,8 @@ export default {
       rowData: null,
       quickFilter: null,
       filter: {
-        EstadosSel: [
-          {value: "PENDIENTE", label: "PENDIENTE"},
-          {value: "DEVUELTO", label: "DEVUELTO"}
-        ],
-        Estados: this.$q.lang.estados,
+        estadosSel: [{value: "PENDIENTE", label: "PENDIENTE"}, {value: "DEVUELTO", label: "DEVUELTO"}],
+        estados: this.$q.lang.estados,
         alldata: false,
         years: [],
         weeks: [],
@@ -122,14 +121,10 @@ export default {
         week: 1
       },
       rowClassRules: {
-        error:
-          "data.Estado.includes('COBRADO') && data.Gestion.includes('ANULADO')",
-        pendiente:
-          "data.Estado.includes('PENDIENTE') && data.Gestion.includes('PENDIENTE')",
-        anulado:
-          "data.Estado.includes('ANULADO') || (data.Gestion.includes('ANULADO') && !data.Estado.includes('COBRADO'))",
-        cobrado:
-          "data.Estado.includes('COBRADO') || (data.Gestion.includes('COBRADO') && data.Importe == data.Cobrado)"
+        error: "data.Estado.includes('COBRADO') && data.Gestion.includes('ANULADO')",
+        pendiente: "data.Estado.includes('PENDIENTE') && data.Gestion.includes('PENDIENTE')",
+        anulado: "data.Estado.includes('ANULADO') || (data.Gestion.includes('ANULADO') && !data.Estado.includes('COBRADO'))",
+        cobrado: "data.Estado.includes('COBRADO') || (data.Gestion.includes('COBRADO') && data.Importe == data.Cobrado)"
       },
       // CLIENT
       client: {
@@ -152,17 +147,22 @@ export default {
       calculos: {
         importe: null
       },
-      helpColors: [
-        "#fcf18e",
-        "#88c9ff",
-        "rgb(182, 255, 191)",
-        "rgb(252, 151, 151)",
-        "#a8a8a7"
-      ]
+      helpColors: ["", "#fcf18e", "#88c9ff", "rgb(182, 255, 191)", "rgb(252, 151, 151)", "#a8a8a7"]
     };
   },
   methods: {
     // AXIOS
+    callData(cmd, table=false, where = false, subtable = false, id = false) {
+      showLoading();
+      return axios.post(localStorage.url, {
+        cmd,
+        table,
+        where,
+        subtable,
+        id,
+        lang: this.$q.lang.db
+      });
+    },
     deleteRecord() {
       this.$q
         .dialog({
@@ -192,6 +192,7 @@ export default {
           }
         });
     },
+    // CALL DATA GESTION
     callDataGestion() {
       let self = this;
       // Por defecto los últimos 13 meses
@@ -201,60 +202,33 @@ export default {
       let dateend = new Date().toISOString().substr(0, 10);
       let where = "(",
         or = "";
-      for (let i = 0; i < this.filter.EstadosSel.length; i++) {
-        where += or + "Estado LIKE '" + this.filter.EstadosSel[i].value + "%'";
+      for (let i = 0; i < this.filter.estadosSel.length; i++) {
+        where += or + "Estado LIKE '" + this.filter.estadosSel[i].value + "%'";
         or = " OR ";
       }
       where += ")";
-      let whereMore = [
-        " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')"
-      ];
+      let whereMore = [" AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')"];
       if (!this.filter.alldata) where += whereMore;
-      console.log(where);
-      showLoading();
-      axios
-        .post(localStorage.url, {
-          cmd: "getRecords",
-          table: "Recibos",
-          subtable: "RecibosGestion",
-          id: "CodigoRecibo",
-          orderby: "Situacion DESC",
-          where: where,
-          lang: this.$q.lang.db
-        })
-        .then(function(response) {
-          self.columnDefs = response.data.columns;
-          self.columnDefsSub = response.data.columnsSub;
-          hideLoading();
-          self.rowData = response.data.data;
-        });
+      where += " ORDER BY Situacion DESC";
+      this.callData("getRecords", "Recibos", where, "RecibosGestion", "CodigoRecibo").then(function(response) {
+        self.columnDefs = response.data.columns;
+        self.columnDefsSub = response.data.columnsSub;
+        hideLoading();
+        self.rowData = response.data.data;
+      });
     },
+    // CALL DATA BAJAS
     callDataBajas() {
       let self = this;
-      let where =
-        "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" +
-        this.filter.year +
-        "-" +
-        this.filter.month +
-        "%')";
-      showLoading();
-      axios
-        .post(localStorage.url, {
-          cmd: "getRecords",
-          table: "Recibos",
-          where: where,
-          orderby: false,
-          subtable: false,
-          id: false,
-          lang: this.$q.lang.db
-        })
-        .then(function(response) {
-          self.columnDefs = response.data.columns;
-          self.columnDefsSub = response.data.columnsSub;
-          hideLoading();
-          self.rowData = response.data.data;
-        });
+      let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
+      this.callData("getRecords", "Recibos", where).then(function(response) {
+        self.columnDefs = response.data.columns;
+        self.columnDefsSub = response.data.columnsSub;
+        hideLoading();
+        self.rowData = response.data.data;
+      });
     },
+    // CALL DATA LIQ
     callDataLiq() {
       let self = this;
       let dateini = this.getMonday(this.filter.year, this.filter.week);
@@ -265,81 +239,37 @@ export default {
       console.log(dateini);
       console.log(dateend);
       // console.log(dateini + "--" + dateend);
-      let where =
-        "(Estado LIKE 'COBRADO') AND (Situacion>='" +
-        dateini +
-        "' AND Situacion<='" +
-        dateend +
-        "')";
-      showLoading();
-      axios
-        .post(localStorage.url, {
-          cmd: "getRecords",
-          table: "Recibos",
-          where: where,
-          orderby: "Situacion DESC",
-          subtable: false,
-          id: false,
-          lang: this.$q.lang.db
-        })
-        .then(function(response) {
-          self.columnDefs = response.data.columns;
-          self.columnDefsSub = response.data.columnsSub;
-          hideLoading();
-          self.rowData = response.data.data;
-        });
+      let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + dateini + "' AND Situacion<='" + dateend + "') ORDER BY Situacion DESC";
+      this.callData("getRecords", "Recibos", where).then(function(response) {
+        self.columnDefs = response.data.columns;
+        self.columnDefsSub = response.data.columnsSub;
+        hideLoading();
+        self.rowData = response.data.data;
+      });
     },
+    // CALL DATA CAJA
     callDataAnt() {
       let self = this;
-      let where =
-        "(Estado LIKE 'PENDIENTE') AND (Cobrado>0 AND Cobrado<>Importe)";
-      showLoading();
-      axios
-        .post(localStorage.url, {
-          cmd: "getRecords",
-          table: "Recibos",
-          where: where,
-          orderby: "Situacion DESC",
-          subtable: false,
-          id: false,
-          lang: this.$q.lang.db
-        })
-        .then(function(response) {
-          self.columnDefs = response.data.columns;
-          self.columnDefsSub = response.data.columnsSub;
-          hideLoading();
-          self.rowData = response.data.data;
-        });
+      let where = "(Estado LIKE 'PENDIENTE') AND (Cobrado>0 AND Cobrado<>Importe) ORDER BY Situacion DESC";
+      this.callData("getRecords", "Recibos", where, this.$q.lang.db).then(function(response) {
+        self.columnDefs = response.data.columns;
+        self.columnDefsSub = response.data.columnsSub;
+        hideLoading();
+        self.rowData = response.data.data;
+      });
     },
+    // CALL DATA RECIBO
     callDataRecibo() {
       let self = this;
       let where = "(CodigoRecibo='" + this.$route.params.recibo + "')";
-      showLoading();
-      axios
-        .post(localStorage.url, {
-          cmd: "getRecords",
-          table: "Recibos",
-          where: where,
-          orderby: false,
-          subtable: false,
-          id: false,
-          lang: this.$q.lang.db
-        })
-        .then(function(response) {
-          self.columnDefs = response.data.columns;
-          self.columnDefsSub = response.data.columnsSub;
-          hideLoading();
-          self.rowData = response.data.data;
-        });
+      this.callData("getRecords", "Recibos", where).then(function(response) {
+        self.columnDefs = response.data.columns;
+        self.columnDefsSub = response.data.columnsSub;
+        hideLoading();
+        self.rowData = response.data.data;
+      });
     },
-    // SELECTED ROWS
-    rowSelectedSub: function(params) {
-      if (params.length == 0) {
-        this.recibo.selectedSub = false;
-        return;
-      }
-      this.recibo.selectedSub = true;
-    },
+    // SELECTED ROW
     rowSelected: function(params) {
       if (params.length == 0) {
         this.recibo.selected = false;
@@ -350,31 +280,29 @@ export default {
       let self = this;
       if (params[0].NombreTomador) {
         let where = "NombreCompleto = '" + params[0].NombreTomador + "'";
-        axios
-          .post(localStorage.url, {
-            cmd: "getRecords",
-            table: "Clientes",
-            where: where,
-            orderby: false,
-            subtable: false,
-            id: false,
-            lang: this.$q.lang.db
-          })
-          .then(function(response) {
-            if (response.data.data.length) {
-              self.client.columns = response.data.columns;
-              self.client.data = response.data.data[0];
-              self.client.selected = true;
-              self.client.name = response.data.data[0].NombreCompleto;
-              self.client.telf = response.data.data[0].Telefono;
-              self.client.mail = response.data.data[0].CorreoElectronico;
-            } else {
-              self.client.selected = false;
-              self.client.telf = self.client.mail = self.client.name = null;
-              self.client.columns = self.client.data = null;
-            }
-          });
+        this.callData("getRecords", "Clientes", where).then(function(response) {
+          if (response.data.data.length) {
+            self.client.columns = response.data.columns;
+            self.client.data = response.data.data[0];
+            self.client.selected = true;
+            self.client.name = response.data.data[0].NombreCompleto;
+            self.client.telf = response.data.data[0].Telefono;
+            self.client.mail = response.data.data[0].CorreoElectronico;
+          } else {
+            self.client.selected = false;
+            self.client.telf = self.client.mail = self.client.name = null;
+            self.client.columns = self.client.data = null;
+          }
+        });
       }
+    },
+    // SELECTED SUB ROWS
+    rowSelectedSub: function(params) {
+      if (params.length == 0) {
+        this.recibo.selectedSub = false;
+        return;
+      }
+      this.recibo.selectedSub = true;
     },
     //CALCULATE
     gridData(data) {
@@ -384,10 +312,7 @@ export default {
         sumCobrado = sumCobrado + data[i].data.Cobrado;
         sumImporte = sumImporte + data[i].data.Importe;
       }
-      this.calculos.importe =
-        this.$route.params.recibo == "ant"
-          ? Number(sumCobrado).toFixed(2)
-          : Number(sumImporte).toFixed(1);
+      this.calculos.importe = this.$route.params.recibo == "ant" ? Number(sumCobrado).toFixed(2) : Number(sumImporte).toFixed(1);
     },
     // INITIALIZATION
     init() {
@@ -409,23 +334,22 @@ export default {
           break;
       }
     },
+    // GET WEEKS
     getMonday(year, week) {
       var d = new Date(year, 0, 1),
         offset = d.getTimezoneOffset();
       d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-      d.setTime(
-        d.getTime() +
-          7 * 24 * 60 * 60 * 1000 * (week + (year == d.getFullYear() ? -1 : 0))
-      );
+      d.setTime(d.getTime() + 7 * 24 * 60 * 60 * 1000 * (week + (year == d.getFullYear() ? -1 : 0)));
       d.setTime(d.getTime() + (d.getTimezoneOffset() - offset) * 60 * 1000);
       d.setDate(d.getDate() - 3);
       return d;
     }
   },
   beforeMount() {
-    this.filter.EstadosSel[0].label = this.$q.lang.estados[0].label;
-    this.filter.EstadosSel[1].label = this.$q.lang.estados[1].label;
+    this.filter.estadosSel[0].label = this.$q.lang.estados[0].label;
+    this.filter.estadosSel[1].label = this.$q.lang.estados[1].label;
     this.init();
+    // CALCULATE WEEKS MONTS YEARS
     let year = new Date().getFullYear();
     let years = [];
     let months = [];
@@ -449,4 +373,3 @@ export default {
   }
 };
 </script>
-

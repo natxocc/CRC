@@ -266,7 +266,7 @@ class db
     /**
      * getRecords
      *
-     * @param  mixed $post (table, where, orderby, subtable, id)
+     * @param  mixed $post (table, where, subtable, id)
      *
      * @return void
      */
@@ -277,9 +277,7 @@ class db
         $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
         $where = $post['where'] ? " WHERE " . $this->sanitize($post['where'], false) : "";
         $sqlquery .= $where;
-        $orderby = $post['orderby'] ? " ORDER BY " . $this->sanitize($post['orderby'], false) : "";
-        $sqlquery .= $orderby;
-        // echo $sqlquery;
+        //echo $sqlquery;
         $sql = $this->db->prepare($sqlquery);
         try {
             $sql->execute();

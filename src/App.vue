@@ -59,6 +59,18 @@
             </q-card>
           </q-dialog>
         </div>
+        <!-- MENU LEFT -->
+        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="left" v-model="menu.left">
+          <q-btn class="full-width" flat icon="home" inline to="/"></q-btn>
+          <q-list :separator="true" bordered>
+            <q-item :key="i" :to="option.to" clickable v-for="(option,i) in menu.leftList" v-ripple>
+              <q-item-section avatar>
+                <q-icon :name="option.icon" color="primary"/>
+              </q-item-section>
+              <q-item-section>{{$q.lang.menu[option.name]}}</q-item-section>
+            </q-item>
+          </q-list>
+        </q-drawer>
         <!-- MENU RIGHT -->
         <q-drawer :bordered="true" :elevated="true" :overlay="true" side="right" v-model="menu.right">
           <div class="row text-center">
@@ -76,18 +88,6 @@
               <q-btn @click="logout" class="q-mt-md" color="secondary">{{$q.lang.CerrarSesion}}</q-btn>
             </div>
           </div>
-        </q-drawer>
-        <!-- MENU LEFT -->
-        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="left" v-model="menu.left">
-          <q-btn class="full-width" flat icon="home" inline to="/"></q-btn>
-          <q-list :separator="true" bordered>
-            <q-item :key="i" :to="option.to" clickable v-for="(option,i) in menu.leftList" v-ripple>
-              <q-item-section avatar>
-                <q-icon :name="option.icon" color="primary"/>
-              </q-item-section>
-              <q-item-section>{{$q.lang.menu[option.name]}}</q-item-section>
-            </q-item>
-          </q-list>
         </q-drawer>
         <!-- ROUTER VIEW -->
         <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in">
@@ -145,6 +145,18 @@ export default {
     };
   },
   methods: {
+    // AXIOS
+    callData(cmd, table=false, where = false, subtable = false, id = false) {
+      showLoading();
+      return axios.post(localStorage.url, {
+        cmd,
+        table,
+        where,
+        subtable,
+        id,
+        lang: this.$q.lang.db
+      });
+    },
     close: function() {
       this.user.dialog = false;
     },
@@ -167,10 +179,7 @@ export default {
             self.user.name = response.data.info.data.fullname;
             self.user.mail = response.data.info.data.email;
             self.$q.notify({
-              message:
-                self.$q.lang.Bienvenido +
-                " " +
-                response.data.info.data.fullname,
+              message: self.$q.lang.Bienvenido + " " + response.data.info.data.fullname,
               icon: "check",
               color: "positive"
             });
@@ -265,12 +274,10 @@ export default {
   beforeMount() {
     //CHECK USER
     localStorage.url = "http://servidor/crc/php/post.php";
-    if (window.location.hostname != "localhost")
-      localStorage.url =
-        "http://" + window.location.hostname + "/crc/php/post.php";
+    if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
     // if (localStorage.sid) this.isLogged();
     // LANG
-    if (localStorage.lang!="es") this.lang = localStorage.lang;
+    if (localStorage.lang != "es") this.lang = localStorage.lang;
   },
   created() {}
 };

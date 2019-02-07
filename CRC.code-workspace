@@ -38,7 +38,9 @@
 			"prettier": {
 				"bracketSpacing": false,
 				"semi": true,
-				"arrowParens": "always"
+				"arrowParens": "always",
+				"preserve": "never",
+				"printWidth": 250
 			}
 		},
 		"php.validate.executablePath": "c:\\php\\php.exe",
