@@ -40,8 +40,6 @@ require_once "class-reale.php";
 $reale = new reale();
 if ($cmd == "updateRecibos") $reale->updateRecibos();
 if ($cmd == "updatePolizas") $reale->updatePolizas();
-if ($cmd == "polizasMediador") $reale->polizasMediador();
-if ($cmd == "getRecibos") $reale->getRecibos($post);
 if ($cmd == "reportRecibos") $reale->reportRecibos($post);
 
 // Consultas db
@@ -54,12 +52,7 @@ if ($cmd == "login") $db->login($post);
 // ---------------FIN
 // Resto de consultas
 if ($cmd == "logout") $db->logout($post);
-if ($cmd == "isLogged") $db->isLogged($post);
-if ($cmd == "getUserInfo") $db->getUserInfo($post);
-if ($cmd == "createUser") $db->createUser($post);
-if ($cmd == "getUser") $db->getUser($post);
 if ($cmd == "sendMail") $db->sendMail($post);
-if ($cmd == "addEvent") $db->addEvent($post);
 if ($cmd == "getRecords") $db->getRecords($post);
 if ($cmd == "updateRecord") $db->updateRecord($post);
 if ($cmd == "deleteRecord") $db->deleteRecord($post);

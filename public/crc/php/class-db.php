@@ -86,12 +86,13 @@ class db
             $_SESSION['IPaddress'] = $this->getRealIP();
             $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
             $_SESSION['logged'] = $result->success;
+            $this->db->exec("UPDATE Usuarios SET sid='" . $_SESSION['sid'] . "' WHERE Usuario='" . $post['user'] . "'");
             if ($result->users) {
                 foreach ($result->users->data->users as $key => $value) {
                     try {
-                        $this->db->exec("INSERT INTO Usuarios (Usuario, Nombre, Correo) VALUES ('" . $value->name . "', '" . $value->description . "','" . $value->email . "')");
+                        $this->db->exec(" INSERT INTO Usuarios(Usuario, Nombre, Correo) VALUES('" . $value->name . "', '" . $value->description . "', '" . $value->email . "') ");
                     } catch (Exception $e) {
-                        $this->db->exec("UPDATE Usuarios SET Correo = '" . $value->email . "' , Nombre = '" . $value->description . "' WHERE Usuario = '" . $value->name . "'");
+                        $this->db->exec(" UPDATE Usuarios SET Correo = '" . $value->email . "', Nombre = '" . $value->description . "' WHERE Usuario = '" . $value->name . "' ");
                     }
                 }
             }
@@ -116,7 +117,8 @@ class db
      */
     public function logout($post)
     {
-        require_once("class-syno.php");
+        require_once(" class - syno
+            . php ");
         $syno = new syno();
         $result = $syno->logout($post);
         session_unset();
@@ -159,28 +161,33 @@ class db
     {
         $subject = $post['subject'];
         $to = $post['to'];
-        $headers = "MIME-version: 1.0\r\n";
-        $headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
-        $body = "";
+        $headers = " MIME - version : 1.0 \r\n ";
+        $headers .= " Content - type : text / html;
+            charset = iso - 8859 - 1 \r\n ";
+        $body = " ";
         // Include event ? 
         if (isset($post['desc']) && isset($post['date'])) {
             $dini = date('YmdHis', strtotime($post['date']));
             $dend = date('YmdHis', strtotime($post['date']));
             $dini = date('Ymd', strtotime($dini)) . 'T' . date('His', strtotime($dini));
             $dend = date('Ymd', strtotime($dend)) . 'T' . date('His', strtotime($dend));
-            $headers .= "Content-class: urn:content-classes:calendarmessage\r\n";
-            $headers .= "Content-type: text/calendar; method=REQUEST; charset=UTF-8\r\n";
-            $body .= "BEGIN:VCALENDAR\r\n";
-            $body .= "VERSION:2.0\r\n";
-            $body .= "PRODID:PHP\r\n";
-            $body .= "METHOD:REQUEST\r\n";
-            $body .= "BEGIN:VEVENT\r\n";
-            $body .= "DTSTART:" . $dini . "\r\n";
-            $body .= "DTEND:" . $dend . "\r\n";
-            $body .= "CATEGORIES:CRC\r\n";
-            $body .= "DESCRIPTION: " . $post['desc'] . "\r\n";
-            $body .= "SUMMARY: Sumario\r\n";
-            $body .= "ORGANIZER; CN=\"Servidor\":mailto: natxocc@verallia.com\r\n";
+            $headers .= " Content - class : urn
+            : content - classes : calendarmessage\r\n ";
+            $headers .= " Content - type : text / calendar;
+            method = REQUEST;
+            charset = UTF - 8 \r\n ";
+            $body .= " BEGIN : VCALENDAR\r\n ";
+            $body .= " VERSION : 2.0 \r\n ";
+            $body .= " PRODID : PHP\r\n ";
+            $body .= " METHOD : REQUEST\r\n ";
+            $body .= " BEGIN : VEVENT\r\n ";
+            $body .= " DTSTART : " . $dini . " \r\n ";
+            $body .= " DTEND : " . $dend . " \r\n ";
+            $body .= " CATEGORIES : CRC\r\n ";
+            $body .= " DESCRIPTION : " . $post['desc'] . " \r\n ";
+            $body .= " SUMMARY : Sumario\r\n ";
+            $body .= " ORGANIZER;
+            CN = \"Servidor\":mailto: natxocc@verallia.com\r\n";
             $body .= "LOCATION: Servidor\r\n";
             $body .= "UID:" . date(" Ymd\TGis ", strtotime($dini)) . rand() . " @natxocc.com\r\n ";
             $body .= "SEQUENCE:0\r\n";
