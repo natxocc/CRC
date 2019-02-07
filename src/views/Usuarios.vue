@@ -16,20 +16,12 @@
 
 <script>
 import NTables from "../components/NTables.vue";
-import Vue from "vue";
-import axios from "axios";
-import {Loading, QSpinnerFacebook, QSpinnerGears} from "quasar";
-function showLoading(options) {
-  Loading.show(options);
-}
-function hideLoading(options) {
-  Loading.hide(options);
-}
-
+import Custom from "../mixins";
 export default {
   components: {
     NTables
   },
+  mixins: [Custom],
   data() {
     return {
       // TABLE
@@ -42,23 +34,9 @@ export default {
   methods: {
     callDataClients() {
       let self = this;
-      showLoading();
-      axios
-        .post(localStorage.url, {
-          cmd: "getRecords",
-          table: "Usuarios",
-          subtable: false,
-          id: false,
-          orderby: "Usuario ASC",
-          where: false,
-          lang: this.$q.lang.db
-        })
-        .then(function(response) {
-          self.columnDefs = response.data.columns;
-          self.columnDefsSub = response.data.columnsSub;
-          hideLoading();
-          self.rowData = response.data.data;
-        });
+      this.callData({cmd: "getRecords", table: "Usuarios"}).then(function(response) {
+        self.defineDataColumns(response)
+      });
     }
   },
   beforeMount() {

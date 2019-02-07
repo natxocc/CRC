@@ -28,20 +28,12 @@
 
 <script>
 import NTables from "../components/NTables.vue";
-import Vue from "vue";
-import axios from "axios";
-import {Loading, QSpinnerFacebook, QSpinnerGears} from "quasar";
-function showLoading(options) {
-  Loading.show(options);
-}
-function hideLoading(options) {
-  Loading.hide(options);
-}
-
+import Custom from "../mixins";
 export default {
   components: {
     NTables
   },
+  mixins: [Custom],
   data() {
     return {
       // TABLE
@@ -64,55 +56,21 @@ export default {
     };
   },
   methods: {
+    // CALL ALTAS
     callDataAltas() {
       let self = this;
-      let where =
-        "(TipoInformacion LIKE 'Nueva%' ) AND (FechaAlta LIKE '" +
-        this.filter.year +
-        "-" +
-        this.filter.month +
-        "%')";
-      showLoading();
-      axios
-        .post(localStorage.url, {
-          cmd: "getRecords",
-          table: "Polizas",
-          subtable: false,
-          id: false,
-          orderby: "FechaAlta DESC",
-          where: where,
-          lang: this.$q.lang.db
-        })
-        .then(function(response) {
-          self.columnDefs = response.data.columns;
-          hideLoading();
-          self.rowData = response.data.data;
-        });
+      let where = "(TipoInformacion LIKE 'Nueva%' ) AND (FechaAlta LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
+      this.callData({cmd: "getRecords", table: "Polizas", where}).then(function(response) {
+        self.defineDataColumns(response);
+      });
     },
+    // CALL BAJAS
     callDataBajas() {
       let self = this;
-      let where =
-        "(TipoInformacion LIKE 'Anula%' )  AND (FechaBaja LIKE '" +
-        this.filter.year +
-        "-" +
-        this.filter.month +
-        "%')";
-      showLoading();
-      axios
-        .post(localStorage.url, {
-          cmd: "getRecords",
-          table: "Polizas",
-          subtable: false,
-          id: false,
-          orderby: "FechaBaja DESC",
-          where: where,
-          lang: this.$q.lang.db
-        })
-        .then(function(response) {
-          self.columnDefs = response.data.columns;
-          hideLoading();
-          self.rowData = response.data.data;
-        });
+      let where = "(TipoInformacion LIKE 'Anula%' )  AND (FechaBaja LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
+      this.callData({cmd: "getRecords", table: "Polizas", where}).then(function(response) {
+        self.defineDataColumns(response);
+      });
     },
     //CALCULATE
     gridData(data) {
@@ -127,37 +85,17 @@ export default {
     },
     // INITIALIZATION
     init() {
-      switch (this.$route.params.poliza) {
-        case "bajas":
-          this.callDataBajas();
-          break;
-        case "altas":
-          this.callDataAltas();
-          break;
-        default:
-          // PONER AQUI LA CONSULTA DE UNA POLIZA
-          break;
-      }
+      if (this.$route.params.poliza == "bajas") this.callDataBajas();
+      if (this.$route.params.poliza == "altas") this.callDataAltas();
     }
   },
   beforeMount() {
     this.init();
-    let year = new Date().getFullYear();
-    let years = [];
-    let months = [];
-    for (let i = 0; i < 20; i++) {
-      years[i] = year - i;
-    }
-    for (let i = 0; i < 12; i++) {
-      months[i + 1] = ("0" + (i + 1)).slice(-2);
-    }
-    months[0] = "";
-    this.filter.months = months;
-    this.filter.years = years;
+    this.filter.months = this.getMonths();
+    this.filter.years = this.getYears();
   },
   watch: {
     $route: "init"
   }
 };
 </script>
-

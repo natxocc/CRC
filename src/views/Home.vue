@@ -1,29 +1,11 @@
 <template>
   <div>
-    <q-img
-      :src="require('../assets/office.jpg')"
-      alt="Image"
-      :ratio="16/9"
-      spinner-color="white"
-      contain
-    />
+    <q-img :ratio="16/9" :src="require('../assets/office.jpg')" alt="Image" contain spinner-color="white"/>
   </div>
 </template>
 
 <script>
 export default {
-  name: "home",
-  data() {
-    return {
-      openDialog: false,
-      user: {
-        name: '',
-        pass: ''
-      }
-    };
-  },
-  methods: {
-    
-  }
+  name: "home"
 };
 </script>

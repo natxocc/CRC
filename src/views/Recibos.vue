@@ -1,11 +1,11 @@
 <template>
   <div class="container">
     <!-- TABS -->
-    <q-tabs active-bg-color="primary" active-color="white" class="bg-secondary text-primary" dense indicator-color="transparent" inline-label top-indicator v-model="tab">
+    <q-tabs active-bg-color="primary" active-color="white" class="bg-secondary text-primary" dense indicator-color="transparent" inline-label top-indicator v-model="myRoute">
       <q-route-tab :label="$q.lang.Gestion" icon="assignment_turned_in" name="gestion" to="/recibos/gestion"/>
       <q-route-tab :label="$q.lang.BajasPendientes" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
       <q-route-tab :label="$q.lang.Liquidacion" icon="credit_card" name="liq" to="/recibos/liq"/>
-      <q-route-tab :label="$q.lang.ControlCaja" icon="done_all" name="ant" to="/recibos/ant"/>
+      <q-route-tab :label="$q.lang.ControlCaja" icon="done_all" name="caja" to="/recibos/caja"/>
       <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
     <!-- SELECT FILTERS TOTALS-->
@@ -88,26 +88,19 @@
 <script>
 import NTables from "../components/NTables.vue";
 import NDialog from "../components/NDialog.vue";
-import Vue from "vue";
-import axios from "axios";
-import {Loading, QSpinnerFacebook, QSpinnerGears} from "quasar";
-function showLoading(options) {
-  Loading.show(options);
-}
-function hideLoading(options) {
-  Loading.hide(options);
-}
+import Custom from "../mixins";
 export default {
   components: {
     NTables,
     NDialog
   },
+  mixins: [Custom],
   data() {
     return {
       // TABLE
-      columnDefs: [],
-      columnDefsSub: [],
-      rowData: null,
+      columnDefs: this.columnDefs,
+      columnDefsSub: this.columnDefsSub,
+      rowData: this.rowData,
       quickFilter: null,
       filter: {
         estadosSel: [{value: "PENDIENTE", label: "PENDIENTE"}, {value: "DEVUELTO", label: "DEVUELTO"}],
@@ -116,7 +109,7 @@ export default {
         years: [],
         weeks: [],
         months: [],
-        month: ("0" + (new Date().getMonth() + 1)).slice(-2),
+        month: parseInt(("0" + (new Date().getMonth() + 1)).slice(-2)),
         year: new Date().getFullYear(),
         week: 1
       },
@@ -142,7 +135,7 @@ export default {
         selectedSub: false
       },
       // GESTION
-      tab: this.$route.params.recibo,
+      myRoute: this.$route.params.recibo,
       // CALCULOS
       calculos: {
         importe: null
@@ -151,18 +144,6 @@ export default {
     };
   },
   methods: {
-    // AXIOS
-    callData(cmd, table=false, where = false, subtable = false, id = false) {
-      showLoading();
-      return axios.post(localStorage.url, {
-        cmd,
-        table,
-        where,
-        subtable,
-        id,
-        lang: this.$q.lang.db
-      });
-    },
     deleteRecord() {
       this.$q
         .dialog({
@@ -173,29 +154,21 @@ export default {
         .onOk(() => {})
         .onCancel(() => {});
     },
+    // SAVE DATA
     saveDataClient() {
       let self = this;
-      axios
-        .post(localStorage.url, {
-          cmd: "updateRecord",
-          table: "Clientes",
-          idkey: "NIF",
-          idvalue: self.client.data["NIF"],
-          data: self.client.data
-        })
-        .then(function(response) {
-          if (response.data == true) {
-            self.$q.notify({
-              message: self.$q.lang.DatosGuardados,
-              color: "positive"
-            });
-          }
-        });
+      this.callData({cmd: "updateRecords", table: "Clientes", idkey: "NIF", idvalue: self.client.data["NIF"], data: self.client.data}).then(function(response) {
+        if (response.data == true) {
+          self.$q.notify({
+            message: self.$q.lang.DatosGuardados,
+            color: "positive"
+          });
+        }
+      });
     },
     // CALL DATA GESTION
     callDataGestion() {
       let self = this;
-      // Por defecto los últimos 13 meses
       let dateini = new Date();
       dateini.setMonth(dateini.getMonth() - 13);
       dateini = dateini.toISOString().substr(0, 10);
@@ -207,66 +180,44 @@ export default {
         or = " OR ";
       }
       where += ")";
-      let whereMore = [" AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')"];
-      if (!this.filter.alldata) where += whereMore;
+      if (!this.filter.alldata) where += " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')";
       where += " ORDER BY Situacion DESC";
-      this.callData("getRecords", "Recibos", where, "RecibosGestion", "CodigoRecibo").then(function(response) {
-        self.columnDefs = response.data.columns;
-        self.columnDefsSub = response.data.columnsSub;
-        hideLoading();
-        self.rowData = response.data.data;
+      this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: "CodigoRecibo"}).then(function(response) {
+        self.defineDataColumns(response)
       });
     },
     // CALL DATA BAJAS
     callDataBajas() {
       let self = this;
+
       let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
-      this.callData("getRecords", "Recibos", where).then(function(response) {
-        self.columnDefs = response.data.columns;
-        self.columnDefsSub = response.data.columnsSub;
-        hideLoading();
-        self.rowData = response.data.data;
+      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
+        self.defineDataColumns(response)
       });
     },
     // CALL DATA LIQ
     callDataLiq() {
       let self = this;
-      let dateini = this.getMonday(this.filter.year, this.filter.week);
-      let dateend = new Date(dateini);
-      dateend.setDate(dateini.getDate() + 6);
-      dateini = dateini.toISOString().substr(0, 10);
-      dateend = dateend.toISOString().substr(0, 10);
-      console.log(dateini);
-      console.log(dateend);
-      // console.log(dateini + "--" + dateend);
-      let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + dateini + "' AND Situacion<='" + dateend + "') ORDER BY Situacion DESC";
-      this.callData("getRecords", "Recibos", where).then(function(response) {
-        self.columnDefs = response.data.columns;
-        self.columnDefsSub = response.data.columnsSub;
-        hideLoading();
-        self.rowData = response.data.data;
+      let days = this.getDaysWeek(this.filter.year, this.filter.month);
+      let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
+      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
+        self.defineDataColumns(response)
       });
     },
     // CALL DATA CAJA
-    callDataAnt() {
+    callDataCaja() {
       let self = this;
       let where = "(Estado LIKE 'PENDIENTE') AND (Cobrado>0 AND Cobrado<>Importe) ORDER BY Situacion DESC";
-      this.callData("getRecords", "Recibos", where, this.$q.lang.db).then(function(response) {
-        self.columnDefs = response.data.columns;
-        self.columnDefsSub = response.data.columnsSub;
-        hideLoading();
-        self.rowData = response.data.data;
+      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
+        self.defineDataColumns(response)
       });
     },
     // CALL DATA RECIBO
     callDataRecibo() {
       let self = this;
       let where = "(CodigoRecibo='" + this.$route.params.recibo + "')";
-      this.callData("getRecords", "Recibos", where).then(function(response) {
-        self.columnDefs = response.data.columns;
-        self.columnDefsSub = response.data.columnsSub;
-        hideLoading();
-        self.rowData = response.data.data;
+      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
+        self.defineDataColumns(response)
       });
     },
     // SELECTED ROW
@@ -280,7 +231,7 @@ export default {
       let self = this;
       if (params[0].NombreTomador) {
         let where = "NombreCompleto = '" + params[0].NombreTomador + "'";
-        this.callData("getRecords", "Clientes", where).then(function(response) {
+        this.callData({cmd: "getRecords", table: "Clientes", where}).then(function(response) {
           if (response.data.data.length) {
             self.client.columns = response.data.columns;
             self.client.data = response.data.data[0];
@@ -312,61 +263,24 @@ export default {
         sumCobrado = sumCobrado + data[i].data.Cobrado;
         sumImporte = sumImporte + data[i].data.Importe;
       }
-      this.calculos.importe = this.$route.params.recibo == "ant" ? Number(sumCobrado).toFixed(2) : Number(sumImporte).toFixed(1);
+      this.calculos.importe = this.$route.params.recibo == "caja" ? Number(sumCobrado).toFixed(2) : Number(sumImporte).toFixed(1);
     },
     // INITIALIZATION
     init() {
-      switch (this.$route.params.recibo) {
-        case "bajas":
-          this.callDataBajas();
-          break;
-        case "gestion":
-          this.callDataGestion();
-          break;
-        case "liq":
-          this.callDataLiq();
-          break;
-        case "ant":
-          this.callDataAnt();
-          break;
-        default:
-          this.callDataRecibo();
-          break;
-      }
-    },
-    // GET WEEKS
-    getMonday(year, week) {
-      var d = new Date(year, 0, 1),
-        offset = d.getTimezoneOffset();
-      d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-      d.setTime(d.getTime() + 7 * 24 * 60 * 60 * 1000 * (week + (year == d.getFullYear() ? -1 : 0)));
-      d.setTime(d.getTime() + (d.getTimezoneOffset() - offset) * 60 * 1000);
-      d.setDate(d.getDate() - 3);
-      return d;
+      if (this.$route.params.recibo == "bajas") this.callDataBajas();
+      if (this.$route.params.recibo == "gestion") this.callDataGestion();
+      if (this.$route.params.recibo == "liq") this.callDataLiq();
+      if (this.$route.params.recibo == "caja") this.callDataCaja();
+      if (this.$route.params.recibo == "") this.callDataRecibo();
     }
   },
   beforeMount() {
     this.filter.estadosSel[0].label = this.$q.lang.estados[0].label;
     this.filter.estadosSel[1].label = this.$q.lang.estados[1].label;
+    this.filter.months = this.getMonths();
+    this.filter.weeks = this.getWeeks();
+    this.filter.years = this.getYears();
     this.init();
-    // CALCULATE WEEKS MONTS YEARS
-    let year = new Date().getFullYear();
-    let years = [];
-    let months = [];
-    let weeks = [];
-    for (let i = 0; i < 20; i++) {
-      years[i] = year - i;
-    }
-    for (let i = 0; i < 55; i++) {
-      weeks[i] = i + 1;
-    }
-    for (let i = 0; i < 12; i++) {
-      months[i + 1] = ("0" + (i + 1)).slice(-2);
-    }
-    months[0] = "";
-    this.filter.months = months;
-    this.filter.weeks = weeks;
-    this.filter.years = years;
   },
   watch: {
     $route: "init"

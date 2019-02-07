@@ -273,9 +273,10 @@ class db
     function getRecords($post)
     {
         $table = $this->sanitize($post['table']);
-        $result['columns'] = $this->getColumns($table, $post['lang']);
+        $lang = isset($post['lang']) ? $post['lang'] : false;
+        $result['columns'] = $this->getColumns($table, $lang);
         $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
-        $where = $post['where'] ? " WHERE " . $this->sanitize($post['where'], false) : "";
+        $where = isset($post['where']) ? " WHERE " . $this->sanitize($post['where'], false) : "";
         $sqlquery .= $where;
         //echo $sqlquery;
         $sql = $this->db->prepare($sqlquery);
@@ -286,7 +287,7 @@ class db
             echo $e;
             exit();
         }
-        if ($post['subtable']) {
+        if (isset($post['subtable'])) {
             $table = $this->sanitize($post['subtable']);
             $result['columnsSub'] = $this->getColumns($table);
             $sqlquery = " SELECT * FROM `" . $table . "`";
@@ -332,9 +333,6 @@ class db
             $comma = ",";
         }
         $sqlquery .= " WHERE `" . $idkey . "` = :idvalue";
-        // if ($_SESSION['isAdmin'] <> 1) {
-        //     $sqlquery .= " AND `Usuario` ='$user'";
-        // }
         $sql = $this->db->prepare($sqlquery);
         $sql->bindParam(":idvalue", $post['idvalue']);
         try {
@@ -443,136 +441,4 @@ class db
         }
         return file_put_contents($file, $fileContent, LOCK_EX);
     }
-
-        // /**
-    //  * login
-    //  *
-    //  * @param  mixed $post (user,pass)
-    //  *
-    //  * @return void
-    //  */
-    // public function login($post)
-    // {
-    //     $return = array();
-    //     if (!isset($post['user']) || !isset($post['pass'])) exit();
-    //     $logged = $sql = $result = "";
-    //     $_SESSION['isAdmin'] = $_SESSION['sid'] = $_SESSION['userAgent'] = $_SESSION['ipAddress'] = $_SESSION['logged'] = false;
-    //     $sql = $this->db->prepare("SELECT Clave,Adm from Usuarios WHERE Usuario=:user");
-    //     $sql->bindParam(":user", $post['user']);
-    //     $sql->execute();
-    //     $result = $sql->fetchAll();
-    //     $logged = password_verify($post['pass'], $result[0]['Clave']);
-    //     if ($logged) {
-    //         $sql = $this->db->prepare("SELECT Usuario,Correo FROM Usuarios");
-    //         $sql->execute();
-    //         $result = $sql->fetchAll();
-    //         foreach ($result as $key => $value) {
-    //             $return['users'][$key]['user'] = $value['Usuario'];
-    //             $return['users'][$key]['mail'] = $value['Correo'];
-    //         }
-    //         $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
-    //         $_SESSION['sid'] = bin2hex(random_bytes(12));
-    //         $_SESSION['ipAddress'] = $this->getRealIP();
-    //         $_SESSION['LastActivity'] = $_SERVER['REQUEST_TIME'];
-    //         $_SESSION['isAdmin'] = $result[0]['Clave'];
-    //         $_SESSION['logged'] = true;
-    //         $return['ip'] = $_SESSION['ipAddress'];
-    //         $return['logged'] = $_SESSION['logged'];
-    //         $return['success'] = true;
-    //         $return['sid'] = $_SESSION['sid'];
-    //         echo json_encode($return);
-    //     } else {
-    //         echo "Usuario Incorrecto";
-    //     }
-    //     exit();
-    // }
-
-    // /**
-    //  * logout
-    //  *
-    //  * @return void
-    //  */
-    // public function logout()
-    // {
-    //     $_SESSION['isAdmin'] = $_SESSION['sid'] = $_SESSION['userAgent'] = $_SESSION['ipAddress'] = $_SESSION['logged'] = false;
-    //     session_unset();
-    //     session_destroy();
-    //     session_start();
-    //     session_regenerate_id(true);
-    //     $return['sid'] = "";
-    //     echo $return['sid'];
-    //     exit();
-    // }
-
-    // /**
-    //  * createUser
-    //  *
-    //  * @param  mixed $post (user,pass)
-    //  *
-    //  * @return void
-    //  */
-    // public function createUser($post)
-    // {
-    //     // PONER CONDICION QUE SOLO ADMIN PUEDE REGISTRAR
-    //     if (!isset($post['user']) && !isset($post['pass']) && $_SESSION['isAdmin'] <> 1) exit();
-    //     $pass = password_hash($post['pass'], PASSWORD_DEFAULT);
-    //     $sql = $this->db->prepare("REPLACE INTO Usuarios(Usuario,Clave) VALUES(:user, :pass)");
-    //     $sql->bindParam(":user", $post['user']);
-    //     $sql->bindParam(":pass", $pass);
-    //     $sql->execute();
-    //     exit();
-    // }
-
-    // /**
-    //  * getUser
-    //  *
-    //  * @param  mixed $post (user, sid)
-    //  *
-    //  * @return void
-    //  */
-    // function getUser($post)
-    // {
-    //     $return = array();
-    //     if (!isset($post['user']) || !isset($post['sid'])) exit();
-    //     $logged = $sql = $result = "";
-    //     if (isset($_SESSION['logged'])) {
-    //         if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
-    //             $sql = $this->db->prepare("SELECT Correo, Adm, Ramo, SubMediador from Usuarios WHERE Usuario=:user");
-    //             $sql->bindParam(":user", $post['user']);
-    //             $sql->execute();
-    //             $result = $sql->fetchAll();
-    //             $return['correo'] = $result[0]['Correo'];
-    //             $return['adm'] = $result[0]['Adm'];
-    //             $return['ramo'] = $result[0]['Ramo'];
-    //             $return['sm'] = $result[0]['SubMediador'];
-    //             $return['success'] = true;
-    //             echo json_encode($return);
-    //             return true;
-    //         } else {
-    //             return false;
-    //         }
-    //     }
-    //     exit();
-    // }
-
-    // /**
-    //  * isLogged
-    //  *
-    //  * @param  mixed $post (sid)
-    //  *
-    //  * @return void
-    //  */
-    // function isLogged($post)
-    // {
-    //     if (!isset($post['sid'])) exit('Falta sid');
-    //     $logged = $sql = $result = "";
-    //     if (isset($_SESSION['logged'])) {
-    //         if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['ipAddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
-    //             return true;
-    //         } else {
-    //             return false;
-    //         }
-    //     }
-    //     exit();
-    // }
 }
