@@ -46,6 +46,7 @@ if ($cmd == "logout") $db->logout($post);
 if ($cmd == "checkUser") $db->checkUser($post);
 // Comprueba si está conectado
 //if (!$db->isLogged($post)) exit("Error Auth");
+$_SESSION[$post['table']]=3;
 // Resto de consultas
 if ($cmd == "sendMail") $db->sendMail($post);
 if ($_SESSION[$post['table']] > 0) {

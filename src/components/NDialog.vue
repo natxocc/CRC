@@ -22,13 +22,13 @@
             <div :key="key" class="col-xs-12 col-sm-6 col-md-4 col-lg-3" v-for="(value,key, index) in data">
               <q-card-section>
                 <!-- ES TEXTO -->
-                <q-input :label="key" :readonly="readonly" dense stack-label type="text" v-if="columns[index].type =='textColumn'" v-model="data[key]"></q-input>
+                <q-input :label="columns[index].headerName" :readonly="readonly" dense stack-label type="text" v-if="columns[index].type =='textColumn'" v-model="data[key]"></q-input>
                 <!-- ES NUMERO -->
-                <q-input :label="key" :readonly="readonly" dense stack-label type="number" v-if="columns[index].type =='numberColumn'" v-model="data[key]"></q-input>
+                <q-input :label="columns[index].headerName" :readonly="readonly" dense stack-label type="number" v-if="columns[index].type =='numberColumn'" v-model="data[key]"></q-input>
                 <!-- ES BIT -->
-                <q-toggle :disable="readonly" :label="key" dense v-if="columns[index].type =='bitColumn'" v-model="data[key]"/>
+                <q-toggle :disable="readonly" :label="columns[index].headerName" dense v-if="columns[index].type =='bitColumn'" v-model="data[key]"/>
                 <!-- ES FECHA -->
-                <q-input :disable="readonly" :label="key" dense mask="date" v-if="columns[index].type =='dateColumn'" v-model="data[key]">
+                <q-input :disable="readonly" :label="columns[index].headerName" dense mask="date" v-if="columns[index].type =='dateColumn'" v-model="data[key]">
                   <q-icon class="cursor-pointer" name="event" slot="append">
                     <q-popup-proxy>
                       <q-date :style="style" minimal todayBtn v-model="data[key]"/>

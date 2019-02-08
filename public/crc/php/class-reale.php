@@ -99,7 +99,8 @@ class reale
   function updatePolizas()
   {
     global $db;
-    $empresa = [4, 10];
+    // $empresa = [4, 10];
+    $empresa = [4];
     $post['table'] = "Polizas";
     $dateini = date("Y-m", strtotime("-1 month", strtotime(date('Y-m-d')))) . "-01";
     // $dateini = date("Y-m", strtotime("-5 day", strtotime(date('Y-m-d')))) . "-01";
