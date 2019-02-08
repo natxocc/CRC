@@ -83,5 +83,10 @@ export default {
     lang(lang) {
       this.getLang(lang);
     }
+  },
+  beforeMount() {
+    if (!localStorage.lang) {
+      this.getLang("es");
+    }
   }
 }
