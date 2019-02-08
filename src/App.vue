@@ -213,7 +213,7 @@ export default {
   },
   beforeMount() {
     if (localStorage.sid) this.checkUser();
-    localStorage.url = "http://servidor/crc/php/post.php";
+    localStorage.url = "http://casa.natxocc.com/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
     if (localStorage.lang != "es") this.lang = localStorage.lang;
   },
