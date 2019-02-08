@@ -3,7 +3,7 @@ module.exports = {
   assetsDir: 'crc',
   productionSourceMap: false,
   lintOnSave: false,
-  baseUrl: './',
+  //baseUrl: './',
   outputDir: undefined,
   runtimeCompiler: undefined,
   parallel: undefined,
