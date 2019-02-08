@@ -41,6 +41,7 @@ import {AgGridVue} from "ag-grid-vue";
 import Vue from "vue";
 import axios from "axios";
 import localeText from "../lang/es.tables";
+
 // EXPORT DEFAULT
 export default {
   name: "NTables",
@@ -48,7 +49,6 @@ export default {
     columnDefs: null,
     columnDefsSub: null,
     rowData: null,
-    table: null,
     masterDetail: null,
     rowClassRules: null,
     filters: null,
@@ -115,7 +115,7 @@ export default {
         defaultToolPanel: "",
         enablePivot: false
       },
-      localeText: localeText
+      localeText: null
     };
   },
   components: {
@@ -205,7 +205,10 @@ export default {
       };
     }
   },
-  beforeMount() {},
+  beforeMount() {
+    var lang = require(`../lang/${localStorage.lang}.tables`);
+    this.localeText = lang.default;
+  },
   created() {},
   watch: {
     quickFilter: function() {

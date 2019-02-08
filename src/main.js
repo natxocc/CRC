@@ -25,7 +25,7 @@ Vue.use(Quasar, {
   }
 })
 Vue.use(HighchartsVue);
-import locale from "./lang/es"
+import locale from"./lang/es"
 Quasar.lang.set(locale)
 new Vue({
   router,

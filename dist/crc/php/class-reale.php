@@ -73,7 +73,6 @@ class reale
         $post['data']['ImporteNeto'] = $value->ImporteNeto;
         $post['data']['FormaPago'] = $value->FormaPago;
         $post['data']['Usuario'] = 0;
-        $post['data']['CIA'] = $emp;
         $sql = $db->insertRecord($post);
         if (!$sql) {
           $post['idkey'] = "CodigoRecibo";
@@ -140,7 +139,6 @@ class reale
         $post['data']['FechaBaja'] = substr($value->DatosGenerales->FechaBaja, 0, 10);
         $post['data']['FechaVencimientoSuplemento'] = substr($value->DatosGenerales->FechaVencimientoSuplemento, 0, 10);
         $post['data']['Usuario'] = 0;
-        $post['data']['CIA'] = $emp;
         $post['data']['Documento'] = str_replace($TD, '', $value->DatosGenerales->DatosTomador->Documento);
         $post['data']['CodigoPoliza'] = $value->DatosGenerales->CodigoPoliza;
         $post['data']['CodigoRecibo'] = $value->DatosGenerales->CodigoRecibo;

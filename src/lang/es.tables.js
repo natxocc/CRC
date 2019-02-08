@@ -94,9 +94,5 @@ export default {
   // añadidos de prueba en status Bar
   filteredRowCount: "Filtrados",
   rowCount: "Registros totales",
-  selectedRowCount: "Seleccionado",
-
-  //filtros AND OR (no funcionan)
-  andButton: "Y",
-  orButton: "O"
+  selectedRowCount: "Seleccionado"
 }

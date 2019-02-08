@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <!-- SELECT FILTERS GESTION -->
+    <!-- SELECT FILTERS -->
     <div class="row text-center">
       <div class="col-xs-12" style="padding: 10px">
         <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
@@ -34,8 +34,8 @@ export default {
   methods: {
     callDataClients() {
       let self = this;
-      this.callData({cmd: "getRecords", table: "Clientes"}).then(function(response) {
-        self.defineTable(response);
+      this.callData({cmd: "getRecords", table: "Usuarios"}).then(function(response) {
+        self.defineTable(response)
       });
     }
   },
