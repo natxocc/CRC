@@ -53,7 +53,7 @@
                 </div>
               </q-card-section>
               <q-card-actions align="right">
-                <q-btn :label="$q.lang.label.cancel" @click="close" color="negative" flat/>
+                <q-btn :label="$q.lang.label.cancel" @click="user.dialog=false" color="negative" flat/>
                 <q-btn :label="$q.lang.label.ok" @click="login" color="primary" flat/>
               </q-card-actions>
             </q-card>
@@ -98,8 +98,9 @@
   </div>
 </template>
 <script>
-import axios from "axios";
+import Custom from "./mixins";
 export default {
+  mixins: [Custom],
   data() {
     return {
       lang: this.$q.lang.isoName,
@@ -145,55 +146,30 @@ export default {
     };
   },
   methods: {
-    // AXIOS
-    callData(cmd, table=false, where = false, subtable = false, id = false) {
-      showLoading();
-      return axios.post(localStorage.url, {
-        cmd,
-        table,
-        where,
-        subtable,
-        id,
-        lang: this.$q.lang.db
-      });
-    },
-    close: function() {
-      this.user.dialog = false;
-    },
     login() {
       let self = this;
-      axios
-        .post(localStorage.url, {
-          cmd: "login",
-          user: self.user.user,
-          pass: self.user.pass
-        })
+      this.callData({cmd: "login", user: self.user.user, pass: self.user.pass})
         .then(function(response) {
-          console.log(response);
           if (response.data.success) {
             localStorage.sid = response.data.data.sid;
-            localStorage.logged = true;
-            localStorage.setItem("users", JSON.stringify(response.data.users));
             localStorage.mail = response.data.info.data.email;
             localStorage.username = response.data.info.data.fullname;
-            self.user.name = response.data.info.data.fullname;
-            self.user.mail = response.data.info.data.email;
             self.$q.notify({
               message: self.$q.lang.Bienvenido + " " + response.data.info.data.fullname,
               icon: "check",
               color: "positive"
             });
           } else {
-            localStorage.lang = self.lang;
+            //this.logout();
             self.$q.notify({
               message: self.$q.lang.UsuarioClaveIncorrecta,
               icon: "close",
               color: "negative"
             });
+            self.logout();
           }
         })
         .catch(function(response) {
-          console.log(response);
           self.$q.notify({
             message: self.$q.lang.ErrorRed,
             color: "negative"
@@ -203,54 +179,29 @@ export default {
     },
     logout() {
       let self = this;
-      axios
-        .post(localStorage.url, {
-          cmd: "logout",
-          sid: localStorage.sid
-        })
-        .then(function(response) {
-          if (response.data.success) {
-            self.$q.notify({
-              message: self.$q.lang.Desconectado,
-              icon: "flash_off",
-              color: "positive"
-            });
-          }
-        });
-      localStorage.removeItem("logged");
+      this.callData({cmd: "logout"});
       localStorage.removeItem("sid");
       localStorage.removeItem("mail");
       localStorage.removeItem("username");
+      self.user.name = localStorage.username;
+      self.user.mail = localStorage.mail;
+      this.menu.left = false;
       this.menu.right = false;
     },
-    // isLogged() {
-    //   let self = this;
-    //   axios
-    //     .post(localStorage.url, {
-    //       cmd: "login",
-    //       sid: localStorage.sid
-    //     })
-    //     .then(function(response) {
-    //       console.log(response.data);
-    //       if (!response.data.success) {
-    //         localStorage.removeItem("logged");
-    //         localStorage.removeItem("sid");
-    //         localStorage.removeItem("mail");
-    //         localStorage.removeItem("username");
-    //       } else {
-    //         self.user.name = localStorage.username;
-    //         self.user.mail = localStorage.mail;
-    //       }
-    //     })
-    //     .catch(function(response) {
-    //       self.$q.notify({
-    //         message: self.$q.lang.ErrorRed,
-    //         color: "negative"
-    //       });
-    //     });
-    // },
+    checkUser() {
+      let self = this;
+      this.callData({cmd: "checkUser"})
+        .then(function(response) {
+          if (response.data.success) {
+            self.user.name = localStorage.username;
+            self.user.mail = localStorage.mail;
+          } else {
+            self.logout();
+          }
+        })
+    },
     menuUser() {
-      if (localStorage.logged) {
+      if (localStorage.sid) {
         this.menu.right = !this.menu.right;
       } else {
         this.user.dialog = true;
@@ -258,24 +209,12 @@ export default {
     },
     sendBug() {
       window.open("https://github.com/natxocc/CRC/issues", "_system");
-    },
-    getLang(lang) {
-      import(`./lang/${lang}`).then((lang) => {
-        this.$q.lang.set(lang.default);
-      });
-      localStorage.lang = this.lang;
-    }
-  },
-  watch: {
-    lang(lang) {
-      this.getLang(lang);
     }
   },
   beforeMount() {
+    if (localStorage.sid) this.checkUser();
     localStorage.url = "http://servidor/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
-    // if (localStorage.sid) this.isLogged();
-    // LANG
     if (localStorage.lang != "es") this.lang = localStorage.lang;
   },
   created() {}

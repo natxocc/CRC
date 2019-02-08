@@ -35,7 +35,7 @@ export default {
     callDataClients() {
       let self = this;
       this.callData({cmd: "getRecords", table: "Clientes"}).then(function(response) {
-        self.defineDataColumns(response);
+        self.defineTable(response);
       });
     }
   },

@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { Loading, QSpinnerFacebook, QSpinnerGears } from "quasar";
+import Quasar from "quasar";
+import { Loading } from "quasar";
 function showLoading(options) {
   Loading.show(options);
 }
@@ -11,8 +12,7 @@ export default {
     return {
       columnsDefs: [],
       columnsDefsSub: [],
-      rowData: null,
-      where: null
+      rowData: null
     }
   },
   methods: {
@@ -27,7 +27,7 @@ export default {
       });
     },
     // DEFINE COLUMNS Y DATA
-    defineDataColumns(data) {
+    defineTable(data) {
       this.columnDefs = data.data.columns;
       this.columnDefsSub = data.data.columnsSub;
       this.rowData = data.data.data;
@@ -70,11 +70,18 @@ export default {
         weeks[i] = i + 1;
       }
       return weeks
+    },
+    // GET LANG
+    getLang(lang) {
+      import(`./lang/${lang}`).then((lang) => {
+        this.$q.lang.set(lang.default);
+      });
+      localStorage.lang = this.lang;
     }
   },
   watch: {
-    where: function () {
-
+    lang(lang) {
+      this.getLang(lang);
     }
   }
 }

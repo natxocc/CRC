@@ -31,8 +31,13 @@ class syno
    */
   function logout($post)
   {
-    $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&_sid=' . $post['sid']);
-    return $data;
+    if (isset($post[sid])) {
+      $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&_sid=' . $post['sid']);
+      return $data;
+    } else {
+      $data = file_get_contents('http://localhost:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout');
+      return $data;
+    }
   }
 
   /**

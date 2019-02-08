@@ -183,7 +183,7 @@ export default {
       if (!this.filter.alldata) where += " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')";
       where += " ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: "CodigoRecibo"}).then(function(response) {
-        self.defineDataColumns(response)
+        self.defineTable(response);
       });
     },
     // CALL DATA BAJAS
@@ -192,7 +192,7 @@ export default {
 
       let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineDataColumns(response)
+        self.defineTable(response);
       });
     },
     // CALL DATA LIQ
@@ -201,7 +201,7 @@ export default {
       let days = this.getDaysWeek(this.filter.year, this.filter.month);
       let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineDataColumns(response)
+        self.defineTable(response);
       });
     },
     // CALL DATA CAJA
@@ -209,7 +209,7 @@ export default {
       let self = this;
       let where = "(Estado LIKE 'PENDIENTE') AND (Cobrado>0 AND Cobrado<>Importe) ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineDataColumns(response)
+        self.defineTable(response);
       });
     },
     // CALL DATA RECIBO
@@ -217,7 +217,7 @@ export default {
       let self = this;
       let where = "(CodigoRecibo='" + this.$route.params.recibo + "')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineDataColumns(response)
+        self.defineTable(response);
       });
     },
     // SELECTED ROW
@@ -281,7 +281,6 @@ export default {
     this.filter.weeks = this.getWeeks();
     this.filter.years = this.getYears();
     this.init();
-    this.callData({cmd:"isLogged"}).then((resp)=>{console.log(resp.data)})
   },
   watch: {
     $route: "init"

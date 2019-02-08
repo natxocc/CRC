@@ -40,7 +40,7 @@
 				"semi": true,
 				"arrowParens": "always",
 				"preserve": "never",
-				"printWidth": 250
+				"printWidth": 500
 			}
 		},
 		"php.validate.executablePath": "c:\\php\\php.exe",

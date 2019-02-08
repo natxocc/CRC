@@ -230,6 +230,7 @@ export default {
   semana: "Setmana",
   Liquidacion: "Liquidació",
   ControlCaja: "Control Caixa",
+  SinAutorizacion: "Sense autorització",
   //REGISTROS
   Nuevo: "Nou",
   Editar: "Editar",

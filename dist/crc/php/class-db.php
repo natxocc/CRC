@@ -13,8 +13,18 @@ class db
     private $showcolumns;
     private $db;
 
-    // Construct
-    //----------
+    /**
+     * __construct
+     *
+     * @param  mixed $Type
+     * @param  mixed $Host
+     * @param  mixed $DBName
+     * @param  mixed $DBUser
+     * @param  mixed $DBPassword
+     * @param  mixed $DBPort
+     *
+     * @return void
+     */
     public function __construct($Type = mysql, $Host, $DBName, $DBUser, $DBPassword, $DBPort = 3306)
     {
         $this->Type = $Type;
@@ -26,12 +36,16 @@ class db
         $this->connect();
     }
 
+    /**
+     * __destruct
+     *
+     * @return void
+     */
     public function __destruct()
     {
         if ($this->db == null) {
             return;
         }
-
         if ($this->Type == 'mysql') {
             @mysqli_close($this->db);
         }
@@ -60,12 +74,8 @@ class db
      */
     public function getRealIP()
     {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            return $_SERVER['HTTP_CLIENT_IP'];
-        }
-        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            return $_SERVER['HTTP_X_FORWARDED_FOR'];
-        }
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) return $_SERVER['HTTP_CLIENT_IP'];
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];
         return $_SERVER['REMOTE_ADDR'];
     }
 
@@ -82,11 +92,17 @@ class db
         $syno = new syno();
         $result = $syno->login($post);
         if ($result->success) {
+            session_regenerate_id(true);
+            $sql = $this->db->query("SELECT PClientes,PPolizas,PUsuarios,PRegistros, PRecibosGestion, PRecibosCaja FROM Usuarios WHERE Usuario='" . $post['user'] . "'");
+            $perms = $sql->fetchAll(PDO::FETCH_ASSOC);
+            $_SESSION['perms'] = $perms;
             $_SESSION['sid'] = $result->data->sid;
             $_SESSION['IPaddress'] = $this->getRealIP();
             $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
-            $_SESSION['logged'] = $result->success;
+            $_SESSION['admin']=false;
+            // Registra los usuarios si es Admin
             if ($result->users) {
+                $_SESSION['admin'] = true;
                 foreach ($result->users->data->users as $key => $value) {
                     try {
                         $this->db->exec(" INSERT INTO Usuarios(Usuario, Nombre, Correo) VALUES('" . $value->name . "', '" . $value->description . "', '" . $value->email . "') ");
@@ -95,16 +111,10 @@ class db
                     }
                 }
             }
-            echo json_encode($result);
-            exit();
         } else {
-            echo json_encode($result);
-            session_unset();
-            session_destroy();
-            session_start();
-            session_regenerate_id(true);
-            exit();
+            $this->logout($post);
         }
+        echo json_encode($result);
     }
 
     /**
@@ -116,21 +126,15 @@ class db
      */
     public function logout($post)
     {
-        require_once(" class - syno
-            . php ");
-        $syno = new syno();
-        $result = $syno->logout($post);
         session_unset();
         session_destroy();
-        session_start();
-        session_regenerate_id(true);
+        require_once("class-syno.php");
+        $syno = new syno();
+        $result = $syno->logout($post);
         echo json_encode($result);
+        exit();
     }
 
-    function updateUsers($users)
-    {
-        echo json_encode($users);
-    }
     /**
      * isLogged
      *
@@ -140,21 +144,30 @@ class db
      */
     function isLogged($post)
     {
-        $result['success']="Antes de log";
-        echo json_encode($result);
-        if (!isset($_SESSION['logged'])) return false;
-        $result['success'] .= "Despues de log";
-        echo json_encode($result);
-        if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
-            echo $result['success'] = true;
-            return true;
-        } else {
-            echo $result['success'] = false;
-            return false;
+        if (isset($_SESSION['sid'])) {
+            if ($_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) return true;
         }
-        exit();
+        $this->logout($post);
+        return false;
     }
 
+    /**
+     * checkUser
+     *
+     * @param  mixed $post
+     *
+     * @return void
+     */
+    function checkUser($post)
+    {
+        require_once("class-syno.php");
+        $syno = new syno();
+        $result = $syno->getUserInfo($post);
+        if (!$result) {
+            $this->logout($post);
+        }
+        echo json_encode($result);
+    }
     /**
      * sendMail
      *
@@ -271,7 +284,6 @@ class db
             if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "dateColumn";
             if (strstr($fetch[$key]['Type'], "bit")) $result[$key]['type'] = "bitColumn";
         }
-        // echo json_encode($result, JSON_PRETTY_PRINT);
         return $result;
     }
 
@@ -326,6 +338,33 @@ class db
     }
 
     /**
+     * insertRecord
+     *
+     * @param  mixed $post (table, data:[])
+     *
+     * @return void
+     */
+    function insertRecord($post)
+    {
+        $table = $this->sanitize($post['table']);
+        $comma = $fields = $values = "";
+        foreach ($post['data'] as $key => $value) {
+            $fields .= $comma . $key;
+            $values .= $comma . "'" . $value . "'";
+            $comma = ",";
+        }
+        $sqlquery = "INSERT INTO `" . $table . "` ($fields) VALUES ($values)";
+        $sql = $this->db->prepare($sqlquery);
+        try {
+            $sql->execute();
+            return true;
+        } catch (Exception $e) {
+            //echo $e;
+            return false;
+        }
+    }
+
+    /**
      * updateRecord
      *
      * @param  mixed $post (table, data[], idkey, idvalue) 
@@ -348,13 +387,12 @@ class db
         $sql = $this->db->prepare($sqlquery);
         $sql->bindParam(":idvalue", $post['idvalue']);
         try {
-            $result = $sql->execute();
+            $sql->execute();
             return true;
         } catch (Exception $e) {
             //echo $e;
             return false;
         }
-        exit('End');
     }
 
     /**
@@ -382,34 +420,5 @@ class db
             //echo $e;
             return false;
         }
-        exit();
-    }
-
-    /**
-     * insertRecord
-     *
-     * @param  mixed $post (table, data:[])
-     *
-     * @return void
-     */
-    function insertRecord($post)
-    {
-        $table = $this->sanitize($post['table']);
-        $comma = $fields = $values = "";
-        foreach ($post['data'] as $key => $value) {
-            $fields .= $comma . $key;
-            $values .= $comma . "'" . $value . "'";
-            $comma = ",";
-        }
-        $sqlquery = "INSERT INTO `" . $table . "` ($fields) VALUES ($values)";
-        $sql = $this->db->prepare($sqlquery);
-        try {
-            $sql->execute();
-            return true;
-        } catch (Exception $e) {
-            //echo $e;
-            return false;
-        }
-        exit();
     }
 }

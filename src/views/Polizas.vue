@@ -61,7 +61,7 @@ export default {
       let self = this;
       let where = "(TipoInformacion LIKE 'Nueva%' ) AND (FechaAlta LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
       this.callData({cmd: "getRecords", table: "Polizas", where}).then(function(response) {
-        self.defineDataColumns(response);
+        self.defineTable(response);
       });
     },
     // CALL BAJAS
@@ -69,7 +69,7 @@ export default {
       let self = this;
       let where = "(TipoInformacion LIKE 'Anula%' )  AND (FechaBaja LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
       this.callData({cmd: "getRecords", table: "Polizas", where}).then(function(response) {
-        self.defineDataColumns(response);
+        self.defineTable(response);
       });
     },
     //CALCULATE

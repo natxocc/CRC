@@ -44,15 +44,11 @@ if ($cmd == "reportRecibos") $reale->reportRecibos($post);
 
 // Consultas db
 if ($cmd == "login") $db->login($post);
-// Comprueba si está conectado
-// ---------------INICIO
-// Comentar durante el desarrollo
-//if (!$db->isLogged($post)) exit("Usuario no conectado");
-// FIN DE BLOQUE
-// ---------------FIN
-// Resto de consultas
-if ($cmd == "isLogged") $db->isLogged($post);
 if ($cmd == "logout") $db->logout($post);
+if ($cmd == "checkUser") $db->checkUser($post);
+// Comprueba si está conectado
+//if (!$db->isLogged($post)) exit("Error Auth");
+// Resto de consultas
 if ($cmd == "sendMail") $db->sendMail($post);
 if ($cmd == "getRecords") $db->getRecords($post);
 if ($cmd == "updateRecord") $db->updateRecord($post);
