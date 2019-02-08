@@ -193,6 +193,12 @@ export default {
     { value: "ANULADO", label: "ANULADO" },
     { value: "EMITIDO", label: "EMITIDO" }
   ],
+  // FILTER BY USER
+  userby: [
+    { value: "NombreTomador", label: "Cliente" },
+    { value: "CodigoRecibo", label: "Recibo" },
+    { value: "CodigoPoliza", label: "Poliza" },
+  ],
   ayuda: [
     "Recibos sin tratamiento",
     "Recibos Pendientes y en curso",
@@ -219,6 +225,7 @@ export default {
   EliminarGestionT: "Eliminar gestión del recibo",
   FiltroRapido: "Filtro Rápido",
   FiltrosDeEstado: "Filtros de Estado",
+  HistorialUsuario: "Historial de usuario por:",
   TodosLosRegistrosT: "Por defecto se filtran los últimos 13 meses",
   TodosLosRegistros: "Mostrar Todos los Recibos",
   Gestion: "Gestión",

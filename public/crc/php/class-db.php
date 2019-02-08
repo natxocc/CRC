@@ -93,16 +93,13 @@ class db
         $result = $syno->login($post);
         if ($result->success) {
             session_regenerate_id(true);
-            $sql = $this->db->query("SELECT PClientes,PPolizas,PUsuarios,PRegistros, PRecibosGestion, PRecibosCaja FROM Usuarios WHERE Usuario='" . $post['user'] . "'");
-            $perms = $sql->fetchAll(PDO::FETCH_ASSOC);
-            $_SESSION['perms'] = $perms;
+            $sql = $this->db->query("SELECT Permisos, Filtros FROM Usuarios WHERE Usuario='" . $post['user'] . "'");
+            $customUser = $sql->fetchAll(PDO::FETCH_ASSOC);
+            $_SESSION['customUser'] = $customUser;
             $_SESSION['sid'] = $result->data->sid;
             $_SESSION['IPaddress'] = $this->getRealIP();
             $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
-            $_SESSION['admin']=false;
-            // Registra los usuarios si es Admin
             if ($result->users) {
-                $_SESSION['admin'] = true;
                 foreach ($result->users->data->users as $key => $value) {
                     try {
                         $this->db->exec(" INSERT INTO Usuarios(Usuario, Nombre, Correo) VALUES('" . $value->name . "', '" . $value->description . "', '" . $value->email . "') ");

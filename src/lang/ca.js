@@ -184,6 +184,12 @@ export default {
     { value: "ANAJ", label: "ANUL·LAT (Ajust)" },
     { value: "ANBA", label: "ANUL·LAT (Baixa)" }
   ],
+  // FILTER BY USER
+  userby: [
+    { value: "NombreTomador", label: "Client" },
+    { value: "CodigoRecibo", label: "Rebut" },
+    { value: "CodigoPoliza", label: "Pòlissa" },
+  ],
   // ESTADOS
   estados: [
     { value: "PENDIENTE", label: "PENDENT" },
@@ -216,9 +222,9 @@ export default {
   EditarGestion: "Editar",
   EditarGestionT: "Editar gestió de rebut seleccionat",
   EliminarGestion: "Eliminar Gestió",
-
   FiltroRapido: "Filtre Ràpid",
   FiltrosDeEstado: "Filtres de estat",
+  HistorialUsuario: "Historial d'usuari per:",
   TodosLosRegistrosT: "Per defecte, es mostren els últims 13 messos",
   TodosLosRegistros: "Ensenya tots els rebuts",
   Gestion: "Gestió",

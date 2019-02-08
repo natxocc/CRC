@@ -20,9 +20,12 @@
         <!-- FILTER ONLY GESTION -->
         <template v-if="this.$route.params.recibo=='gestion'">
           <div class="col-xs-12 col-md-4" style="padding: 10px">
-            <q-select :label="$q.lang.FiltrosDeEstado" :options="filter.estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.estadosSel"/>
+            <q-select :label="$q.lang.FiltrosDeEstado" :options="this.$q.lang.estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.estadosSel"/>
           </div>
-          <div class="col-xs-12 col-md-4" style="padding: 10px">
+          <div class="col-xs-6 col-md-2" style="padding: 10px">
+            <q-select :label="$q.lang.HistorialUsuario" :options="this.$q.lang.userby" @input="callDataGestion" dense expandBesides optionsDense v-model="client.userby"/>
+          </div>
+          <div class="col-xs-6 col-md-2" style="padding: 10px">
             <q-toggle :label="$q.lang.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
               <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.TodosLosRegistrosT}}</q-tooltip>
             </q-toggle>
@@ -103,8 +106,7 @@ export default {
       rowData: this.rowData,
       quickFilter: null,
       filter: {
-        estadosSel: [{value: "PENDIENTE", label: "PENDIENTE"}, {value: "DEVUELTO", label: "DEVUELTO"}],
-        estados: this.$q.lang.estados,
+        estadosSel: [{value: "PENDIENTE", label: this.$q.lang.estados[0].label}, {value: "DEVUELTO", label: this.$q.lang.estados[1].label}],
         alldata: false,
         years: [],
         weeks: [],
@@ -127,7 +129,11 @@ export default {
         telf: null,
         mail: null,
         dialog: false,
-        selected: false
+        selected: false,
+        userby: {
+          value: "NombreTomador",
+          label: this.$q.lang.userby[0].label
+        }
       },
       // RECIBO
       recibo: {
@@ -182,7 +188,7 @@ export default {
       where += ")";
       if (!this.filter.alldata) where += " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')";
       where += " ORDER BY Situacion DESC";
-      this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: "CodigoRecibo"}).then(function(response) {
+      this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.client.userby.value}).then(function(response) {
         self.defineTable(response);
       });
     },
@@ -275,8 +281,7 @@ export default {
     }
   },
   beforeMount() {
-    this.filter.estadosSel[0].label = this.$q.lang.estados[0].label;
-    this.filter.estadosSel[1].label = this.$q.lang.estados[1].label;
+    console.log(this.client.userby);
     this.filter.months = this.getMonths();
     this.filter.weeks = this.getWeeks();
     this.filter.years = this.getYears();
