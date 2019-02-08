@@ -88,19 +88,12 @@ export default {
           filter: "agSetColumnFilter",
           enableRowGroup: true,
           cellRenderer: function(params) {
-            return `<input type='checkbox' onclick="return false;" ${
-              params.value ? "checked" : ""
-            } />`;
+            return `<input type='checkbox' onclick="return false;" ${params.value ? "checked" : ""} />`;
           }
         }
       },
       statusBar: {
-        statusPanels: [
-          {statusPanel: "agTotalRowCountComponent", align: "left"},
-          {statusPanel: "agFilteredRowCountComponent"},
-          {statusPanel: "agSelectedRowCountComponent"},
-          {statusPanel: "agAggregationComponent"}
-        ]
+        statusPanels: [{statusPanel: "agTotalRowCountComponent", align: "left"}, {statusPanel: "agFilteredRowCountComponent"}, {statusPanel: "agSelectedRowCountComponent"}, {statusPanel: "agAggregationComponent"}]
       },
       sideBar: {
         toolPanels: [
@@ -156,10 +149,7 @@ export default {
     },
     onFilterChanged(event) {
       if (this.gridApi) {
-        this.$emit(
-          "gridData",
-          this.gridApi.rowModel.rootNode.childrenAfterFilter
-        );
+        this.$emit("gridData", this.gridApi.rowModel.rootNode.childrenAfterFilter);
       }
     },
     onCellClicked(event) {
@@ -196,11 +186,7 @@ export default {
           params.successCallback(params.data.callRecords);
         },
         template: function(params) {
-          return (
-            '<div style="height: 100%; background-color: #EDF6FF; padding: 20px; box-sizing: border-box;">' +
-            '  <div ref="eDetailGrid" style="height: 90%;"></div>' +
-            "</div>"
-          );
+          return '<div style="height: 100%; background-color: #EDF6FF; padding: 20px; box-sizing: border-box;">' + '  <div ref="eDetailGrid" style="height: 90%;"></div>' + "</div>";
         }
       };
     }

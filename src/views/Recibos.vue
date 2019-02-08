@@ -82,7 +82,7 @@
       </div>
     </div>
     <!-- TABLA DE DATOS -->
-    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
+    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO DE CLIENTES -->
     <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" :table="null" @cancel="client.dialog=false" @onSave="saveDataClient"></n-dialog>
   </div>
@@ -105,6 +105,7 @@ export default {
       columnDefsSub: this.columnDefsSub,
       rowData: this.rowData,
       quickFilter: null,
+      filters: null,
       filter: {
         estadosSel: [{value: "PENDIENTE", label: this.$q.lang.estados[0].label}, {value: "DEVUELTO", label: this.$q.lang.estados[1].label}],
         alldata: false,
@@ -281,7 +282,6 @@ export default {
     }
   },
   beforeMount() {
-    console.log(this.client.userby);
     this.filter.months = this.getMonths();
     this.filter.weeks = this.getWeeks();
     this.filter.years = this.getYears();

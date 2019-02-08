@@ -12,7 +12,8 @@ export default {
     return {
       columnsDefs: [],
       columnsDefsSub: [],
-      rowData: null
+      rowData: null,
+      lang: this.$q.lang.isoName,
     }
   },
   methods: {
@@ -86,7 +87,8 @@ export default {
   },
   beforeMount() {
     if (!localStorage.lang) {
-      this.getLang("es");
+      localStorage.lang = "es"
     }
+    this.lang = localStorage.lang;
   }
 }

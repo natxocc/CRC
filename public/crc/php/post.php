@@ -31,7 +31,6 @@ foreach ($REQUEST as $key => $value) {
     $post[$key] = $value;
 }
 $cmd = $post['cmd'];
-
 // Call class db
 require_once "class-db.php";
 $db = new db(DBTYPE, DBHOST, DBNAME, DBUSER, DBPASS);
@@ -41,7 +40,6 @@ $reale = new reale();
 if ($cmd == "updateRecibos") $reale->updateRecibos();
 if ($cmd == "updatePolizas") $reale->updatePolizas();
 if ($cmd == "reportRecibos") $reale->reportRecibos($post);
-
 // Consultas db
 if ($cmd == "login") $db->login($post);
 if ($cmd == "logout") $db->logout($post);
@@ -50,8 +48,14 @@ if ($cmd == "checkUser") $db->checkUser($post);
 //if (!$db->isLogged($post)) exit("Error Auth");
 // Resto de consultas
 if ($cmd == "sendMail") $db->sendMail($post);
-if ($cmd == "getRecords") $db->getRecords($post);
-if ($cmd == "updateRecord") $db->updateRecord($post);
-if ($cmd == "deleteRecord") $db->deleteRecord($post);
-if ($cmd == "insertRecord") $db->insertRecord($post);
+if ($_SESSION[$post['table']] > 0) {
+    if ($cmd == "getRecords") $db->getRecords($post);
+}
+if ($_SESSION[$post['table']] > 1) {
+    if ($cmd == "updateRecord") $db->updateRecord($post);
+    if ($cmd == "insertRecord") $db->insertRecord($post);
+}
+if ($_SESSION[$post['table']] > 2) {
+    if ($cmd == "deleteRecord") $db->deleteRecord($post);
+}
 exit();

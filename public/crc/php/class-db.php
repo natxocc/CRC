@@ -93,9 +93,6 @@ class db
         $result = $syno->login($post);
         if ($result->success) {
             session_regenerate_id(true);
-            $sql = $this->db->query("SELECT Permisos, Filtros FROM Usuarios WHERE Usuario='" . $post['user'] . "'");
-            $customUser = $sql->fetchAll(PDO::FETCH_ASSOC);
-            $_SESSION['customUser'] = $customUser;
             $_SESSION['sid'] = $result->data->sid;
             $_SESSION['IPaddress'] = $this->getRealIP();
             $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -108,12 +105,22 @@ class db
                     }
                 }
             }
+            $_SESSION['perms'] = $this->getPerms($post);
+            $result->perms = $_SESSION['perms'];
         } else {
             $this->logout($post);
         }
         echo json_encode($result);
     }
-
+    function getPerms($post)
+    {
+        $sql = $this->db->query("SELECT * FROM Usuarios WHERE Usuario='" . $this->sanitize($post['user']) . "'");
+        $user = $sql->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($user as $key => $value) {
+            $perms[$key] = $value;
+        }
+        return $perms;
+    }
     /**
      * logout
      *
@@ -142,7 +149,7 @@ class db
     function isLogged($post)
     {
         if (isset($_SESSION['sid'])) {
-            if ($_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) return true;
+            if ($_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $this->sanitize($post['sid']) == $_SESSION['sid']) return true;
         }
         $this->logout($post);
         return false;
@@ -276,7 +283,7 @@ class db
                 if (strstr($columnName[2], "A")) $result[$key]['tooltipField'] .= 'Autocomplete';
                 if (strstr($columnName[2], "H")) $result[$key]['tooltipField'] .= 'Hidden';
             }
-            if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int")) $result[$key]['type'] = "numberColumn";
+            if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int") || strstr($fetch[$key]['Type'], "double")) $result[$key]['type'] = "numberColumn";
             if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "textColumn";
             if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "dateColumn";
             if (strstr($fetch[$key]['Type'], "bit")) $result[$key]['type'] = "bitColumn";
@@ -294,40 +301,44 @@ class db
     function getRecords($post)
     {
         $table = $this->sanitize($post['table']);
-        $lang = isset($post['lang']) ? $post['lang'] : false;
-        $result['columns'] = $this->getColumns($table, $lang);
-        $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
-        $where = isset($post['where']) ? " WHERE " . $this->sanitize($post['where'], false) : "";
-        $sqlquery .= $where;
+        if ($_SESSION[$table] > 0) {
+            $lang = isset($post['lang']) ? $post['lang'] : false;
+            $result['columns'] = $this->getColumns($table, $lang);
+            $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
+            $where = isset($post['where']) ? " WHERE " . $this->sanitize($post['where'], false) : "";
+            $sqlquery .= $where;
         //echo $sqlquery;
-        $sql = $this->db->prepare($sqlquery);
-        try {
-            $sql->execute();
-            $result['data'] = $sql->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            echo $e;
-            exit();
-        }
-        if (isset($post['subtable'])) {
-            $table = $this->sanitize($post['subtable']);
-            $result['columnsSub'] = $this->getColumns($table);
-            $sqlquery = " SELECT * FROM `" . $table . "`";
-            $id = $this->sanitize($post['id']);
             $sql = $this->db->prepare($sqlquery);
-            $sql->execute();
-            $subdata = $sql->fetchAll(PDO::FETCH_ASSOC);
-            $subresult = array();
-            foreach ($result['data'] as $rowkey1 => $rowvalue1) {
-                foreach ($subdata as $rowkey2 => $rowvalue2) {
-                    if ($rowvalue1[$id] == $rowvalue2[$id]) {
-                        $subresult[] = $rowvalue2;
-                    }
-                }
-                $subtable['temp'][$rowkey1] = $rowvalue1;
-                $subtable['temp'][$rowkey1]['callRecords'] = $subresult;
-                $subresult = array();
+            try {
+                $sql->execute();
+                $result['data'] = $sql->fetchAll(PDO::FETCH_ASSOC);
+            } catch (Exception $e) {
+                echo $e;
+                exit();
             }
-            $result['data'] = $subtable['temp'];
+            if (isset($post['subtable'])) {
+                $table = $this->sanitize($post['subtable']);
+                $result['columnsSub'] = $this->getColumns($table);
+                $sqlquery = " SELECT * FROM `" . $table . "`";
+                $id = $this->sanitize($post['id']);
+                $sql = $this->db->prepare($sqlquery);
+                $sql->execute();
+                $subdata = $sql->fetchAll(PDO::FETCH_ASSOC);
+                $subresult = array();
+                foreach ($result['data'] as $rowkey1 => $rowvalue1) {
+                    foreach ($subdata as $rowkey2 => $rowvalue2) {
+                        if ($rowvalue1[$id] == $rowvalue2[$id]) {
+                            $subresult[] = $rowvalue2;
+                        }
+                    }
+                    $subtable['temp'][$rowkey1] = $rowvalue1;
+                    $subtable['temp'][$rowkey1]['callRecords'] = $subresult;
+                    $subresult = array();
+                }
+                $result['data'] = $subtable['temp'];
+            }
+        } else {
+            $result['success'] = false;
         }
         echo json_encode($result, JSON_NUMERIC_CHECK);
         return $result['data'];
