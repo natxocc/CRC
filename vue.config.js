@@ -4,7 +4,7 @@ module.exports = {
   productionSourceMap: false,
   lintOnSave: false,
   //baseUrl: './',
-  outputDir: undefined,
+  outputDir: 'docs',
   runtimeCompiler: undefined,
   parallel: undefined,
   css: undefined

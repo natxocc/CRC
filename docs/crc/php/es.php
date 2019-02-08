@@ -17,4 +17,7 @@ $lang = array(
   "RecomendacionCliente" => "Nuestra prioridad es darle el mejor servicio y satisfacción para nuestros clientes e informarle de su próxima renovación. Recordarle que estamos a su entera disposición para cualquier duda o consulta que le pueda surgir.",
   "SaludoCliente" => "Reciba un cordial seguro de su Oficina Reale Valls."
 );
+$langdb = array(
+  "Usuario"
+)
 ?>
