@@ -86,7 +86,6 @@ class db
             $_SESSION['IPaddress'] = $this->getRealIP();
             $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
             $_SESSION['logged'] = $result->success;
-            $this->db->exec("UPDATE Usuarios SET sid='" . $_SESSION['sid'] . "' WHERE Usuario='" . $post['user'] . "'");
             if ($result->users) {
                 foreach ($result->users->data->users as $key => $value) {
                     try {
@@ -141,10 +140,16 @@ class db
      */
     function isLogged($post)
     {
+        $result['success']="Antes de log";
+        echo json_encode($result);
         if (!isset($_SESSION['logged'])) return false;
+        $result['success'] .= "Despues de log";
+        echo json_encode($result);
         if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
+            echo $result['success'] = true;
             return true;
         } else {
+            echo $result['success'] = false;
             return false;
         }
         exit();
@@ -406,46 +411,5 @@ class db
             return false;
         }
         exit();
-    }
-
-    // $syno->saveConfig(['data' => ['pepe' => ['uno' => 'ii', 'dos' => 'dos'], 'juan' => 'oo'], 'file' => '../../Config.php']);
-
-    // Hay que crear un Config.php en la raiz y darles permisos de escritura
-    /**
-     * loadConfig
-     *
-     * @param  mixed $post
-     *
-     * @return void
-     */
-    function loadConfig($post)
-    {
-        $config = parse_ini_file($post['file'], true);
-        $_SESSION['Config'] = $config;
-    }
-
-    /**
-     * saveConfig
-     *
-     * @param  mixed $post
-     *
-     * @return void
-     */
-    function saveConfig($post)
-    {
-        $config = $post['data'];
-        $file = $post['file'];
-        $fileContent = '';
-        if (!empty($config)) {
-            foreach ($config as $i => $v) {
-                if (is_array($v)) {
-                    foreach ($v as $t => $m) {
-                        $fileContent .= $i . "[" . $t . "] = " . (is_numeric($m) ? $m : '"' . $m . '"') . "\n\r";
-                    }
-                } else $fileContent .= $i . " = " . (is_numeric($v) ? $v : '"' . $v . '"') . "\n\r";
-
-            }
-        }
-        return file_put_contents($file, $fileContent, LOCK_EX);
     }
 }

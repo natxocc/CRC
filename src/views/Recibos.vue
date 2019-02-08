@@ -281,6 +281,7 @@ export default {
     this.filter.weeks = this.getWeeks();
     this.filter.years = this.getYears();
     this.init();
+    this.callData({cmd:"isLogged"}).then((resp)=>{console.log(resp.data)})
   },
   watch: {
     $route: "init"

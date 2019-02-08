@@ -89,9 +89,9 @@ class db
             if ($result->users) {
                 foreach ($result->users->data->users as $key => $value) {
                     try {
-                        $this->db->exec("INSERT INTO Usuarios (Usuario, Nombre, Correo) VALUES ('" . $value->name . "', '" . $value->description . "','" . $value->email . "')");
+                        $this->db->exec(" INSERT INTO Usuarios(Usuario, Nombre, Correo) VALUES('" . $value->name . "', '" . $value->description . "', '" . $value->email . "') ");
                     } catch (Exception $e) {
-                        $this->db->exec("UPDATE Usuarios SET Correo = '" . $value->email . "' , Nombre = '" . $value->description . "' WHERE Usuario = '" . $value->name . "'");
+                        $this->db->exec(" UPDATE Usuarios SET Correo = '" . $value->email . "', Nombre = '" . $value->description . "' WHERE Usuario = '" . $value->name . "' ");
                     }
                 }
             }
@@ -116,7 +116,8 @@ class db
      */
     public function logout($post)
     {
-        require_once("class-syno.php");
+        require_once(" class - syno
+            . php ");
         $syno = new syno();
         $result = $syno->logout($post);
         session_unset();
@@ -139,10 +140,16 @@ class db
      */
     function isLogged($post)
     {
+        $result['success']="Antes de log";
+        echo json_encode($result);
         if (!isset($_SESSION['logged'])) return false;
+        $result['success'] .= "Despues de log";
+        echo json_encode($result);
         if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
+            echo $result['success'] = true;
             return true;
         } else {
+            echo $result['success'] = false;
             return false;
         }
         exit();
@@ -159,28 +166,33 @@ class db
     {
         $subject = $post['subject'];
         $to = $post['to'];
-        $headers = "MIME-version: 1.0\r\n";
-        $headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
-        $body = "";
+        $headers = " MIME - version : 1.0 \r\n ";
+        $headers .= " Content - type : text / html;
+            charset = iso - 8859 - 1 \r\n ";
+        $body = " ";
         // Include event ? 
         if (isset($post['desc']) && isset($post['date'])) {
             $dini = date('YmdHis', strtotime($post['date']));
             $dend = date('YmdHis', strtotime($post['date']));
             $dini = date('Ymd', strtotime($dini)) . 'T' . date('His', strtotime($dini));
             $dend = date('Ymd', strtotime($dend)) . 'T' . date('His', strtotime($dend));
-            $headers .= "Content-class: urn:content-classes:calendarmessage\r\n";
-            $headers .= "Content-type: text/calendar; method=REQUEST; charset=UTF-8\r\n";
-            $body .= "BEGIN:VCALENDAR\r\n";
-            $body .= "VERSION:2.0\r\n";
-            $body .= "PRODID:PHP\r\n";
-            $body .= "METHOD:REQUEST\r\n";
-            $body .= "BEGIN:VEVENT\r\n";
-            $body .= "DTSTART:" . $dini . "\r\n";
-            $body .= "DTEND:" . $dend . "\r\n";
-            $body .= "CATEGORIES:CRC\r\n";
-            $body .= "DESCRIPTION: " . $post['desc'] . "\r\n";
-            $body .= "SUMMARY: Sumario\r\n";
-            $body .= "ORGANIZER; CN=\"Servidor\":mailto: natxocc@verallia.com\r\n";
+            $headers .= " Content - class : urn
+            : content - classes : calendarmessage\r\n ";
+            $headers .= " Content - type : text / calendar;
+            method = REQUEST;
+            charset = UTF - 8 \r\n ";
+            $body .= " BEGIN : VCALENDAR\r\n ";
+            $body .= " VERSION : 2.0 \r\n ";
+            $body .= " PRODID : PHP\r\n ";
+            $body .= " METHOD : REQUEST\r\n ";
+            $body .= " BEGIN : VEVENT\r\n ";
+            $body .= " DTSTART : " . $dini . " \r\n ";
+            $body .= " DTEND : " . $dend . " \r\n ";
+            $body .= " CATEGORIES : CRC\r\n ";
+            $body .= " DESCRIPTION : " . $post['desc'] . " \r\n ";
+            $body .= " SUMMARY : Sumario\r\n ";
+            $body .= " ORGANIZER;
+            CN = \"Servidor\":mailto: natxocc@verallia.com\r\n";
             $body .= "LOCATION: Servidor\r\n";
             $body .= "UID:" . date(" Ymd\TGis ", strtotime($dini)) . rand() . " @natxocc.com\r\n ";
             $body .= "SEQUENCE:0\r\n";
@@ -266,20 +278,19 @@ class db
     /**
      * getRecords
      *
-     * @param  mixed $post (table, where, orderby, subtable, id)
+     * @param  mixed $post (table, where, subtable, id)
      *
      * @return void
      */
     function getRecords($post)
     {
         $table = $this->sanitize($post['table']);
-        $result['columns'] = $this->getColumns($table, $post['lang']);
+        $lang = isset($post['lang']) ? $post['lang'] : false;
+        $result['columns'] = $this->getColumns($table, $lang);
         $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
-        $where = $post['where'] ? " WHERE " . $this->sanitize($post['where'], false) : "";
+        $where = isset($post['where']) ? " WHERE " . $this->sanitize($post['where'], false) : "";
         $sqlquery .= $where;
-        $orderby = $post['orderby'] ? " ORDER BY " . $this->sanitize($post['orderby'], false) : "";
-        $sqlquery .= $orderby;
-        // echo $sqlquery;
+        //echo $sqlquery;
         $sql = $this->db->prepare($sqlquery);
         try {
             $sql->execute();
@@ -288,7 +299,7 @@ class db
             echo $e;
             exit();
         }
-        if ($post['subtable']) {
+        if (isset($post['subtable'])) {
             $table = $this->sanitize($post['subtable']);
             $result['columnsSub'] = $this->getColumns($table);
             $sqlquery = " SELECT * FROM `" . $table . "`";
@@ -334,17 +345,13 @@ class db
             $comma = ",";
         }
         $sqlquery .= " WHERE `" . $idkey . "` = :idvalue";
-        // if ($_SESSION['isAdmin'] <> 1) {
-        //     $sqlquery .= " AND `Usuario` ='$user'";
-        // }
         $sql = $this->db->prepare($sqlquery);
         $sql->bindParam(":idvalue", $post['idvalue']);
         try {
             $result = $sql->execute();
-            echo json_encode($result);
             return true;
         } catch (Exception $e) {
-            echo $e;
+            //echo $e;
             return false;
         }
         exit('End');
@@ -372,7 +379,7 @@ class db
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            echo $e;
+            //echo $e;
             return false;
         }
         exit();
@@ -400,182 +407,9 @@ class db
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            echo $e;
+            //echo $e;
             return false;
         }
         exit();
     }
-
-    // $syno->saveConfig(['data' => ['pepe' => ['uno' => 'ii', 'dos' => 'dos'], 'juan' => 'oo'], 'file' => '../../Config.php']);
-
-    // Hay que crear un Config.php en la raiz y darles permisos de escritura
-    /**
-     * loadConfig
-     *
-     * @param  mixed $post
-     *
-     * @return void
-     */
-    function loadConfig($post)
-    {
-        $config = parse_ini_file($post['file'], true);
-        $_SESSION['Config'] = $config;
-    }
-
-    /**
-     * saveConfig
-     *
-     * @param  mixed $post
-     *
-     * @return void
-     */
-    function saveConfig($post)
-    {
-        $config = $post['data'];
-        $file = $post['file'];
-        $fileContent = '';
-        if (!empty($config)) {
-            foreach ($config as $i => $v) {
-                if (is_array($v)) {
-                    foreach ($v as $t => $m) {
-                        $fileContent .= $i . "[" . $t . "] = " . (is_numeric($m) ? $m : '"' . $m . '"') . "\n\r";
-                    }
-                } else $fileContent .= $i . " = " . (is_numeric($v) ? $v : '"' . $v . '"') . "\n\r";
-
-            }
-        }
-        return file_put_contents($file, $fileContent, LOCK_EX);
-    }
-
-        // /**
-    //  * login
-    //  *
-    //  * @param  mixed $post (user,pass)
-    //  *
-    //  * @return void
-    //  */
-    // public function login($post)
-    // {
-    //     $return = array();
-    //     if (!isset($post['user']) || !isset($post['pass'])) exit();
-    //     $logged = $sql = $result = "";
-    //     $_SESSION['isAdmin'] = $_SESSION['sid'] = $_SESSION['userAgent'] = $_SESSION['ipAddress'] = $_SESSION['logged'] = false;
-    //     $sql = $this->db->prepare("SELECT Clave,Adm from Usuarios WHERE Usuario=:user");
-    //     $sql->bindParam(":user", $post['user']);
-    //     $sql->execute();
-    //     $result = $sql->fetchAll();
-    //     $logged = password_verify($post['pass'], $result[0]['Clave']);
-    //     if ($logged) {
-    //         $sql = $this->db->prepare("SELECT Usuario,Correo FROM Usuarios");
-    //         $sql->execute();
-    //         $result = $sql->fetchAll();
-    //         foreach ($result as $key => $value) {
-    //             $return['users'][$key]['user'] = $value['Usuario'];
-    //             $return['users'][$key]['mail'] = $value['Correo'];
-    //         }
-    //         $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
-    //         $_SESSION['sid'] = bin2hex(random_bytes(12));
-    //         $_SESSION['ipAddress'] = $this->getRealIP();
-    //         $_SESSION['LastActivity'] = $_SERVER['REQUEST_TIME'];
-    //         $_SESSION['isAdmin'] = $result[0]['Clave'];
-    //         $_SESSION['logged'] = true;
-    //         $return['ip'] = $_SESSION['ipAddress'];
-    //         $return['logged'] = $_SESSION['logged'];
-    //         $return['success'] = true;
-    //         $return['sid'] = $_SESSION['sid'];
-    //         echo json_encode($return);
-    //     } else {
-    //         echo "Usuario Incorrecto";
-    //     }
-    //     exit();
-    // }
-
-    // /**
-    //  * logout
-    //  *
-    //  * @return void
-    //  */
-    // public function logout()
-    // {
-    //     $_SESSION['isAdmin'] = $_SESSION['sid'] = $_SESSION['userAgent'] = $_SESSION['ipAddress'] = $_SESSION['logged'] = false;
-    //     session_unset();
-    //     session_destroy();
-    //     session_start();
-    //     session_regenerate_id(true);
-    //     $return['sid'] = "";
-    //     echo $return['sid'];
-    //     exit();
-    // }
-
-    // /**
-    //  * createUser
-    //  *
-    //  * @param  mixed $post (user,pass)
-    //  *
-    //  * @return void
-    //  */
-    // public function createUser($post)
-    // {
-    //     // PONER CONDICION QUE SOLO ADMIN PUEDE REGISTRAR
-    //     if (!isset($post['user']) && !isset($post['pass']) && $_SESSION['isAdmin'] <> 1) exit();
-    //     $pass = password_hash($post['pass'], PASSWORD_DEFAULT);
-    //     $sql = $this->db->prepare("REPLACE INTO Usuarios(Usuario,Clave) VALUES(:user, :pass)");
-    //     $sql->bindParam(":user", $post['user']);
-    //     $sql->bindParam(":pass", $pass);
-    //     $sql->execute();
-    //     exit();
-    // }
-
-    // /**
-    //  * getUser
-    //  *
-    //  * @param  mixed $post (user, sid)
-    //  *
-    //  * @return void
-    //  */
-    // function getUser($post)
-    // {
-    //     $return = array();
-    //     if (!isset($post['user']) || !isset($post['sid'])) exit();
-    //     $logged = $sql = $result = "";
-    //     if (isset($_SESSION['logged'])) {
-    //         if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
-    //             $sql = $this->db->prepare("SELECT Correo, Adm, Ramo, SubMediador from Usuarios WHERE Usuario=:user");
-    //             $sql->bindParam(":user", $post['user']);
-    //             $sql->execute();
-    //             $result = $sql->fetchAll();
-    //             $return['correo'] = $result[0]['Correo'];
-    //             $return['adm'] = $result[0]['Adm'];
-    //             $return['ramo'] = $result[0]['Ramo'];
-    //             $return['sm'] = $result[0]['SubMediador'];
-    //             $return['success'] = true;
-    //             echo json_encode($return);
-    //             return true;
-    //         } else {
-    //             return false;
-    //         }
-    //     }
-    //     exit();
-    // }
-
-    // /**
-    //  * isLogged
-    //  *
-    //  * @param  mixed $post (sid)
-    //  *
-    //  * @return void
-    //  */
-    // function isLogged($post)
-    // {
-    //     if (!isset($post['sid'])) exit('Falta sid');
-    //     $logged = $sql = $result = "";
-    //     if (isset($_SESSION['logged'])) {
-    //         if ($_SESSION['logged'] == true && $_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['ipAddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) {
-    //             return true;
-    //         } else {
-    //             return false;
-    //         }
-    //     }
-    //     exit();
-    // }
 }

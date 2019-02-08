@@ -272,7 +272,6 @@ export default {
     }
   },
   beforeMount() {
-    //CHECK USER
     localStorage.url = "http://servidor/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
     // if (localStorage.sid) this.isLogged();

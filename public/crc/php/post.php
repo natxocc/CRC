@@ -51,6 +51,7 @@ if ($cmd == "login") $db->login($post);
 // FIN DE BLOQUE
 // ---------------FIN
 // Resto de consultas
+if ($cmd == "isLogged") $db->isLogged($post);
 if ($cmd == "logout") $db->logout($post);
 if ($cmd == "sendMail") $db->sendMail($post);
 if ($cmd == "getRecords") $db->getRecords($post);
