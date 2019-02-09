@@ -167,7 +167,7 @@ class db
         require_once("class-syno.php");
         $syno = new syno();
         $result = $syno->getUserInfo($post['sid']);
-        if (!$result) {
+        if (!$result && !isset($_SESSION['sid'])) {
             $this->logout($post);
         }
         echo json_encode($result);

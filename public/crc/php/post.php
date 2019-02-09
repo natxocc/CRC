@@ -49,20 +49,19 @@ if ($cmd == "checkUser") $db->checkUser($post);
 $_SESSION['tables'][$post['table']] = 3; // PROVISIONAL PARA SALTAR LA SEGURIDAD
 // Resto de consultas
 if ($cmd == "sendMail") $db->sendMail($post);
-$result['success'] = false;
-$resulta= false;
+$result = false;
 if (isset($_SESSION['tables'][$post['table']])) {
     if ($_SESSION['tables'][$post['table']] > 0) {
         if ($cmd == "getRecords") $result = $db->getRecords($post);
     }
     if ($_SESSION['tables'][$post['table']] > 1) {
-        if ($cmd == "updateRecord") $resulta = $db->updateRecord($post);
-        if ($cmd == "insertRecord") $resulta = $db->insertRecord($post);
+        if ($cmd == "updateRecord") $result = $db->updateRecord($post);
+        if ($cmd == "insertRecord") $result = $db->insertRecord($post);
     }
     if ($_SESSION['tables'][$post['table']] > 2) {
-        if ($cmd == "deleteRecord") $resulta = $db->deleteRecord($post);
+        if ($cmd == "deleteRecord") $result = $db->deleteRecord($post);
     }
-    if ($resulta) $result = $resulta;
+    if ($result) $result['success'] = $result;
 }
 echo json_encode($result, JSON_NUMERIC_CHECK);
 exit();
