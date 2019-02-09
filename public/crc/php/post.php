@@ -46,17 +46,23 @@ if ($cmd == "logout") $db->logout($post);
 if ($cmd == "checkUser") $db->checkUser($post);
 // Comprueba si está conectado
 //if (!$db->isLogged($post)) exit("Error Auth");
-$_SESSION[$post['table']]=3;
+$_SESSION['tables'][$post['table']] = 3; // PROVISIONAL PARA SALTAR LA SEGURIDAD
 // Resto de consultas
 if ($cmd == "sendMail") $db->sendMail($post);
-if ($_SESSION[$post['table']] > 0) {
-    if ($cmd == "getRecords") $db->getRecords($post);
+$result['success'] = false;
+$resulta= false;
+if (isset($_SESSION['tables'][$post['table']])) {
+    if ($_SESSION['tables'][$post['table']] > 0) {
+        if ($cmd == "getRecords") $result = $db->getRecords($post);
+    }
+    if ($_SESSION['tables'][$post['table']] > 1) {
+        if ($cmd == "updateRecord") $resulta = $db->updateRecord($post);
+        if ($cmd == "insertRecord") $resulta = $db->insertRecord($post);
+    }
+    if ($_SESSION['tables'][$post['table']] > 2) {
+        if ($cmd == "deleteRecord") $resulta = $db->deleteRecord($post);
+    }
+    if ($resulta) $result = $resulta;
 }
-if ($_SESSION[$post['table']] > 1) {
-    if ($cmd == "updateRecord") $db->updateRecord($post);
-    if ($cmd == "insertRecord") $db->insertRecord($post);
-}
-if ($_SESSION[$post['table']] > 2) {
-    if ($cmd == "deleteRecord") $db->deleteRecord($post);
-}
+echo json_encode($result, JSON_NUMERIC_CHECK);
 exit();

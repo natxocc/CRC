@@ -225,7 +225,7 @@ export default {
   EliminarGestionT: "Eliminar gestión del recibo",
   FiltroRapido: "Filtro Rápido",
   FiltrosDeEstado: "Filtros de Estado",
-  HistorialUsuario: "Historial de usuario por:",
+  HistorialUsuario: "Historial de recibos por:",
   TodosLosRegistrosT: "Por defecto se filtran los últimos 13 meses",
   TodosLosRegistros: "Mostrar Todos los Recibos",
   Gestion: "Gestión",

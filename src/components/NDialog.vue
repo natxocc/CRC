@@ -51,7 +51,7 @@ export default {
     model: null,
     columns: null,
     data: null,
-    table: null
+    mode: null
   },
   data() {
     return {

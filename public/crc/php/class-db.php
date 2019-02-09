@@ -105,21 +105,21 @@ class db
                     }
                 }
             }
-            $_SESSION['perms'] = $this->getPerms($post);
-            $result->perms = $_SESSION['perms'];
+            $_SESSION['tables'] = $this->getTablePerms($post);
+            $result->tables = $_SESSION['tables'];
         } else {
             $this->logout($post);
         }
         echo json_encode($result);
     }
-    function getPerms($post)
+    function getTablePerms($post)
     {
         $sql = $this->db->query("SELECT * FROM Usuarios WHERE Usuario='" . $this->sanitize($post['user']) . "'");
         $user = $sql->fetchAll(PDO::FETCH_ASSOC);
         foreach ($user as $key => $value) {
-            $perms[$key] = $value;
+            $table[$key] = $value;
         }
-        return $perms;
+        return $table;
     }
     /**
      * logout
@@ -301,48 +301,43 @@ class db
     function getRecords($post)
     {
         $table = $this->sanitize($post['table']);
-        if ($_SESSION[$table] > 0) {
-            $lang = isset($post['lang']) ? $post['lang'] : false;
-            $result['columns'] = $this->getColumns($table, $lang);
-            $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
-            $where = isset($post['where']) ? " WHERE " . $this->sanitize($post['where'], false) : "";
-            $sqlquery .= $where;
+        $lang = isset($post['lang']) ? $post['lang'] : false;
+        $result['columns'] = $this->getColumns($table, $lang);
+        $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
+        $where = isset($post['where']) ? " WHERE " . $this->sanitize($post['where'], false) : "";
+        $sqlquery .= $where;
         //echo $sqlquery;
-            $sql = $this->db->prepare($sqlquery);
-            try {
-                $sql->execute();
-                $result['data'] = $sql->fetchAll(PDO::FETCH_ASSOC);
-            } catch (Exception $e) {
-                echo $e;
-                exit();
-            }
-            if (isset($post['subtable'])) {
-                $table = $this->sanitize($post['subtable']);
-                $result['columnsSub'] = $this->getColumns($table);
-                $sqlquery = " SELECT * FROM `" . $table . "`";
-                $id = $this->sanitize($post['id']);
-                $sql = $this->db->prepare($sqlquery);
-                $sql->execute();
-                $subdata = $sql->fetchAll(PDO::FETCH_ASSOC);
-                $subresult = array();
-                foreach ($result['data'] as $rowkey1 => $rowvalue1) {
-                    foreach ($subdata as $rowkey2 => $rowvalue2) {
-                        if ($rowvalue1[$id] == $rowvalue2[$id]) {
-                            $subresult[] = $rowvalue2;
-                        }
-                    }
-                    $subtable['temp'][$rowkey1] = $rowvalue1;
-                    $subtable['temp'][$rowkey1]['callRecords'] = $subresult;
-                    $subresult = array();
-                }
-                $result['data'] = $subtable['temp'];
-            }
-        } else {
-            $result['success'] = false;
+        $sql = $this->db->prepare($sqlquery);
+        try {
+            $sql->execute();
+            $result['success'] = true;
+            $result['data'] = $sql->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            echo $e;
+            exit();
         }
-        echo json_encode($result, JSON_NUMERIC_CHECK);
-        return $result['data'];
-        exit();
+        if (isset($post['subtable'])) {
+            $table = $this->sanitize($post['subtable']);
+            $result['columnsSub'] = $this->getColumns($table);
+            $sqlquery = " SELECT * FROM `" . $table . "`";
+            $id = $this->sanitize($post['id']);
+            $sql = $this->db->prepare($sqlquery);
+            $sql->execute();
+            $subdata = $sql->fetchAll(PDO::FETCH_ASSOC);
+            $subresult = array();
+            foreach ($result['data'] as $rowkey1 => $rowvalue1) {
+                foreach ($subdata as $rowkey2 => $rowvalue2) {
+                    if ($rowvalue1[$id] == $rowvalue2[$id]) {
+                        $subresult[] = $rowvalue2;
+                    }
+                }
+                $subtable['temp'][$rowkey1] = $rowvalue1;
+                $subtable['temp'][$rowkey1]['callRecords'] = $subresult;
+                $subresult = array();
+            }
+            $result['data'] = $subtable['temp'];
+        }       
+        return $result;
     }
 
     /**

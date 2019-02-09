@@ -224,7 +224,7 @@ export default {
   EliminarGestion: "Eliminar Gestió",
   FiltroRapido: "Filtre Ràpid",
   FiltrosDeEstado: "Filtres de estat",
-  HistorialUsuario: "Historial d'usuari per:",
+  HistorialUsuario: "Historial de rebuts per:",
   TodosLosRegistrosT: "Per defecte, es mostren els últims 13 messos",
   TodosLosRegistros: "Ensenya tots els rebuts",
   Gestion: "Gestió",

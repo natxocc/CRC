@@ -1,5 +1,4 @@
 import axios from 'axios'
-import Quasar from "quasar";
 import { Loading } from "quasar";
 function showLoading(options) {
   Loading.show(options);
@@ -13,6 +12,8 @@ export default {
       columnsDefs: [],
       columnsDefsSub: [],
       rowData: null,
+      columns: null,
+      data: null,
       lang: this.$q.lang.isoName,
     }
   },
@@ -29,9 +30,22 @@ export default {
     },
     // DEFINE COLUMNS Y DATA
     defineTable(data) {
-      this.columnDefs = data.data.columns;
-      this.columnDefsSub = data.data.columnsSub;
-      this.rowData = data.data.data;
+      if (data.data.success) {
+        this.columnDefs = data.data.columns;
+        this.columnDefsSub = data.data.columnsSub;
+        this.rowData = data.data.data;
+      }
+      else {
+        this.$q.notify({
+          message: this.$q.lang.SinAutorizacion,
+          icon: "close",
+          color: "negative"
+        })
+      }
+    },
+    // DEFINE DATA FOR DIALOG
+    defineDialog(data) {
+
     },
     // GET DAYS WEEK
     getDaysWeek(year, week) {
@@ -78,6 +92,13 @@ export default {
         this.$q.lang.set(lang.default);
       });
       localStorage.lang = this.lang;
+    },
+    noAuth(data) {
+      if (!data.data.success) self.$q.notify({
+        message: self.$q.lang.SinAutorizacion,
+        icon: "close",
+        color: "negative"
+      });
     }
   },
   watch: {

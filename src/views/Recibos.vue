@@ -84,7 +84,7 @@
     <!-- TABLA DE DATOS -->
     <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO DE CLIENTES -->
-    <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" :table="null" @cancel="client.dialog=false" @onSave="saveDataClient"></n-dialog>
+    <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" @cancel="client.dialog=false" @onSave="saveDataClient"></n-dialog>
   </div>
 </template>
 
@@ -104,6 +104,8 @@ export default {
       columnDefs: this.columnDefs,
       columnDefsSub: this.columnDefsSub,
       rowData: this.rowData,
+      columns: this.columns,
+      data:this.data,
       quickFilter: null,
       filters: null,
       filter: {
