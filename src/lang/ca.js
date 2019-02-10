@@ -235,7 +235,6 @@ export default {
   mes: "Mes",
   semana: "Setmana",
   Liquidacion: "Liquidació",
-  ControlCaja: "Control Caixa",
   SinAutorizacion: "Sense autorització",
   //REGISTROS
   Nuevo: "Nou",

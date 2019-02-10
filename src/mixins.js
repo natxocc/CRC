@@ -9,11 +9,12 @@ function hideLoading(options) {
 export default {
   data() {
     return {
-      columnsDefs: [],
-      columnsDefsSub: [],
+      columnDefs: [],
+      columnDefsSub: [],
       rowData: null,
-      columns: null,
-      data: null,
+      dialogData: [],
+      dialogMode: null,
+      dialogModel: false,
       lang: this.$q.lang.isoName,
     }
   },
@@ -45,7 +46,12 @@ export default {
     },
     // DEFINE DATA FOR DIALOG
     defineDialog(data) {
-
+      let dialogData = {};
+      dialogData.data = data.data[0]
+      dialogData.name = data.columns.map(x => x.headerName)
+      dialogData.type = data.columns.map(x => x.type)
+      dialogData.field = data.columns.map(x => x.field)
+      this.dialogData = dialogData
     },
     // GET DAYS WEEK
     getDaysWeek(year, week) {

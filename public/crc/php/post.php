@@ -61,7 +61,7 @@ if (isset($_SESSION['tables'][$post['table']])) {
     if ($_SESSION['tables'][$post['table']] > 2) {
         if ($cmd == "deleteRecord") $result = $db->deleteRecord($post);
     }
-    if ($result) $result['success'] = $result;
+    if ($result) $result['success'] = true;
 }
 echo json_encode($result, JSON_NUMERIC_CHECK);
 exit();

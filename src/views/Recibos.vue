@@ -5,7 +5,6 @@
       <q-route-tab :label="$q.lang.Gestion" icon="assignment_turned_in" name="gestion" to="/recibos/gestion"/>
       <q-route-tab :label="$q.lang.BajasPendientes" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
       <q-route-tab :label="$q.lang.Liquidacion" icon="credit_card" name="liq" to="/recibos/liq"/>
-      <q-route-tab :label="$q.lang.ControlCaja" icon="done_all" name="caja" to="/recibos/caja"/>
       <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
     </q-tabs>
     <!-- SELECT FILTERS TOTALS-->
@@ -40,7 +39,7 @@
             <q-select :label="$q.lang.mes" :options="filter.months" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.month"/>
           </div>
         </template>
-        <!-- FILTER ONLY LIQ -->
+        <!-- FILTER ONLY LIQ & CAJA -->
         <template v-else-if="this.$route.params.recibo=='liq'">
           <div class="col-xs-12 col-md-4" style="padding: 10px">
             <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.year"/>
@@ -77,14 +76,14 @@
       <div class="row textcenter">
         <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected"></q-btn>
         <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
-          <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span>
+          <!-- <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span> -->
         </q-btn>
       </div>
     </div>
     <!-- TABLA DE DATOS -->
     <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO DE CLIENTES -->
-    <n-dialog :columns="client.columns" :data="client.data" :model="client.dialog" @cancel="client.dialog=false" @onSave="saveDataClient"></n-dialog>
+    <n-dialog :data="dialogData" :mode="dialogMode" :model="dialogModel" @cancel="dialogModel=false" @onSave="saveDataClient"></n-dialog>
   </div>
 </template>
 
@@ -100,12 +99,11 @@ export default {
   mixins: [Custom],
   data() {
     return {
-      // TABLE
-      columnDefs: this.columnDefs,
-      columnDefsSub: this.columnDefsSub,
-      rowData: this.rowData,
-      columns: this.columns,
-      data:this.data,
+      // columnDefs: this.columnDefs,
+      // columnDefsSub: this.columnDefsSub,
+      // rowData: this.rowData,
+      // dialogColumns: this.dialogColumns,
+      // dialogData: this.dialogData,
       quickFilter: null,
       filters: null,
       filter: {
@@ -126,12 +124,9 @@ export default {
       },
       // CLIENT
       client: {
-        columns: null,
-        data: null,
         name: null,
         telf: null,
         mail: null,
-        dialog: false,
         selected: false,
         userby: {
           value: "NombreTomador",
@@ -166,7 +161,7 @@ export default {
     // SAVE DATA
     saveDataClient() {
       let self = this;
-      this.callData({cmd: "updateRecords", table: "Clientes", idkey: "NIF", idvalue: self.client.data["NIF"], data: self.client.data}).then(function(response) {
+      this.callData({cmd: "updateRecords", table: "Clientes", idkey: "NIF", idvalue: self.dialogData["NIF"], data: self.dialogData}).then(function(response) {
         if (response.data == true) {
           self.$q.notify({
             message: self.$q.lang.DatosGuardados,
@@ -213,14 +208,6 @@ export default {
         self.defineTable(response);
       });
     },
-    // CALL DATA CAJA
-    callDataCaja() {
-      let self = this;
-      let where = "(Estado LIKE 'PENDIENTE') AND (Cobrado>0 AND Cobrado<>Importe) ORDER BY Situacion DESC";
-      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineTable(response);
-      });
-    },
     // CALL DATA RECIBO
     callDataRecibo() {
       let self = this;
@@ -231,19 +218,18 @@ export default {
     },
     // SELECTED ROW
     rowSelected: function(params) {
-      if (params.length == 0) {
+      this.defineDialog(params);
+      console.log(params.data);
+      if (params.data.length == 0) {
         this.recibo.selected = false;
         this.client.selected = false;
-        return;
-      }
-      this.recibo.selected = true;
-      let self = this;
-      if (params[0].NombreTomador) {
-        let where = "NombreCompleto = '" + params[0].NombreTomador + "'";
-        this.callData({cmd: "getRecords", table: "Clientes", where}).then(function(response) {
+      } else {
+        let self = this;
+        let where = "NombreCompleto = '" + params.data[0].NombreTomador + "'";
+        this.callData({cmd: "getRecords", table: "Clientes", where, noColumns: true}).then(function(response) {
+          console.log(response);
           if (response.data.data.length) {
-            self.client.columns = response.data.columns;
-            self.client.data = response.data.data[0];
+            self.recibo.selected = true;
             self.client.selected = true;
             self.client.name = response.data.data[0].NombreCompleto;
             self.client.telf = response.data.data[0].Telefono;
@@ -251,7 +237,6 @@ export default {
           } else {
             self.client.selected = false;
             self.client.telf = self.client.mail = self.client.name = null;
-            self.client.columns = self.client.data = null;
           }
         });
       }
@@ -279,7 +264,6 @@ export default {
       if (this.$route.params.recibo == "bajas") this.callDataBajas();
       if (this.$route.params.recibo == "gestion") this.callDataGestion();
       if (this.$route.params.recibo == "liq") this.callDataLiq();
-      if (this.$route.params.recibo == "caja") this.callDataCaja();
       if (this.$route.params.recibo == "") this.callDataRecibo();
     }
   },

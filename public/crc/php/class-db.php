@@ -105,22 +105,20 @@ class db
                     }
                 }
             }
-            $_SESSION['tables'] = $this->getTablePerms($post);
+            // Recoge las tablas de Uuarios con permisos
+            $sql = $this->db->query("SELECT * FROM Usuarios WHERE Usuario='" . $this->sanitize($post['user']) . "'");
+            $user = $sql->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($user as $key => $value) {
+                $table[$key] = $value;
+            }
+            $_SESSION['tables'] = $table;
             $result->tables = $_SESSION['tables'];
         } else {
             $this->logout($post);
         }
         echo json_encode($result);
     }
-    function getTablePerms($post)
-    {
-        $sql = $this->db->query("SELECT * FROM Usuarios WHERE Usuario='" . $this->sanitize($post['user']) . "'");
-        $user = $sql->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($user as $key => $value) {
-            $table[$key] = $value;
-        }
-        return $table;
-    }
+
     /**
      * logout
      *
@@ -172,6 +170,7 @@ class db
         }
         echo json_encode($result);
     }
+    
     /**
      * sendMail
      *
@@ -294,7 +293,7 @@ class db
     /**
      * getRecords
      *
-     * @param  mixed $post (table, where, subtable, id)
+     * @param  mixed $post (table, where, subtable, id) OPTIONAL (noColumns)
      *
      * @return void
      */
@@ -302,7 +301,7 @@ class db
     {
         $table = $this->sanitize($post['table']);
         $lang = isset($post['lang']) ? $post['lang'] : false;
-        $result['columns'] = $this->getColumns($table, $lang);
+        $result['columns'] = isset($post['noColumns']) ? false : $this->getColumns($table, $lang);
         $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
         $where = isset($post['where']) ? " WHERE " . $this->sanitize($post['where'], false) : "";
         $sqlquery .= $where;
