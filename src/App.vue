@@ -131,6 +131,11 @@ export default {
             icon: "person",
             name: this.$q.lang.menu.Usuarios,
             to: "/usuarios"
+          },
+          {
+            icon: "person",
+            name: this.$q.lang.menu.Registros,
+            to: "/registros"
           }
         ]
       },

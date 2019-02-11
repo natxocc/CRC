@@ -95,7 +95,8 @@ export default {
     Polizas: "Pòlisses",
     Clientes: "Clients",
     Siniestros: "Sinistres",
-    Usuarios: "Usuaris"
+    Usuarios: "Usuaris",
+    Registros: "Registres"
   },
   db: {
     Usuario: "Usuari",
@@ -178,9 +179,6 @@ export default {
     { value: "COTA", label: "COBRAT (Tarja)" },
     { value: "COTR", label: "COBRAT (Transfèrencia)" },
     { value: "COBA", label: "COBRAT (Banc)" },
-    { value: "AVME", label: "BESTRETA (Metàlic)" },
-    { value: "AVTR", label: "BESTRETA (Transfèrencia)" },
-    { value: "AVPR", label: "PROVISIONAL" },
     { value: "ANAJ", label: "ANUL·LAT (Ajust)" },
     { value: "ANBA", label: "ANUL·LAT (Baixa)" }
   ],

@@ -5,6 +5,7 @@ import Recibos from './views/Recibos.vue'
 import Clientes from './views/Clientes.vue'
 import Polizas from './views/Polizas.vue'
 import Usuarios from './views/Usuarios.vue'
+import Registros from './views/Registros.vue'
 import Page404 from './views/404.vue'
 
 
@@ -36,6 +37,11 @@ export default new Router({
       path: '/usuarios',
       name: 'Usuarios',
       component: Usuarios
+    },
+    {
+      path: '/registros',
+      name: 'Registros',
+      component: Registros
     },
     {
       path: '*',

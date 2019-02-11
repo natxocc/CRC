@@ -13,13 +13,10 @@ header("Content-Type: application/json;charset=utf-8");
 // Esta parte a eliminar en produccion
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
-// if ($_SERVER['HTTP_REFERER'] == 'http://localhost:8080/') {
-// if ($_SERVER['SERVER_NAME'] == 'http://localhost:8080/') {
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Access-Control-Allow-Credentials: true');
-// }
 // FIN DE BLOQUE
 // ---------------FIN
 // Captura los datos enviados
@@ -34,32 +31,37 @@ foreach ($REQUEST as $key => $value) {
     $post[$key] = $value;
 }
 $cmd = $post['cmd'];
-
+// Call class db
+require_once "class-db.php";
+$db = new db(DBTYPE, DBHOST, DBNAME, DBUSER, DBPASS);
 // Consultas Reale
 require_once "class-reale.php";
 $reale = new reale();
-if ($cmd == "updateRecibos") $reale->updateRecibos($post);
+if ($cmd == "updateRecibos") $reale->updateRecibos();
 if ($cmd == "updatePolizas") $reale->updatePolizas();
-if ($cmd == "polizasMediador") $reale->polizasMediador();
-if ($cmd == "getRecibos") $reale->getRecibos($post);
 if ($cmd == "reportRecibos") $reale->reportRecibos($post);
-
-// Consultas db (Class-db included in Class-reale)
+// Consultas db
 if ($cmd == "login") $db->login($post);
+if ($cmd == "logout") $db->logout($post);
+if ($cmd == "checkUser") $db->checkUser($post);
 // Comprueba si está conectado
-// ---------------INICIO
-// Comentar durante el desarrollo
-//if (!$db->isLogged($post)) exit("Usuario no conectado");
-// FIN DE BLOQUE
-// ---------------FIN
+//if (!$db->isLogged($post)) exit("Error Auth");
+$_SESSION['tables'][$post['table']] = 3; // PROVISIONAL PARA SALTAR LA SEGURIDAD
 // Resto de consultas
-if ($cmd == "logout") $db->logout();
-if ($cmd == "createUser") $db->createUser($post);
-if ($cmd == "getUser") $db->getUser($post);
 if ($cmd == "sendMail") $db->sendMail($post);
-if ($cmd == "addEvent") $db->addEvent($post);
-if ($cmd == "getRecords") $db->getRecords($post);
-if ($cmd == "updateRecord") $db->updateRecord($post);
-if ($cmd == "deleteRecord") $db->deleteRecord($post);
-if ($cmd == "insertRecord") $db->insertRecord($post);
+$result = false;
+if (isset($_SESSION['tables'][$post['table']])) {
+    if ($_SESSION['tables'][$post['table']] > 0) {
+        if ($cmd == "getRecords") $result = $db->getRecords($post);
+    }
+    if ($_SESSION['tables'][$post['table']] > 1) {
+        if ($cmd == "updateRecord") $result = $db->updateRecord($post);
+        if ($cmd == "insertRecord") $result = $db->insertRecord($post);
+    }
+    if ($_SESSION['tables'][$post['table']] > 2) {
+        if ($cmd == "deleteRecord") $result = $db->deleteRecord($post);
+    }
+    if ($result) $result['success'] = true;
+}
+echo json_encode($result, JSON_NUMERIC_CHECK);
 exit();

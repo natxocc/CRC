@@ -95,7 +95,8 @@ export default {
     Polizas: "Polizas",
     Clientes: "Clientes",
     Siniestros: "Siniestros",
-    Usuarios: "Usuarios"
+    Usuarios: "Usuarios",
+    Registros: "Registros"
   },
   // BASE DATOS
   db: {
@@ -179,9 +180,6 @@ export default {
     { value: "COTA", label: "COBRADO (Tarjeta)" },
     { value: "COTR", label: "COBRADO (Transferencia)" },
     { value: "COBA", label: "COBRADO (Banco)" },
-    { value: "AVME", label: "ANTICIPO (Metálico)" },
-    { value: "AVTR", label: "ANTICIPO (Transferencia)" },
-    { value: "AVPR", label: "PROVISIONAL" },
     { value: "ANAJ", label: "ANULADO (Ajuste)" },
     { value: "ANBA", label: "ANULADO (Baja)" }
   ],

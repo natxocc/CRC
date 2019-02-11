@@ -51,6 +51,7 @@ export default {
       dialogData.name = data.columns.map(x => x.headerName)
       dialogData.type = data.columns.map(x => x.type)
       dialogData.field = data.columns.map(x => x.field)
+      dialogData.extras = data.columns.map(x => x.headerTooltip)
       this.dialogData = dialogData
     },
     // GET DAYS WEEK
