@@ -219,7 +219,6 @@ export default {
     // SELECTED ROW
     rowSelected: function(params) {
       this.defineDialog(params);
-      console.log(params.data);
       if (params.data.length == 0) {
         this.recibo.selected = false;
         this.client.selected = false;
@@ -227,7 +226,7 @@ export default {
         let self = this;
         let where = "NombreCompleto = '" + params.data[0].NombreTomador + "'";
         this.callData({cmd: "getRecords", table: "Clientes", where, noColumns: true}).then(function(response) {
-          console.log(response);
+          //console.log(response);
           if (response.data.data.length) {
             self.recibo.selected = true;
             self.client.selected = true;

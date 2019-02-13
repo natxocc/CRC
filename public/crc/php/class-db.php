@@ -170,7 +170,7 @@ class db
         }
         echo json_encode($result);
     }
-    
+
     /**
      * sendMail
      *
@@ -277,11 +277,6 @@ class db
                     $result[$key]['minWidth'] = substr($columnName[1], strpos($columnName[1], "W") + 1, 2) * 16;
                 }
             }
-            if (isset($columnName[2])) {
-                if (strstr($columnName[2], "R")) $result[$key]['tooltipField'] .= 'Required';
-                if (strstr($columnName[2], "A")) $result[$key]['tooltipField'] .= 'Autocomplete';
-                if (strstr($columnName[2], "H")) $result[$key]['tooltipField'] .= 'Hidden';
-            }
             if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int") || strstr($fetch[$key]['Type'], "double")) $result[$key]['type'] = "numberColumn";
             if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "textColumn";
             if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "dateColumn";
@@ -335,7 +330,7 @@ class db
                 $subresult = array();
             }
             $result['data'] = $subtable['temp'];
-        }       
+        }
         return $result;
     }
 

@@ -47,10 +47,21 @@ export default {
     // DEFINE DATA FOR DIALOG
     defineDialog(data) {
       let dialogData = {};
-      dialogData.data = data.data[0]
       dialogData.name = data.columns.map(x => x.headerName)
       dialogData.type = data.columns.map(x => x.type)
-      dialogData.field = data.columns.map(x => x.field)
+      dialogData.rules = []
+      dialogData.data = []
+      if (data.data.length == 0) {
+        dialogData.data = data.data[0]
+      } else {
+        for (let i = 0; i < data.columns.length; i++) {
+          if (dialogData.type[i] == "textColumn") dialogData.data[data.columns[i].field] = ""
+          if (dialogData.type[i] == "numberColumn") dialogData.data[data.columns[i].field] = 0
+          if (dialogData.type[i] == "dateColumn") dialogData.data[data.columns[i].field] = new Date().toISOString().substr(0, 10)
+          if (dialogData.type[i] == "gereralColumn") dialogData.data[data.columns[i].field] = ""
+          if (dialogData.type[i] == "bitColumn") dialogData.data[data.columns[i].field] = 0
+        }
+      }
       dialogData.extras = data.columns.map(x => x.headerTooltip)
       this.dialogData = dialogData
     },
