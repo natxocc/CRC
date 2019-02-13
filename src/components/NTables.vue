@@ -157,8 +157,7 @@ export default {
     },
     onSelectionChanged(params) {
       let row=[];
-      row.data = this.gridApi.getSelectedRows();
-      row.columns = params.columnApi.columnController.columnDefs;
+      row = this.gridApi.getSelectedRows();
       this.$emit("rowSelected", row);
     },
     onCellValueChanged(value) {},
@@ -181,8 +180,7 @@ export default {
           onCellValueChanged(value) {},
           onSelectionChanged(event) {
             let row={};
-            row.data = this.gridApi.getSelectedRows();
-            row.columns = params.columnApi.columnController.columnDefs;
+            row = this.gridApi.getSelectedRows();
             self.$emit("rowSelectedSub", row);
           }
         },

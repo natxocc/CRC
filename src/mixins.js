@@ -31,10 +31,16 @@ export default {
     },
     // DEFINE COLUMNS Y DATA
     defineTable(data) {
+
       if (data.data.success) {
         this.columnDefs = data.data.columns;
         this.columnDefsSub = data.data.columnsSub;
         this.rowData = data.data.data;
+        this.dialogData.name = this.dialogData.type = []
+        this.dialogData.data = {}
+        this.dialogData.name = data.data.columns.map(x => x.headerName)
+        this.dialogData.type = data.data.columns.map(x => x.type)
+        this.defineDialog(false)
       }
       else {
         this.$q.notify({
@@ -46,22 +52,16 @@ export default {
     },
     // DEFINE DATA FOR DIALOG
     defineDialog(data) {
-      let dialogData = {};
-      dialogData.name = data.columns.map(x => x.headerName)
-      dialogData.type = data.columns.map(x => x.type)
-      dialogData.data = []
-      dialogData.data = data.data[0]
-      this.dialogData = dialogData
-      console.log(this.dialogData)
-    },
-    // DEFINE NEW DATA IN DIALOG
-    defineDialogNew() {
-      for (let i = 0; i < this.dialogData.data.length; i++) {
-        if (this.dialogData.type[i] == "textColumn") this.dialogData.data.new[data.columns[i].field] = ""
-        if (this.dialogData.type[i] == "numberColumn") this.dialogData.data.new[data.columns[i].field] = 0
-        if (this.dialogData.type[i] == "dateColumn") this.dialogData.data.new[data.columns[i].field] = new Date().toISOString().substr(0, 10)
-        if (this.dialogData.type[i] == "generalColumn") this.dialogData.data.new[data.columns[i].field] = ""
-        if (this.dialogData.type[i] == "bitColumn") this.dialogData.data.new[data.columns[i].field] = 0
+      if (data.length) {
+        this.dialogData.data = data[0];
+      } else {
+        for (let i = 0; i < this.dialogData.name.length; i++) {
+          if (this.dialogData.type[i] == "textColumn") this.dialogData.data[this.columnDefs[i].field] = ""
+          if (this.dialogData.type[i] == "numberColumn") this.dialogData.data[this.columnDefs[i].field] = 0
+          if (this.dialogData.type[i] == "dateColumn") this.dialogData.data[this.columnDefs[i].field] = new Date().toISOString().substr(0, 10)
+          if (this.dialogData.type[i] == "generalColumn") this.dialogData.data[this.columnDefs[i].field] = ""
+          if (this.dialogData.type[i] == "bitColumn") this.dialogData.data[this.columnDefs[i].field] = 0
+        }
       }
     },
     // GET DAYS WEEK

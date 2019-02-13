@@ -218,13 +218,14 @@ export default {
     },
     // SELECTED ROW
     rowSelected: function(params) {
+      // console.log(params.length)
       this.defineDialog(params);
-      if (params.data.length == 0) {
+      if (!params.length) {
         this.recibo.selected = false;
         this.client.selected = false;
       } else {
         let self = this;
-        let where = "NombreCompleto = '" + params.data[0].NombreTomador + "'";
+        let where = "NombreCompleto = '" + params[0].NombreTomador + "'";
         this.callData({cmd: "getRecords", table: "Clientes", where, noColumns: true}).then(function(response) {
           //console.log(response);
           if (response.data.data.length) {
