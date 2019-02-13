@@ -258,7 +258,6 @@ class db
         $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
         foreach ($fetch as $key => $value) {
             $result[$key]['type'] = "generalColumn";
-            $result[$key]['headerTooltip'] = $fetch[$key]['Field'];
             $result[$key]['tooltipField'] = "";
             $result[$key]['field'] = $fetch[$key]['Field'];
             $columnName = explode("|", $fetch[$key]['Comment']);

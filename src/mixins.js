@@ -49,21 +49,20 @@ export default {
       let dialogData = {};
       dialogData.name = data.columns.map(x => x.headerName)
       dialogData.type = data.columns.map(x => x.type)
-      dialogData.rules = []
       dialogData.data = []
-      if (data.data.length == 0) {
-        dialogData.data = data.data[0]
-      } else {
-        for (let i = 0; i < data.columns.length; i++) {
-          if (dialogData.type[i] == "textColumn") dialogData.data[data.columns[i].field] = ""
-          if (dialogData.type[i] == "numberColumn") dialogData.data[data.columns[i].field] = 0
-          if (dialogData.type[i] == "dateColumn") dialogData.data[data.columns[i].field] = new Date().toISOString().substr(0, 10)
-          if (dialogData.type[i] == "gereralColumn") dialogData.data[data.columns[i].field] = ""
-          if (dialogData.type[i] == "bitColumn") dialogData.data[data.columns[i].field] = 0
-        }
-      }
-      dialogData.extras = data.columns.map(x => x.headerTooltip)
+      dialogData.data = data.data[0]
       this.dialogData = dialogData
+      console.log(this.dialogData)
+    },
+    // DEFINE NEW DATA IN DIALOG
+    defineDialogNew() {
+      for (let i = 0; i < this.dialogData.data.length; i++) {
+        if (this.dialogData.type[i] == "textColumn") this.dialogData.data.new[data.columns[i].field] = ""
+        if (this.dialogData.type[i] == "numberColumn") this.dialogData.data.new[data.columns[i].field] = 0
+        if (this.dialogData.type[i] == "dateColumn") this.dialogData.data.new[data.columns[i].field] = new Date().toISOString().substr(0, 10)
+        if (this.dialogData.type[i] == "generalColumn") this.dialogData.data.new[data.columns[i].field] = ""
+        if (this.dialogData.type[i] == "bitColumn") this.dialogData.data.new[data.columns[i].field] = 0
+      }
     },
     // GET DAYS WEEK
     getDaysWeek(year, week) {
