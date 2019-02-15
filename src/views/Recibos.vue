@@ -175,21 +175,21 @@ export default {
       if (!this.filter.alldata) where += " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')";
       where += " ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.filter.userby.value}).then(function(response) {
-        let data = self.defineTable(response);
+        let data = self.getColumnsData(response);
         self.columnDefs = data.columnDefs;
         self.columnDefsSub = data.columnDefsSub;
         self.rowData = data.rowData;
         // self.dialogData=response.data.data[0]
-        self.dialogFields = {};
+        self.dialogFields = self.dialogProps = {};
         self.dialogFields.name = data.columnDefsSub.map((x) => x.headerName);
+        // console.log(self.dialogFields);
         self.dialogFields.type = data.columnDefsSub.map((x) => x.type);
-        self.dialogProps = {};
-        self.dialogProps.FechaGestion = {disable: true};
-        self.dialogProps["CodigoPoliza"] = {disable: true};
-        self.dialogProps["NombreTomador"] = {disable: true};
-        self.dialogProps["Usuario"] = {disable: true};
+        self.dialogProps.FechaGestion = self.dialogProps["CodigoPoliza"] = self.dialogProps["NombreTomador"] = self.dialogProps["Usuario"] = self.dialogProps["CodigoRecibo"] = {disable: true, hidden: true};
+        self.dialogFields.type[6] = "selectColumn";
+        self.dialogProps["Gestion"] = [];
+        self.dialogProps["Gestion"].options = self.$q.lang.gestion
         self.dialogModel = true;
-        self.dialogData = self.defineDialog(data.columnDefsSub);
+        self.dialogData = self.newDataDialog(data.columnDefsSub);
       });
     },
     // CALL DATA BAJAS
@@ -197,7 +197,7 @@ export default {
       let self = this;
       let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineTable(response);
+        self.getColumnsData(response);
       });
     },
     // CALL DATA LIQ
@@ -206,7 +206,7 @@ export default {
       let days = this.getDaysWeek(this.filter.year, this.filter.month);
       let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineTable(response);
+        self.getColumnsData(response);
       });
     },
     // CALL DATA RECIBO
@@ -214,7 +214,7 @@ export default {
       let self = this;
       let where = "(CodigoRecibo='" + this.$route.params.recibo + "')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineTable(response);
+        self.getColumnsData(response);
       });
     },
     // SELECTED ROW
@@ -264,12 +264,10 @@ export default {
     $route: "init",
     dialogData: {
       handler(val) {
-        if(val.Gestion =="COME" || val.Gestion =="COTR") {
-          this.dialogProps['Importe']={disable:false, rules: [
-            val=> val>0 || "error"
-          ]}
+        if (val.Gestion.value == "COME" || val.Gestion.value == "COTR") {
+          this.dialogProps["Importe"] = {disable: false, rules: [(val) => val > 0 || "error"]};
         } else {
-          this.dialogProps['Importe']={disable:true}
+          this.dialogProps["Importe"] = {disable: true};
         }
       },
       deep: true

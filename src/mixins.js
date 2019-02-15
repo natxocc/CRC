@@ -13,7 +13,12 @@ export default {
     }
   },
   methods: {
-    // CALL AXIOS
+    /**
+     *
+     *
+     * @param {*} post
+     * @returns Data from axios
+     */
     callData(post) {
       showLoading();
       post.sid = localStorage.sid
@@ -23,8 +28,13 @@ export default {
         return response
       });
     },
-    // DEFINE COLUMNS Y DATA
-    defineTable(data) {
+    /**
+     *
+     *
+     * @param {*} data
+     * @returns Columns and Data from table
+     */
+    getColumnsData(data) {
       if (data.data.success) {
         let ret = {}
         ret.columnDefs = data.data.columns;
@@ -41,8 +51,13 @@ export default {
         return false;
       }
     },
-    // DEFINE DIALOG
-    defineDialog(columns) {
+    /**
+     *
+     *
+     * @param {*} columns
+     * @returns new Data for Dialog
+     */
+    newDataDialog(columns) {
       let ret = {};
       for (let i = 0; i < columns.length; i++) {
         if (columns[i].type == "textColumn") ret[columns[i].field] = ""
@@ -53,7 +68,13 @@ export default {
       }
       return ret;
     },
-    // GET DAYS WEEK
+    /**
+     *
+     *
+     * @param {*} year
+     * @param {*} week
+     * @returns {dateini, dateend} of week
+     */
     getDaysWeek(year, week) {
       var dateini = new Date(year, 0, 1),
         offset = dateini.getTimezoneOffset();
@@ -68,7 +89,11 @@ export default {
       let result = { dateini, dateend }
       return result;
     },
-    // GET YEARS MONTHS WEEKS
+    /**
+     *
+     *
+     * @returns [years]
+     */
     getYears() {
       let year = new Date().getFullYear();
       let years = [];
@@ -92,17 +117,24 @@ export default {
       }
       return weeks
     },
-    // GET FULL DATETIME
+    /**
+     *
+     *
+     * @param {*} data
+     * @returns datetime
+     */
     getDateTime(data) {
-      let date = new Date(data)
-      let now = new Date()
-      date.setHours(now.getHours())
-      date.setMinutes(now.getMinutes())
-      date.setSeconds(now.getSeconds())
-      console.log(date)
-      return date
+      // let now = new Date()
+      // now.setHours(now.getHours())
+      // now.setMinutes(now.getMinutes())
+      // now.setSeconds(now.getSeconds())
+      // return date
     },
-    // GET LANG
+    /**
+     *
+     *
+     * @param {*} lang
+     */
     getLang(lang) {
       import(`./lang/${lang}`).then((lang) => {
         this.$q.lang.set(lang.default);
