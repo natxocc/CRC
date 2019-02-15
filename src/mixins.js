@@ -9,12 +9,6 @@ function hideLoading(options) {
 export default {
   data() {
     return {
-      columnDefs: [],
-      columnDefsSub: [],
-      rowData: null,
-      dialogData: [],
-      dialogMode: null,
-      dialogModel: false,
       lang: this.$q.lang.isoName,
     }
   },
@@ -31,16 +25,12 @@ export default {
     },
     // DEFINE COLUMNS Y DATA
     defineTable(data) {
-
       if (data.data.success) {
-        this.columnDefs = data.data.columns;
-        this.columnDefsSub = data.data.columnsSub;
-        this.rowData = data.data.data;
-        this.dialogData.name = this.dialogData.type = []
-        this.dialogData.data = {}
-        this.dialogData.name = data.data.columns.map(x => x.headerName)
-        this.dialogData.type = data.data.columns.map(x => x.type)
-        this.defineDialog(false)
+        let ret = {}
+        ret.columnDefs = data.data.columns;
+        ret.rowData = data.data.data;
+        if (data.data.columnsSub) ret.columnDefsSub = data.data.columnsSub
+        return ret;
       }
       else {
         this.$q.notify({
@@ -48,21 +38,20 @@ export default {
           icon: "close",
           color: "negative"
         })
+        return false;
       }
     },
-    // DEFINE DATA FOR DIALOG
-    defineDialog(data) {
-      if (data.length) {
-        this.dialogData.data = data[0];
-      } else {
-        for (let i = 0; i < this.dialogData.name.length; i++) {
-          if (this.dialogData.type[i] == "textColumn") this.dialogData.data[this.columnDefs[i].field] = ""
-          if (this.dialogData.type[i] == "numberColumn") this.dialogData.data[this.columnDefs[i].field] = 0
-          if (this.dialogData.type[i] == "dateColumn") this.dialogData.data[this.columnDefs[i].field] = new Date().toISOString().substr(0, 10)
-          if (this.dialogData.type[i] == "generalColumn") this.dialogData.data[this.columnDefs[i].field] = ""
-          if (this.dialogData.type[i] == "bitColumn") this.dialogData.data[this.columnDefs[i].field] = 0
-        }
+    // DEFINE DIALOG
+    defineDialog(columns) {
+      let ret = {};
+      for (let i = 0; i < columns.length; i++) {
+        if (columns[i].type == "textColumn") ret[columns[i].field] = ""
+        if (columns[i].type == "numberColumn") ret[columns[i].field] = 0
+        if (columns[i].type == "dateColumn") ret[columns[i].field] = new Date().toISOString().substr(0, 10)
+        if (columns[i].type == "generalColumn") ret[columns[i].field] = ""
+        if (columns[i].type == "bitColumn") ret[columns[i].field] = 0
       }
+      return ret;
     },
     // GET DAYS WEEK
     getDaysWeek(year, week) {
@@ -102,6 +91,16 @@ export default {
         weeks[i] = i + 1;
       }
       return weeks
+    },
+    // GET FULL DATETIME
+    getDateTime(data) {
+      let date = new Date(data)
+      let now = new Date()
+      date.setHours(now.getHours())
+      date.setMinutes(now.getMinutes())
+      date.setSeconds(now.getSeconds())
+      console.log(date)
+      return date
     },
     // GET LANG
     getLang(lang) {

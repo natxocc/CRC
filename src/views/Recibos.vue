@@ -22,7 +22,7 @@
             <q-select :label="$q.lang.FiltrosDeEstado" :options="this.$q.lang.estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.estadosSel"/>
           </div>
           <div class="col-xs-6 col-md-2" style="padding: 10px">
-            <q-select :label="$q.lang.HistorialUsuario" :options="this.$q.lang.userby" @input="callDataGestion" dense expandBesides optionsDense v-model="client.userby"/>
+            <q-select :label="$q.lang.HistorialUsuario" :options="this.$q.lang.userby" @input="callDataGestion" dense expandBesides optionsDense v-model="filter.userby"/>
           </div>
           <div class="col-xs-6 col-md-2" style="padding: 10px">
             <q-toggle :label="$q.lang.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
@@ -51,7 +51,7 @@
       </div>
       <!-- MINI TOOLBAR-->
       <q-bar class="bg-primary text-white">
-        <q-btn dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">{{$q.lang.NuevoRecibo}}</q-btn>
+        <q-btn @click="dialogModel=true" dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">{{$q.lang.NuevoRecibo}}</q-btn>
         <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selected">{{$q.lang.EliminarRecibo}}</q-btn>
         <q-btn dense flat icon="add" v-if="recibo.selected">{{$q.lang.NuevaGestion}}</q-btn>
         <q-btn color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
@@ -72,18 +72,11 @@
           </q-btn>
         </div>
       </q-bar>
-      <!-- LINE CLIENTS -->
-      <div class="row textcenter">
-        <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="!client.selected && recibo.selected"></q-btn>
-        <q-btn @click="client.dialog=true" dense flat icon="perm_contact_calendar" v-if="client.selected">
-          <!-- <span class="text-weight-bold" style="margin: 2px">{{client.name}}{{client.telf1}} {{client.telf2}} {{client.mail}}</span> -->
-        </q-btn>
-      </div>
     </div>
     <!-- TABLA DE DATOS -->
     <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO DE CLIENTES -->
-    <n-dialog :data="dialogData" :mode="dialogMode" :model="dialogModel" @cancel="dialogModel=false" @onSave="saveDataClient"></n-dialog>
+    <n-dialog :data="dialogData" :fields="dialogFields" :model="dialogModel" :props="dialogProps" @cancel="dialogModel=false" @onSave="saveDataClient"></n-dialog>
   </div>
 </template>
 
@@ -99,14 +92,20 @@ export default {
   mixins: [Custom],
   data() {
     return {
-      // columnDefs: this.columnDefs,
-      // columnDefsSub: this.columnDefsSub,
-      // rowData: this.rowData,
-      // dialogColumns: this.dialogColumns,
-      // dialogData: this.dialogData,
+      columnDefs: null,
+      columnDefsSub: null,
+      rowData: null,
+      dialogModel: false,
+      dialogData: null,
+      dialogFields: null,
+      dialogProps: null,
       quickFilter: null,
       filters: null,
       filter: {
+        userby: {
+          value: "NombreTomador",
+          label: this.$q.lang.userby[0].label
+        },
         estadosSel: [{value: "PENDIENTE", label: this.$q.lang.estados[0].label}, {value: "DEVUELTO", label: this.$q.lang.estados[1].label}],
         alldata: false,
         years: [],
@@ -121,17 +120,6 @@ export default {
         pendiente: "data.Estado.includes('PENDIENTE') && data.Gestion.includes('PENDIENTE')",
         anulado: "data.Estado.includes('ANULADO') || (data.Gestion.includes('ANULADO') && !data.Estado.includes('COBRADO'))",
         cobrado: "data.Estado.includes('COBRADO') || (data.Gestion.includes('COBRADO') && data.Importe == data.Cobrado)"
-      },
-      // CLIENT
-      client: {
-        name: null,
-        telf: null,
-        mail: null,
-        selected: false,
-        userby: {
-          value: "NombreTomador",
-          label: this.$q.lang.userby[0].label
-        }
       },
       // RECIBO
       recibo: {
@@ -186,14 +174,27 @@ export default {
       where += ")";
       if (!this.filter.alldata) where += " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')";
       where += " ORDER BY Situacion DESC";
-      this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.client.userby.value}).then(function(response) {
-        self.defineTable(response);
+      this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.filter.userby.value}).then(function(response) {
+        let data = self.defineTable(response);
+        self.columnDefs = data.columnDefs;
+        self.columnDefsSub = data.columnDefsSub;
+        self.rowData = data.rowData;
+        // self.dialogData=response.data.data[0]
+        self.dialogFields = {};
+        self.dialogFields.name = data.columnDefsSub.map((x) => x.headerName);
+        self.dialogFields.type = data.columnDefsSub.map((x) => x.type);
+        self.dialogProps = {};
+        self.dialogProps.FechaGestion = {disable: true};
+        self.dialogProps["CodigoPoliza"] = {disable: true};
+        self.dialogProps["NombreTomador"] = {disable: true};
+        self.dialogProps["Usuario"] = {disable: true};
+        self.dialogModel = true;
+        self.dialogData = self.defineDialog(data.columnDefsSub);
       });
     },
     // CALL DATA BAJAS
     callDataBajas() {
       let self = this;
-
       let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
         self.defineTable(response);
@@ -218,27 +219,13 @@ export default {
     },
     // SELECTED ROW
     rowSelected: function(params) {
-      // console.log(params.length)
-      this.defineDialog(params);
+      // this.defineDialog(params);
+      this.dialogModel = true;
       if (!params.length) {
         this.recibo.selected = false;
-        this.client.selected = false;
       } else {
+        this.recibo.selected = true;
         let self = this;
-        let where = "NombreCompleto = '" + params[0].NombreTomador + "'";
-        this.callData({cmd: "getRecords", table: "Clientes", where, noColumns: true}).then(function(response) {
-          //console.log(response);
-          if (response.data.data.length) {
-            self.recibo.selected = true;
-            self.client.selected = true;
-            self.client.name = response.data.data[0].NombreCompleto;
-            self.client.telf = response.data.data[0].Telefono;
-            self.client.mail = response.data.data[0].CorreoElectronico;
-          } else {
-            self.client.selected = false;
-            self.client.telf = self.client.mail = self.client.name = null;
-          }
-        });
       }
     },
     // SELECTED SUB ROWS
@@ -274,7 +261,19 @@ export default {
     this.init();
   },
   watch: {
-    $route: "init"
+    $route: "init",
+    dialogData: {
+      handler(val) {
+        if(val.Gestion =="COME" || val.Gestion =="COTR") {
+          this.dialogProps['Importe']={disable:false, rules: [
+            val=> val>0 || "error"
+          ]}
+        } else {
+          this.dialogProps['Importe']={disable:true}
+        }
+      },
+      deep: true
+    }
   }
 };
 </script>
