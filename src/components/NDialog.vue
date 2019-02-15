@@ -17,7 +17,7 @@
                 <!-- ES TEXTO -->
                 <q-input :label="fields.name[index]" dense stack-label type="text" v-bind="props[key]" v-if="fields.type[index] =='textColumn'" v-model="data[key]"></q-input>
                 <!-- ES SELECT -->
-                <q-select :label="fields.name[index]" :options="options" :options-dense="true" @filter="filterFn({value: data[key], list:props[key].options})" dense hide-selected stack-label type="text" use-input v-bind="props[key]" v-if="fields.type[index] =='selectColumn'" v-model="data[key]"/>
+                <q-select :label="fields.name[index]" :options="props[key].options" :options-dense="true" dense hide-selected stack-label type="text" use-input v-bind="props[key]" v-if="fields.type[index] =='selectColumn'" v-model="data[key]"/>
                 <!-- ES NUMERO -->
                 <q-input :label="fields.name[index]" dense stack-label type="number" v-bind="props[key]" v-if="fields.type[index] =='numberColumn'" v-model="data[key]"></q-input>
                 <!-- ES BIT -->
@@ -51,10 +51,9 @@ export default {
     props: null
   },
   data() {
-    return {
-      options: []
-    };
+    return {};
   },
+  computed: {},
   methods: {
     onSave: function() {
       this.$emit("onSave", true);
@@ -66,12 +65,20 @@ export default {
     view(data) {
       console.log(data);
     },
-    filterFn(data) {
-      console.log(data)
-      if (data.value === '') {
-        this.options=['hh','uu']
-        return
-      }
+    getListOptions(list) {
+      console.log(list);
+      return list;
+      // let value = val.toLowerCase();
+      // return list.filter(val => val.toLowerCase().indexOf(value) > -1)
+    },
+    filterFn(val, list) {;
+      // update(() => {
+
+      // });
+      // return;
+      // if (data === '') {
+
+      // }
       // update(() => {
       //   const needle = val.toLowerCase()
       //   this.select = stringOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)

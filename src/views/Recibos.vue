@@ -187,7 +187,7 @@ export default {
         self.dialogProps.FechaGestion = self.dialogProps["CodigoPoliza"] = self.dialogProps["NombreTomador"] = self.dialogProps["Usuario"] = self.dialogProps["CodigoRecibo"] = {disable: true, hidden: true};
         self.dialogFields.type[6] = "selectColumn";
         self.dialogProps["Gestion"] = [];
-        self.dialogProps["Gestion"].options = self.$q.lang.gestion
+        self.dialogProps["Gestion"].options = self.$q.lang.gestion;
         self.dialogModel = true;
         self.dialogData = self.newDataDialog(data.columnDefsSub);
       });
@@ -264,10 +264,20 @@ export default {
     $route: "init",
     dialogData: {
       handler(val) {
+        console.log(val.Gestion.value)
         if (val.Gestion.value == "COME" || val.Gestion.value == "COTR") {
           this.dialogProps["Importe"] = {disable: false, rules: [(val) => val > 0 || "error"]};
         } else {
           this.dialogProps["Importe"] = {disable: true};
+        }
+        if (val.Gestion.label == "") {
+          // let options = (this.dialogProps["Gestion"].options = this.$q.lang.gestion);
+          // const needle = val.Gestion.value.toLowerCase();
+          this.dialogProps["Gestion"].options = ['pp','uu']
+          // this.dialogProps["Gestion"].options = options.filter((v) => v.toLowerCase().indexOf(needle) > -1);
+          console.log("ok")
+        } else {
+          this.dialogProps["Gestion"].options = this.$q.lang.gestion
         }
       },
       deep: true
