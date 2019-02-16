@@ -9,7 +9,7 @@ function hideLoading(options) {
 export default {
   data() {
     return {
-      lang: this.$q.lang.isoName,
+      lang: this.$q.lang.isoName
     }
   },
   methods: {
@@ -32,7 +32,7 @@ export default {
      *
      *
      * @param {*} data
-     * @returns Columns and Data from table
+     * @returns (ColumnsDefs, rowData)
      */
     getColumnsData(data) {
       if (data.data.success) {
@@ -51,25 +51,30 @@ export default {
         return false;
       }
     },
+    /**
+     *
+     *
+     * @param {*} columns
+     * @param {*} data
+     * @returns (data,fields)
+     */
     setDialogData(columns, data) {
       let result = {}
       result.data = {}
-      result.info = {}
+      result.fields = {}
       let fields = columns.map((x) => x.field)
       for (let i = 0; i < fields.length; i++) {
-        result.info[fields[i]] = {}
-        result.info[fields[i]].props = {}
-        result.info[fields[i]].name = columns[i].headerName
-        result.info[fields[i]].type = columns[i].type
-        result.info[fields[i]].props.disable = false
-        result.info[fields[i]].props.hidden = false
-        result.info[fields[i]].options = []
+        result.fields[fields[i]] = {}
+        result.fields[fields[i]].props = {}
+        result.fields[fields[i]].name = columns[i].headerName
+        result.fields[fields[i]].type = columns[i].type
+        result.fields[fields[i]].props.disable = false
+        result.fields[fields[i]].props.hidden = false
+        result.fields[fields[i]].options = []
         // Values
         if (!data) {
-          if (columns[i].type == "text") result.data[fields[i]] = ""
-          if (columns[i].type == "number") result.data[fields[i]] = 0
+          result.data[fields[i]] = null
           if (columns[i].type == "date") result.data[fields[i]] = new Date().toISOString().substr(0, 10)
-          if (columns[i].type == "general") result.data[fields[i]] = ""
           if (columns[i].type == "bit") result.data[fields[i]] = 0
         } else {
           result.data[fields[i]] = data[fields[i]]
@@ -77,21 +82,12 @@ export default {
       }
       return result
     },
-    filterDialogOptions(val, update) {
-      update(() => { })
-    },
-    setDialogOptions() {
-
-    },
-    getDialogOptions() {
-
-    },
     /**
      *
      *
      * @param {*} year
      * @param {*} week
-     * @returns {dateini, dateend} of week
+     * @returns (dateini, dateend) of week
      */
     getDaysWeek(year, week) {
       var dateini = new Date(year, 0, 1),

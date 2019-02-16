@@ -12,21 +12,23 @@
         <!-- INICIO DE DATOS -->
         <q-card-section class="scroll" style="max-height: 90%">
           <div class="row">
-            <div :key="key" class="col-xs-12 col-sm-6 col-md-4 col-lg-3"  v-for="(value,key, index) in data.data">
+            <div :key="key" class="col-xs-12 col-sm-6 col-md-4 col-lg-3" v-bind="fields[key].props" v-for="(value,key, index) in data">
               <q-card-section>
                 <!-- ES TEXTO -->
-                <q-input :label="data.info[key].name" dense stack-label type="text" v-bind="data.info[key].props" v-if="data.info[key].type =='text'" v-model="data.data[key]" @input="onChange"></q-input>
+                <q-input :label="fields[key].name" @input="onChange(data[key], key)" dense stack-label type="text" v-bind="fields[key].props" v-if="fields[key].type =='text'" v-model="data[key]"></q-input>
                 <!-- ES SELECT -->
-                <q-select :label="data.info[key].name" :options="data.info[key].options" :options-dense="true" dense stack-label type="text" v-bind="data.info[key].props" v-if="data.info[key].type =='select'" v-model="data[key]" @input="onChange"/>
+                <q-select :label="fields[key].name" :options="options[key].options" :options-dense="true" @filter="filterFn" @input="onChange(data[key], key)" @keyup.native="selected=key" @new-value="createValue" dense stack-label type="text" v-bind="fields[key].props" v-if="fields[key].type =='select'" v-model="data[key]"/>
+                <!-- ES AUTOCOMPLETE -->
+                <q-select :label="fields[key].name" :options="options[key].options" :options-dense="true" @filter="filterFn" @input="onChange(data[key], key)" @keyup.native="selected=key" @new-value="createValue" dense hide-selected input-debounce="0" stack-label type="text" use-input v-bind="fields[key].props" v-if="fields[key].type =='autocomplete'" v-model="data[key]"/>
                 <!-- ES NUMERO -->
-                <q-input :label="data.info[key].name" dense stack-label type="number" v-bind="data.info[key].props" v-if="data.info[key].type =='number'" v-model="data.data[key]" @input="onChange"></q-input>
+                <q-input :label="fields[key].name" @input="onChange(data[key], key)" dense stack-label type="number" v-bind="fields[key].props" v-if="fields[key].type =='number'" v-model="data[key]"></q-input>
                 <!-- ES BIT -->
-                <q-toggle :label="data.info[key].name" dense v-bind="data.info[key].props" v-if="data.info[key].type =='bit'" v-model="data.data[key]"/>
+                <q-toggle :label="fields[key].name" dense v-bind="fields[key].props" v-if="fields[key].type =='bit'" v-model="data[key]"/>
                 <!-- ES FECHA -->
-                <q-input :label="data.info[key].name" dense mask="date" v-bind="data.info[key].props" v-if="data.info[key].type =='date'" v-model="data.data[key]" @input="onChange">
+                <q-input :label="fields[key].name" @input="onChange(data[key], key)" dense mask="date" v-bind="fields[key].props" v-if="fields[key].type =='date'" v-model="data[key]">
                   <q-icon class="cursor-pointer" name="event" slot="append">
                     <q-popup-proxy>
-                      <q-date minimal todayBtn v-model="data.data[key]" @input="onChange"/>
+                      <q-date @input="onChange(data[key], key)" minimal todayBtn v-model="data[key]"/>
                     </q-popup-proxy>
                   </q-icon>
                 </q-input>
@@ -46,10 +48,13 @@ export default {
   name: "NDialog",
   props: {
     model: null,
-    data: null
+    data: null,
+    fields: null
   },
   data() {
     return {
+      selected: false,
+      options: null
     };
   },
   computed: {},
@@ -61,25 +66,45 @@ export default {
       this.model = false;
       this.$emit("onCancel", true);
     },
-    onChange: function(event) {
-      this.$emit("onChange",event)
+    onChange: function(value, key) {
+      this.$emit("onChange", value, key);
+    },
+    createValue(val, done) {
+      done(val);
+    },
+    selectKey(key) {
+      this.selected = key;
+    },
+    filterFn(val, update, abort) {
+      if (!this.selected) {
+        update(() => {});
+        return;
+      }
+      let fields = this.fields[this.selected].options;
+      if (val === "") {
+        update(() => {
+          this.options[this.selected].options = fields;
+          return;
+        });
+      } else {
+        update(() => {
+          const value = val.toLowerCase();
+          if (!fields[0].label) {
+            this.options[this.selected].options = fields.filter((v) => v.toLowerCase().indexOf(value) > -1);
+          } else {
+            fields = fields.map((x) => x.label);
+            this.options[this.selected].options = fields.filter((v) => v.toLowerCase().indexOf(value) > -1);
+          }
+        });
+      }
     }
-    // filterFn(val, update) {
-
-    //   update(() =>{});
-      // console.log(this.props["Gestion"].options)})
-      // let stringOptions = this.props[this.keySelected].options
-      // if (val === "") {
-      //   update(() => {});
-      //   return;
-      // }
-      // update(() => {
-      //   const needle = val.toLowerCase();
-      //   this.props[this.keySelected].options = stringOptions.filter((v) => v.toLowerCase().indexOf(needle) > -1);
-      // });
-    // }
   },
-  beforeMount() {}
+  beforeMount() {},
+  watch: {
+    model: function(params) {
+      this.options = JSON.parse(JSON.stringify(this.fields));
+    }
+  }
 };
 </script>
 

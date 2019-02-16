@@ -76,7 +76,7 @@
     <!-- TABLA DE DATOS -->
     <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO DE CLIENTES -->
-    <n-dialog :data="dialogData" :model="dialogModel" @onChange="onChange" @cancel="dialogModel=false" @onSave="saveDataClient"></n-dialog>
+    <n-dialog :data="dialogData" :fields="dialogFields" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="saveDataClient"></n-dialog>
   </div>
 </template>
 
@@ -96,7 +96,8 @@ export default {
       columnDefsSub: null,
       rowData: null,
       dialogModel: false,
-      dialogData: {data: {}, info: {}},
+      dialogData: {},
+      dialogFields: {},
       quickFilter: null,
       filters: null,
       filter: {
@@ -134,8 +135,8 @@ export default {
     };
   },
   methods: {
-    onChange(event) {
-      console.log(event)
+    onChange(value, key) {
+      // console.log(value, key);
     },
     deleteRecord() {
       this.$q
@@ -180,20 +181,22 @@ export default {
         self.columnDefs = data.columnDefs;
         self.columnDefsSub = data.columnDefsSub;
         self.rowData = data.rowData;
-        self.dialogData = self.setDialogData(data.columnDefsSub);
-        self.dialogData.info['Gestion'].type="select"
-        self.dialogData.info['Gestion'].options=self.$q.lang.gestion
-        console.log(self.dialogData);
+        data = self.setDialogData(data.columnDefsSub);
+        self.dialogData = data.data;
+        self.dialogFields = data.fields;
+        console.log(self.dialogFields);
+        self.dialogFields["CodigoRecibo"].props = {hidden: true};
+        self.dialogFields["CodigoPoliza"].props = {hidden: true};
+        self.dialogFields["NombreTomador"].props = {hidden: true};
+        self.dialogFields["FechaGestion"].props = {hidden: true};
+        self.dialogFields["Usuario"].props = {hidden: true};
+        self.dialogFields["Comentarios"].props = {autogrow: true};
+        self.dialogFields["Gestion"].type = "select";
+        self.dialogFields['Gestion'].options=self.$q.lang.gestion
         // self.dialogData=response.data.data[0]
-        // self.dialogFields.name = data.columnDefsSub.map((x) => x.headerName);
-        // console.log(self.dialogFields);
         // self.dialogFields.type = data.columnDefsSub.map((x) => x.type);
         // self.dialogProps.FechaGestion = self.dialogProps["CodigoPoliza"] = self.dialogProps["NombreTomador"] = self.dialogProps["Usuario"] = self.dialogProps["CodigoRecibo"] = {disable: true, hidden: true};
-        // // self.dialogFields.type[6] = "selectColumn";
-        // self.dialogProps["Gestion"] = [];
         // // self.dialogProps["Gestion"].options = self.$q.lang.gestion;
-        self.dialogModel = true;
-        // self.dialogData = self.newDialogData(data.columnDefsSub);
       });
     },
     // CALL DATA BAJAS
@@ -223,7 +226,6 @@ export default {
     },
     // SELECTED ROW
     rowSelected: function(params) {
-      // this.defineDialog(params);
       this.dialogModel = true;
       if (!params.length) {
         this.recibo.selected = false;
@@ -265,18 +267,7 @@ export default {
     this.init();
   },
   watch: {
-    $route: "init",
-    // dialogData: {
-    //   handler(val) {
-    //     console.log(val);
-    //     if (val.data.Gestion == "COME" || val.data.Gestion == "COTR") {
-    //       this.dialogData.info["Importe"].props = {disable: false, rules: [(val) => val > 0 || "error"]};
-    //     } else {
-    //       this.dialogData.info["Importe"].props = {disable: true};
-    //     }
-    //   },
-    //   deep: true
-    // }
+    $route: "init"
   }
 };
 </script>
