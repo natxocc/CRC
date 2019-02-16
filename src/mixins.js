@@ -52,8 +52,7 @@ export default {
       }
     },
     setDialogData(columns, data) {
-      console.log(columns)
-      let result = []
+      let result = {}
       result.data = {}
       result.info = {}
       let fields = columns.map((x) => x.field)
@@ -76,8 +75,7 @@ export default {
           result.data[fields[i]] = data[fields[i]]
         }
       }
-
-      console.log(result)
+      return result
     },
     filterDialogOptions(val, update) {
       update(() => { })
