@@ -69,22 +69,22 @@ export default {
         sortable: true
       },
       columnTypes: {
-        dateColumn: {
+        date: {
           filter: "agSetColumnFilter"
         },
-        textColumn: {
+        text: {
           filter: "agSetColumnFilter"
         },
-        numberColumn: {
+        number: {
           filter: "agNumberColumnFilter",
           enableValue: true,
           enableRowGroup: true
         },
-        generalColumn: {
+        general: {
           filter: "agSetColumnFilter",
           enableRowGroup: true
         },
-        bitColumn: {
+        bit: {
           filter: "agSetColumnFilter",
           enableRowGroup: true,
           cellRenderer: function(params) {

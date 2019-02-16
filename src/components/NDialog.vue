@@ -15,15 +15,15 @@
             <div :key="key" class="col-xs-12 col-sm-6 col-md-4 col-lg-3" v-bind="props[key]" v-for="(value,key, index) in data">
               <q-card-section>
                 <!-- ES TEXTO -->
-                <q-input :label="fields.name[index]" dense stack-label type="text" v-bind="props[key]" v-if="fields.type[index] =='textColumn'" v-model="data[key]"></q-input>
+                <q-input :label="fields.name[index]" dense stack-label type="text" v-bind="props[key]" v-if="fields.type[index] =='text'" v-model="data[key]"></q-input>
                 <!-- ES SELECT -->
-                <q-select :label="fields.name[index]" :options="props[key].options" :options-dense="true" dense hide-selected stack-label type="text" use-input v-bind="props[key]" v-if="fields.type[index] =='selectColumn'" v-model="data[key]"/>
+                <q-select :label="fields.name[index]" :options="props[key].options" :options-dense="true" @filter="filterDialogOptions" @keyup="setDialogOptions(value,key,index)" dense hide-selected stack-label type="text" use-input v-bind="props[key]" v-if="fields.type[index] =='select'" v-model="data[key]"/>
                 <!-- ES NUMERO -->
-                <q-input :label="fields.name[index]" dense stack-label type="number" v-bind="props[key]" v-if="fields.type[index] =='numberColumn'" v-model="data[key]"></q-input>
+                <q-input :label="fields.name[index]" dense stack-label type="number" v-bind="props[key]" v-if="fields.type[index] =='number'" v-model="data[key]"></q-input>
                 <!-- ES BIT -->
-                <q-toggle :label="fields.name[index]" dense v-bind="props[key]" v-if="fields.type[index] =='bitColumn'" v-model="data[key]"/>
+                <q-toggle :label="fields.name[index]" dense v-bind="props[key]" v-if="fields.type[index] =='bit'" v-model="data[key]"/>
                 <!-- ES FECHA -->
-                <q-input :label="fields.name[index]" dense mask="date" v-bind="props[key]" v-if="fields.type[index] =='dateColumn'" v-model="data[key]">
+                <q-input :label="fields.name[index]" dense mask="date" v-bind="props[key]" v-if="fields.type[index] =='date'" v-model="data[key]">
                   <q-icon class="cursor-pointer" name="event" slot="append">
                     <q-popup-proxy>
                       <q-date @input="getDateTime(data[key])" minimal todayBtn v-model="data[key]"/>
@@ -51,7 +51,8 @@ export default {
     props: null
   },
   data() {
-    return {};
+    return {
+    };
   },
   computed: {},
   methods: {
@@ -62,36 +63,22 @@ export default {
       this.model = false;
       this.$emit("onCancel", true);
     },
-    view(data) {
-      console.log(data);
-    },
-    getListOptions(list) {
-      console.log(list);
-      return list;
-      // let value = val.toLowerCase();
-      // return list.filter(val => val.toLowerCase().indexOf(value) > -1)
-    },
-    filterFn(val, list) {;
-      // update(() => {
+    filterFn(val, update) {
 
-      // });
-      // return;
-      // if (data === '') {
-
+      update(() =>{});
+      // console.log(this.props["Gestion"].options)})
+      // let stringOptions = this.props[this.keySelected].options
+      // if (val === "") {
+      //   update(() => {});
+      //   return;
       // }
       // update(() => {
-      //   const needle = val.toLowerCase()
-      //   this.select = stringOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
-      // })
+      //   const needle = val.toLowerCase();
+      //   this.props[this.keySelected].options = stringOptions.filter((v) => v.toLowerCase().indexOf(needle) > -1);
+      // });
     }
   },
-  beforeMount() {},
-  watch: {
-    props: {
-      handler(val) {},
-      deep: true
-    }
-  }
+  beforeMount() {}
 };
 </script>
 

@@ -51,22 +51,42 @@ export default {
         return false;
       }
     },
-    /**
-     *
-     *
-     * @param {*} columns
-     * @returns new Data for Dialog
-     */
-    newDataDialog(columns) {
-      let ret = {};
-      for (let i = 0; i < columns.length; i++) {
-        if (columns[i].type == "textColumn") ret[columns[i].field] = ""
-        if (columns[i].type == "numberColumn") ret[columns[i].field] = 0
-        if (columns[i].type == "dateColumn") ret[columns[i].field] = new Date().toISOString().substr(0, 10)
-        if (columns[i].type == "generalColumn") ret[columns[i].field] = ""
-        if (columns[i].type == "bitColumn") ret[columns[i].field] = 0
+    setDialogData(columns, data) {
+      console.log(columns)
+      let result = []
+      result.data = {}
+      result.info = {}
+      let fields = columns.map((x) => x.field)
+      for (let i = 0; i < fields.length; i++) {
+        result.info[fields[i]] = {}
+        result.info[fields[i]].props = {}
+        result.info[fields[i]].name = columns[i].headerName
+        result.info[fields[i]].type = columns[i].type
+        result.info[fields[i]].props.disable = false
+        result.info[fields[i]].props.hidden = false
+        result.info[fields[i]].options = []
+        // Values
+        if (!data) {
+          if (columns[i].type == "text") result.data[fields[i]] = ""
+          if (columns[i].type == "number") result.data[fields[i]] = 0
+          if (columns[i].type == "date") result.data[fields[i]] = new Date().toISOString().substr(0, 10)
+          if (columns[i].type == "general") result.data[fields[i]] = ""
+          if (columns[i].type == "bit") result.data[fields[i]] = 0
+        } else {
+          result.data[fields[i]] = data[fields[i]]
+        }
       }
-      return ret;
+
+      console.log(result)
+    },
+    filterDialogOptions(val, update) {
+      update(() => { })
+    },
+    setDialogOptions() {
+
+    },
+    getDialogOptions() {
+
     },
     /**
      *

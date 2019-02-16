@@ -257,7 +257,7 @@ class db
         $sql->execute();
         $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
         foreach ($fetch as $key => $value) {
-            $result[$key]['type'] = "generalColumn";
+            $result[$key]['type'] = "general";
             $result[$key]['tooltipField'] = "";
             $result[$key]['field'] = $fetch[$key]['Field'];
             $columnName = explode("|", $fetch[$key]['Comment']);
@@ -276,10 +276,10 @@ class db
                     $result[$key]['minWidth'] = substr($columnName[1], strpos($columnName[1], "W") + 1, 2) * 16;
                 }
             }
-            if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int") || strstr($fetch[$key]['Type'], "double")) $result[$key]['type'] = "numberColumn";
-            if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "textColumn";
-            if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "dateColumn";
-            if (strstr($fetch[$key]['Type'], "bit")) $result[$key]['type'] = "bitColumn";
+            if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int") || strstr($fetch[$key]['Type'], "double")) $result[$key]['type'] = "number";
+            if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "text";
+            if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "date";
+            if (strstr($fetch[$key]['Type'], "bit")) $result[$key]['type'] = "bit";
         }
         return $result;
     }
@@ -311,7 +311,7 @@ class db
         }
         if (isset($post['subtable'])) {
             $table = $this->sanitize($post['subtable']);
-            $result['columnsSub'] = $this->getColumns($table);
+            $result['columnsSub'] = $this->getColumns($table, $lang);
             $sqlquery = " SELECT * FROM `" . $table . "`";
             $id = $this->sanitize($post['id']);
             $sql = $this->db->prepare($sqlquery);
