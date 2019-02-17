@@ -15,9 +15,11 @@ export default {
       rowData: null,
       dialogModel: false,
       dialogMode: null,
+      dialogTable: null,
       dialogData: {},
       dialogFields: {},
       quickFilter: null,
+      idKey: null
     }
   },
   methods: {
@@ -36,13 +38,21 @@ export default {
         return response
       });
     },
-
     saveData(post) {
+      // console.log(post)
+      let self = this;
       this.callData(post).then(function (response) {
-        if (response.data == true) {
+        if (response.data.success == true) {
           self.$q.notify({
             message: self.$q.lang.DatosGuardados,
+            timeout: 1000,
             color: "positive"
+          });
+        } else {
+          self.$q.notify({
+            message: self.$q.lang.ErrorOperacion,
+            timeout: 1000,
+            color: "negative"
           });
         }
       })
@@ -50,13 +60,23 @@ export default {
     /**
      *
      *
+     * @param {*} columns
+     */
+    setId(columns) {
+      let idkey = columns.find(function (x) { return x.groupId === true })
+      this.idKey = idkey.field
+    },
+    /**
+     *
+     *
      * @param {*} data
-     * @returns (tgue or false)
+     * @returns
      */
     defineTable(data) {
       if (data.data.success) {
         this.columnDefs = data.data.columns;
         this.rowData = data.data.data;
+        this.setId(this.columnDefs)
         if (data.data.columnsSub) this.columnDefsSub = data.data.columnsSub
         return true
       }
@@ -73,33 +93,47 @@ export default {
      *
      *
      * @param {*} columns
+     * @param {*} table
      * @param {*} data
      * @returns (true)
      */
-    defineDialog(columns, data) {
+    defineDialog(columns, table, data) {
+      this.dialogTable = table
       let result = {}
       result.data = {}
       result.fields = {}
       let fields = columns.map((x) => x.field)
       for (let i = 0; i < fields.length; i++) {
+        // Props
         result.fields[fields[i]] = {}
-        result.fields[fields[i]].props = {}
         result.fields[fields[i]].name = columns[i].headerName
         result.fields[fields[i]].type = columns[i].type
-        result.fields[fields[i]].props.disable = false
-        result.fields[fields[i]].props.hidden = false
         result.fields[fields[i]].options = []
+        if (columns[i].headerClass != "") {
+          result.fields[fields[i]].props = {}
+          result.fields[fields[i]].props.disable = columns[i].headerClass.disable ? columns[i].headerClass.disable : false
+          result.fields[fields[i]].props.hidden = columns[i].headerClass.hidden ? columns[i].headerClass.hidden : false
+          result.fields[fields[i]].props.autofocus = columns[i].headerClass.autofocus ? columns[i].headerClass.autofocus : false
+          result.fields[fields[i]].props.autogrow = columns[i].headerClass.autogrow ? columns[i].headerClass.autogrow : false
+          if (columns[i].headerClass.select) {
+            result.fields[fields[i]].options = [...new Set(this.rowData.map((x) => x[fields[i]]))]
+            result.fields[fields[i]].type = columns[i].headerClass.autocomplete ? "autocomplete" : "select"
+          }
+        }
+
         // Values
-        this.dialogMode="insertRecords"
+        this.dialogMode = "insertRecord"
         if (!data) {
           result.data[fields[i]] = null
           if (columns[i].type == "date") result.data[fields[i]] = new Date().toISOString().substr(0, 10)
           if (columns[i].type == "bit") result.data[fields[i]] = 0
         } else {
-          this.dialogMode="updateRecords"
+          this.dialogMode = "updateRecord"
           result.data[fields[i]] = data[fields[i]]
         }
+
       }
+      console.log(result)
       this.dialogData = result.data;
       this.dialogFields = result.fields;
       return true

@@ -17,9 +17,9 @@
                 <!-- ES TEXTO -->
                 <q-input :label="fields[key].name" @input="onChange(data[key], key)" dense stack-label type="text" v-bind="fields[key].props" v-if="fields[key].type =='text'" v-model="data[key]"></q-input>
                 <!-- ES SELECT -->
-                <q-select :label="fields[key].name" :options="options[key].options" :options-dense="true" @filter="filterFn" @input="onChange(data[key], key)" @keyup.native="selected=key" @new-value="createValue" dense stack-label type="text" v-bind="fields[key].props" v-if="fields[key].type =='select'" v-model="data[key]"/>
+                <q-select :label="fields[key].name" :options="options[key].options" :options-dense="true" @filter="filterFn" @input="onChange(data[key], key)" @keyup.native="selected=key" @new-value="createValue" dense stack-label type="text" v-bind="fields[key].props" v-if="fields[key].type =='select' && options" v-model="data[key]"/>
                 <!-- ES AUTOCOMPLETE -->
-                <q-select :label="fields[key].name" :options="options[key].options" :options-dense="true" @filter="filterFn" @input="onChange(data[key], key)" @keyup.native="selected=key" @new-value="createValue" dense hide-selected input-debounce="0" stack-label type="text" use-input v-bind="fields[key].props" v-if="fields[key].type =='autocomplete'" v-model="data[key]"/>
+                <q-select :label="fields[key].name" :options="options[key].options" :options-dense="true" @filter="filterFn" @input="onChange(data[key], key)" @keyup.native="selected=key" @new-value="createValue" dense hide-selected input-debounce="0" stack-label type="text" use-input v-bind="fields[key].props" v-if="fields[key].type =='autocomplete' && options" v-model="data[key]"/>
                 <!-- ES NUMERO -->
                 <q-input :label="fields[key].name" @input="onChange(data[key], key)" dense stack-label type="number" v-bind="fields[key].props" v-if="fields[key].type =='number'" v-model="data[key]"></q-input>
                 <!-- ES BIT -->
@@ -90,10 +90,22 @@ export default {
         update(() => {
           const value = val.toLowerCase();
           if (!fields[0].label) {
-            this.options[this.selected].options = fields.filter((v) => v.toLowerCase().indexOf(value) > -1);
+            this.options[this.selected].options = fields.filter(
+              (v) =>
+                v
+                  .toString()
+                  .toLowerCase()
+                  .indexOf(value) > -1
+            );
           } else {
             fields = fields.map((x) => x.label);
-            this.options[this.selected].options = fields.filter((v) => v.toLowerCase().indexOf(value) > -1);
+            this.options[this.selected].options = fields.filter(
+              (v) =>
+                v
+                  .toString()
+                  .toLowerCase()
+                  .indexOf(value) > -1
+            );
           }
         });
       }

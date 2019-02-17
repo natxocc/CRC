@@ -240,5 +240,6 @@ export default {
   Editar: "Editar",
   Guardar: "Guardar",
   Cerrar: "Cerrar",
-  DatosGuardados: "Datos Guardados"
+  DatosGuardados: "Datos Guardados",
+  ErrorOperacion: "Error en la operación"
 }

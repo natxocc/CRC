@@ -76,7 +76,7 @@
     <!-- TABLA DE DATOS -->
     <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO DE CLIENTES -->
-    <n-dialog :data="dialogData" :fields="dialogFields" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="saveData"></n-dialog>
+    <n-dialog :data="dialogData" :fields="dialogFields" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"></n-dialog>
   </div>
 </template>
 
@@ -92,7 +92,7 @@ export default {
   mixins: [Custom],
   data() {
     return {
-      dialog:{
+      dialog: {
         newGestion: {},
         editRecibo: {}
       },
@@ -135,6 +135,10 @@ export default {
     onChange(value, key) {
       // console.log(value, key);
     },
+    onSave() {
+      this.saveData({cmd: this.dialogMode, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable});
+      this.init();
+    },
     deleteRecord() {
       this.$q
         .dialog({
@@ -142,20 +146,11 @@ export default {
           message: "Desea Eliminar este Registro",
           cancel: true
         })
-        .onOk(() => {})
+        .onOk(() => {
+          this.saveData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.dialogTable});
+          this.init();
+        })
         .onCancel(() => {});
-    },
-    // SAVE DATA
-    saveData(cmd) {
-      let self = this;
-      this.callData({cmd: "insertRecords", table: "Clientes", idkey: "NIF", idvalue: self.dialogData["NIF"], data: self.dialogData}).then(function(response) {
-        if (response.data == true) {
-          self.$q.notify({
-            message: self.$q.lang.DatosGuardados,
-            color: "positive"
-          });
-        }
-      });
     },
     // CALL DATA GESTION
     callDataGestion() {
@@ -175,8 +170,7 @@ export default {
       where += " ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.filter.userby.value}).then(function(response) {
         self.defineTable(response);
-        self.defineDialog(self.columnDefs);
-        
+        self.defineDialog(self.columnDefs, "Recibos");
 
         // self.dialogFields["Gestion"].options = self.$q.lang.gestion;
         // self.dialogFields["Gestion"].type = "select";
@@ -210,18 +204,24 @@ export default {
     },
     // SELECTED ROW
     rowSelected: function(params) {
+      // console.log(params);
       if (!params.length) {
         this.recibo.selected = false;
-        this.defineDialog(this.columnDefs);
+        this.defineDialog(this.columnDefs, "Recibos");
       } else {
         this.recibo.selected = true;
-        this.defineDialog(this.columnDefsSub);
+        this.defineDialog(this.columnDefsSub, "RecibosGestion");
         this.dialogFields["CodigoRecibo"].props = {hidden: true};
         this.dialogFields["CodigoPoliza"].props = {hidden: true};
         this.dialogFields["NombreTomador"].props = {hidden: true};
         this.dialogFields["FechaGestion"].props = {hidden: true};
         this.dialogFields["Usuario"].props = {hidden: true};
         this.dialogFields["Comentarios"].props = {autogrow: true, autofocus: true};
+        this.dialogData["CodigoRecibo"] = params[0].CodigoRecibo;
+        this.dialogData["CodigoPoliza"] = params[0].CodigoPoliza;
+        this.dialogData["NombreTomador"] = params[0].NombreTomador;
+        this.dialogData["FechaGestion"] = params[0].FechaGestion;
+        this.dialogData["Usuario"] = localStorage.username;
       }
     },
     // SELECTED SUB ROWS

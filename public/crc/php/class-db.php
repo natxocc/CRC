@@ -258,9 +258,9 @@ class db
         $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
         // var_dump($fetch);
         foreach ($fetch as $key => $value) {
-            $result[$key]['idKey'] = false;
+            $result[$key]['groupId'] = false;
             $result[$key]['type'] = "general";
-            $result[$key]['tooltipField'] = "";
+            $result[$key]['headerClass'] = "";
             $result[$key]['field'] = $fetch[$key]['Field'];
             $columnName = explode("|", $fetch[$key]['Comment']);
             $result[$key]['headerName'] = isset($lang[$fetch[$key]['Field']]) ? $lang[$fetch[$key]['Field']] : $columnName[0];
@@ -278,12 +278,22 @@ class db
                     $result[$key]['minWidth'] = substr($columnName[1], strpos($columnName[1], "W") + 1, 2) * 16;
                 }
             }
+            if (isset($columnName[2])) {
+                if (strstr($columnName[2], "H")) $result[$key]['headerClass']['hidden'] = true;
+                if (strstr($columnName[2], "D")) $result[$key]['headerClass']['disable'] = true;
+                if (strstr($columnName[2], "T")) $result[$key]['headerClass']['autogrow'] = true;
+                if (strstr($columnName[2], "F")) $result[$key]['headerClass']['autofocus'] = true;
+                if (strstr($columnName[2], "R")) $result[$key]['headerClass']['required'] = true;
+                if (strstr($columnName[2], "A")) $result[$key]['headerClass']['autocomplete'] = true;
+                if (strstr($columnName[2], "S")) $result[$key]['headerClass']['select'] = true;
+                
+            }
             if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int") || strstr($fetch[$key]['Type'], "double")) $result[$key]['type'] = "number";
             if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "text";
             if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "date";
             if (strstr($fetch[$key]['Type'], "bit")) $result[$key]['type'] = "bit";
             //ID
-            if (strstr($fetch[$key]['Key'], "PRI")) $result[$key]['idKey'] = true;
+            if (strstr($fetch[$key]['Key'], "PRI")) $result[$key]['groupId'] = true;
         }
         return $result;
     }
@@ -359,7 +369,7 @@ class db
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            //echo $e;
+            echo $e;
             return false;
         }
     }
@@ -390,7 +400,7 @@ class db
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            //echo $e;
+            echo $e;
             return false;
         }
     }
@@ -406,18 +416,15 @@ class db
     {
         $table = $this->sanitize($post['table']);
         $idkey = $this->sanitize($post['idkey']);
-        $user = $this->sanitize($post['user']);
         $sqlquery = "DELETE FROM `" . $table . "` WHERE `" . $idkey . "` = :idvalue";
-        if ($_SESSION['isAdmin'] <> 1) {
-            $sqlquery .= " AND `Usuario` ='$user'";
-        }
         $sql = $this->db->prepare($sqlquery);
         $sql->bindParam(":idvalue", $post['idvalue']);
+        echo $sqlquery;
         try {
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            //echo $e;
+            echo $e;
             return false;
         }
     }
