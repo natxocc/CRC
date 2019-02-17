@@ -53,7 +53,7 @@
       <q-bar class="bg-primary text-white">
         <q-btn @click="dialogModel=true" dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">{{$q.lang.NuevoRecibo}}</q-btn>
         <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selected">{{$q.lang.EliminarRecibo}}</q-btn>
-        <q-btn dense flat icon="add" v-if="recibo.selected">{{$q.lang.NuevaGestion}}</q-btn>
+        <q-btn @click="dialogModel=true" dense flat icon="add" v-if="recibo.selected">{{$q.lang.NuevaGestion}}</q-btn>
         <q-btn color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
         <q-btn dense flat icon="edit" v-if="recibo.selectedSub">{{$q.lang.EditarGestion}}</q-btn>
         <q-space/>
@@ -76,7 +76,7 @@
     <!-- TABLA DE DATOS -->
     <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO DE CLIENTES -->
-    <n-dialog :data="dialogData" :fields="dialogFields" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="saveDataClient"></n-dialog>
+    <n-dialog :data="dialogData" :fields="dialogFields" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="saveData"></n-dialog>
   </div>
 </template>
 
@@ -92,13 +92,10 @@ export default {
   mixins: [Custom],
   data() {
     return {
-      columnDefs: null,
-      columnDefsSub: null,
-      rowData: null,
-      dialogModel: false,
-      dialogData: {},
-      dialogFields: {},
-      quickFilter: null,
+      dialog:{
+        newGestion: {},
+        editRecibo: {}
+      },
       filters: null,
       filter: {
         userby: {
@@ -149,9 +146,9 @@ export default {
         .onCancel(() => {});
     },
     // SAVE DATA
-    saveDataClient() {
+    saveData(cmd) {
       let self = this;
-      this.callData({cmd: "updateRecords", table: "Clientes", idkey: "NIF", idvalue: self.dialogData["NIF"], data: self.dialogData}).then(function(response) {
+      this.callData({cmd: "insertRecords", table: "Clientes", idkey: "NIF", idvalue: self.dialogData["NIF"], data: self.dialogData}).then(function(response) {
         if (response.data == true) {
           self.$q.notify({
             message: self.$q.lang.DatosGuardados,
@@ -177,26 +174,13 @@ export default {
       if (!this.filter.alldata) where += " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')";
       where += " ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.filter.userby.value}).then(function(response) {
-        let data = self.getColumnsData(response);
-        self.columnDefs = data.columnDefs;
-        self.columnDefsSub = data.columnDefsSub;
-        self.rowData = data.rowData;
-        data = self.setDialogData(data.columnDefsSub);
-        self.dialogData = data.data;
-        self.dialogFields = data.fields;
-        console.log(self.dialogFields);
-        self.dialogFields["CodigoRecibo"].props = {hidden: true};
-        self.dialogFields["CodigoPoliza"].props = {hidden: true};
-        self.dialogFields["NombreTomador"].props = {hidden: true};
-        self.dialogFields["FechaGestion"].props = {hidden: true};
-        self.dialogFields["Usuario"].props = {hidden: true};
-        self.dialogFields["Comentarios"].props = {autogrow: true};
-        self.dialogFields["Gestion"].type = "select";
-        self.dialogFields['Gestion'].options=self.$q.lang.gestion
-        // self.dialogData=response.data.data[0]
-        // self.dialogFields.type = data.columnDefsSub.map((x) => x.type);
-        // self.dialogProps.FechaGestion = self.dialogProps["CodigoPoliza"] = self.dialogProps["NombreTomador"] = self.dialogProps["Usuario"] = self.dialogProps["CodigoRecibo"] = {disable: true, hidden: true};
-        // // self.dialogProps["Gestion"].options = self.$q.lang.gestion;
+        self.defineTable(response);
+        self.defineDialog(self.columnDefs);
+        
+
+        // self.dialogFields["Gestion"].options = self.$q.lang.gestion;
+        // self.dialogFields["Gestion"].type = "select";
+        // self.dialogModel=true
       });
     },
     // CALL DATA BAJAS
@@ -204,7 +188,7 @@ export default {
       let self = this;
       let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.getColumnsData(response);
+        self.defineTable(response);
       });
     },
     // CALL DATA LIQ
@@ -213,7 +197,7 @@ export default {
       let days = this.getDaysWeek(this.filter.year, this.filter.month);
       let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.getColumnsData(response);
+        self.defineTable(response);
       });
     },
     // CALL DATA RECIBO
@@ -221,17 +205,23 @@ export default {
       let self = this;
       let where = "(CodigoRecibo='" + this.$route.params.recibo + "')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.getColumnsData(response);
+        self.defineTable(response);
       });
     },
     // SELECTED ROW
     rowSelected: function(params) {
-      this.dialogModel = true;
       if (!params.length) {
         this.recibo.selected = false;
+        this.defineDialog(this.columnDefs);
       } else {
         this.recibo.selected = true;
-        let self = this;
+        this.defineDialog(this.columnDefsSub);
+        this.dialogFields["CodigoRecibo"].props = {hidden: true};
+        this.dialogFields["CodigoPoliza"].props = {hidden: true};
+        this.dialogFields["NombreTomador"].props = {hidden: true};
+        this.dialogFields["FechaGestion"].props = {hidden: true};
+        this.dialogFields["Usuario"].props = {hidden: true};
+        this.dialogFields["Comentarios"].props = {autogrow: true, autofocus: true};
       }
     },
     // SELECTED SUB ROWS

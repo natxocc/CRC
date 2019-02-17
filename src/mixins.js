@@ -9,7 +9,15 @@ function hideLoading(options) {
 export default {
   data() {
     return {
-      lang: this.$q.lang.isoName
+      lang: this.$q.lang.isoName,
+      columnDefs: null,
+      columnDefsSub: null,
+      rowData: null,
+      dialogModel: false,
+      dialogMode: null,
+      dialogData: {},
+      dialogFields: {},
+      quickFilter: null,
     }
   },
   methods: {
@@ -28,19 +36,29 @@ export default {
         return response
       });
     },
+
+    saveData(post) {
+      this.callData(post).then(function (response) {
+        if (response.data == true) {
+          self.$q.notify({
+            message: self.$q.lang.DatosGuardados,
+            color: "positive"
+          });
+        }
+      })
+    },
     /**
      *
      *
      * @param {*} data
-     * @returns (ColumnsDefs, rowData)
+     * @returns (tgue or false)
      */
-    getColumnsData(data) {
+    defineTable(data) {
       if (data.data.success) {
-        let ret = {}
-        ret.columnDefs = data.data.columns;
-        ret.rowData = data.data.data;
-        if (data.data.columnsSub) ret.columnDefsSub = data.data.columnsSub
-        return ret;
+        this.columnDefs = data.data.columns;
+        this.rowData = data.data.data;
+        if (data.data.columnsSub) this.columnDefsSub = data.data.columnsSub
+        return true
       }
       else {
         this.$q.notify({
@@ -56,9 +74,9 @@ export default {
      *
      * @param {*} columns
      * @param {*} data
-     * @returns (data,fields)
+     * @returns (true)
      */
-    setDialogData(columns, data) {
+    defineDialog(columns, data) {
       let result = {}
       result.data = {}
       result.fields = {}
@@ -72,15 +90,19 @@ export default {
         result.fields[fields[i]].props.hidden = false
         result.fields[fields[i]].options = []
         // Values
+        this.dialogMode="insertRecords"
         if (!data) {
           result.data[fields[i]] = null
           if (columns[i].type == "date") result.data[fields[i]] = new Date().toISOString().substr(0, 10)
           if (columns[i].type == "bit") result.data[fields[i]] = 0
         } else {
+          this.dialogMode="updateRecords"
           result.data[fields[i]] = data[fields[i]]
         }
       }
-      return result
+      this.dialogData = result.data;
+      this.dialogFields = result.fields;
+      return true
     },
     /**
      *
@@ -134,19 +156,6 @@ export default {
     /**
      *
      *
-     * @param {*} data
-     * @returns datetime
-     */
-    getDateTime(data) {
-      // let now = new Date()
-      // now.setHours(now.getHours())
-      // now.setMinutes(now.getMinutes())
-      // now.setSeconds(now.getSeconds())
-      // return date
-    },
-    /**
-     *
-     *
      * @param {*} lang
      */
     getLang(lang) {
@@ -155,13 +164,6 @@ export default {
       });
       localStorage.lang = this.lang;
     },
-    noAuth(data) {
-      if (!data.data.success) self.$q.notify({
-        message: self.$q.lang.SinAutorizacion,
-        icon: "close",
-        color: "negative"
-      });
-    }
   },
   watch: {
     lang(lang) {

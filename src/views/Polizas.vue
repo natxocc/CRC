@@ -37,9 +37,6 @@ export default {
   data() {
     return {
       // TABLE
-      columnDefs: [],
-      rowData: null,
-      quickFilter: null,
       rowClassRules: {},
       filter: {
         years: [],

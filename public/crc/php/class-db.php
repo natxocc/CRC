@@ -256,7 +256,9 @@ class db
         $sql = $this->db->prepare("SHOW FULL COLUMNS FROM $table");
         $sql->execute();
         $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
+        // var_dump($fetch);
         foreach ($fetch as $key => $value) {
+            $result[$key]['idKey'] = false;
             $result[$key]['type'] = "general";
             $result[$key]['tooltipField'] = "";
             $result[$key]['field'] = $fetch[$key]['Field'];
@@ -280,6 +282,8 @@ class db
             if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "text";
             if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "date";
             if (strstr($fetch[$key]['Type'], "bit")) $result[$key]['type'] = "bit";
+            //ID
+            if (strstr($fetch[$key]['Key'], "PRI")) $result[$key]['idKey'] = true;
         }
         return $result;
     }
