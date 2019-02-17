@@ -10,14 +10,14 @@
         </q-toolbar>
         <q-separator/>
         <!-- INICIO DE DATOS -->
-        <q-card-section class="scroll" style="max-height: 90%">
+        <q-card-section>
           <div class="row">
             <div :key="key" class="col-xs-12 col-sm-6 col-md-4 col-lg-3" v-bind="fields[key].props" v-for="(value,key, index) in data">
               <q-card-section>
                 <!-- ES TEXTO -->
                 <q-input :label="fields[key].name" @input="onChange(data[key], key)" dense stack-label type="text" v-bind="fields[key].props" v-if="fields[key].type =='text'" v-model="data[key]"></q-input>
                 <!-- ES SELECT -->
-                <q-select :label="fields[key].name" :options="options[key].options" :options-dense="true" @filter="filterFn" @input="onChange(data[key], key)" @keyup.native="selected=key" @new-value="createValue" dense stack-label type="text" v-bind="fields[key].props" v-if="fields[key].type =='select' && options" v-model="data[key]"/>
+                <q-select :label="fields[key].name" :options="options[key].options" :options-dense="true" @filter="filterFn" @input="onChange(data[key], key)" dense stack-label type="text" v-bind="fields[key].props" v-if="fields[key].type =='select' && options" v-model="data[key]"/>
                 <!-- ES AUTOCOMPLETE -->
                 <q-select :label="fields[key].name" :options="options[key].options" :options-dense="true" @filter="filterFn" @input="onChange(data[key], key)" @keyup.native="selected=key" @new-value="createValue" dense hide-selected input-debounce="0" stack-label type="text" use-input v-bind="fields[key].props" v-if="fields[key].type =='autocomplete' && options" v-model="data[key]"/>
                 <!-- ES NUMERO -->
@@ -63,11 +63,12 @@ export default {
       this.$emit("onSave", true);
     },
     onCancel: function() {
-      this.model = false;
       this.$emit("onCancel", true);
+      this.model = false;
     },
     onChange: function(value, key) {
-      this.$emit("onChange", value, key);
+      if (this.data[key].value) this.data[key] = this.data[key].value;
+      this.$emit("onChange", this.data[key], key);
     },
     createValue(val, done) {
       done(val);
@@ -80,6 +81,11 @@ export default {
         update(() => {});
         return;
       }
+      if (this.fields[key].type == "select") {
+        update(() => {});
+        return;
+      }
+
       let fields = this.fields[this.selected].options;
       if (val === "") {
         update(() => {
@@ -115,8 +121,8 @@ export default {
   watch: {
     model: function(params) {
       this.options = JSON.parse(JSON.stringify(this.fields));
+      if (!this.model) this.options = null;
     }
   }
 };
 </script>
-

@@ -240,5 +240,7 @@ export default {
   Guardar: "Guardar",
   Cerrar: "Tancar",
   DatosGuardados: "Dades enregistrades",
-  ErrorOperacion: "Error en la operació"
+  ErrorOperacion: "Error en la operació",
+  EliminarRegistro: "Vols esborrar aquest registre?",
+  CampoObligatorio: "Camp obligatori"
 }

@@ -14,12 +14,13 @@ export default {
       columnDefsSub: null,
       rowData: null,
       dialogModel: false,
-      dialogMode: null,
-      dialogTable: null,
       dialogData: {},
       dialogFields: {},
       quickFilter: null,
-      idKey: null
+      idKey: null,
+      tableDelete: null,
+      tableNewEdit: null,
+      cmd: null
     }
   },
   methods: {
@@ -76,7 +77,6 @@ export default {
       if (data.data.success) {
         this.columnDefs = data.data.columns;
         this.rowData = data.data.data;
-        this.setId(this.columnDefs)
         if (data.data.columnsSub) this.columnDefsSub = data.data.columnsSub
         return true
       }
@@ -97,8 +97,8 @@ export default {
      * @param {*} data
      * @returns (true)
      */
-    defineDialog(columns, table, data) {
-      this.dialogTable = table
+    defineDialog(columns, data) {
+      this.setId(columns)
       let result = {}
       result.data = {}
       result.fields = {}
@@ -119,23 +119,25 @@ export default {
             result.fields[fields[i]].options = [...new Set(this.rowData.map((x) => x[fields[i]]))]
             result.fields[fields[i]].type = columns[i].headerClass.autocomplete ? "autocomplete" : "select"
           }
+          if (columns[i].headerClass.required) {
+            result.fields[fields[i]].props.rules = [val => !!val || this.$q.lang.CampoObligatorio]
+          }
         }
 
         // Values
-        this.dialogMode = "insertRecord"
+        this.cmd = "insertRecord"
         if (!data) {
           result.data[fields[i]] = null
           if (columns[i].type == "date") result.data[fields[i]] = new Date().toISOString().substr(0, 10)
           if (columns[i].type == "bit") result.data[fields[i]] = 0
         } else {
-          this.dialogMode = "updateRecord"
+          this.cmd = "updateRecord"
           result.data[fields[i]] = data[fields[i]]
         }
-
       }
-      console.log(result)
       this.dialogData = result.data;
       this.dialogFields = result.fields;
+      // console.log(result)
       return true
     },
     /**

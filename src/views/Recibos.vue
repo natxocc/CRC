@@ -52,10 +52,10 @@
       <!-- MINI TOOLBAR-->
       <q-bar class="bg-primary text-white">
         <q-btn @click="dialogModel=true" dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">{{$q.lang.NuevoRecibo}}</q-btn>
-        <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selected">{{$q.lang.EliminarRecibo}}</q-btn>
         <q-btn @click="dialogModel=true" dense flat icon="add" v-if="recibo.selected">{{$q.lang.NuevaGestion}}</q-btn>
-        <q-btn color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
-        <q-btn dense flat icon="edit" v-if="recibo.selectedSub">{{$q.lang.EditarGestion}}</q-btn>
+        <q-btn @click="dialogModel=true" dense flat icon="edit" v-if="recibo.selectedSub">{{$q.lang.EditarGestion}}</q-btn>
+        <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selected">{{$q.lang.EliminarRecibo}}</q-btn>
+        <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
         <q-space/>
         <!-- COLORS HELP -->
         <div>
@@ -92,10 +92,6 @@ export default {
   mixins: [Custom],
   data() {
     return {
-      dialog: {
-        newGestion: {},
-        editRecibo: {}
-      },
       filters: null,
       filter: {
         userby: {
@@ -113,9 +109,9 @@ export default {
       },
       rowClassRules: {
         error: "data.Estado.includes('COBRADO') && data.Gestion.includes('ANULADO')",
-        pendiente: "data.Estado.includes('PENDIENTE') && data.Gestion.includes('PENDIENTE')",
-        anulado: "data.Estado.includes('ANULADO') || (data.Gestion.includes('ANULADO') && !data.Estado.includes('COBRADO'))",
-        cobrado: "data.Estado.includes('COBRADO') || (data.Gestion.includes('COBRADO') && data.Importe == data.Cobrado)"
+        pendiente: "data.Estado.includes('PENDIENTE') && data.Gestion.includes('PE')",
+        anulado: "data.Estado.includes('ANULADO') || (data.Gestion.includes('AN') && !data.Estado.includes('COBRADO'))",
+        cobrado: "data.Estado.includes('COBRADO') || (data.Gestion.includes('CO') && data.Importe == data.Cobrado)"
       },
       // RECIBO
       recibo: {
@@ -133,21 +129,27 @@ export default {
   },
   methods: {
     onChange(value, key) {
+      if (this.dialogData["Gestion"] == "COME" || this.dialogData["Gestion"] == "COTR") {
+        this.dialogFields["Importe"].props.disable = false;
+      } else {
+        this.dialogFields["Importe"].props.disable = true;
+      }
       // console.log(value, key);
     },
     onSave() {
-      this.saveData({cmd: this.dialogMode, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable});
+      this.dialogModel = false;
+      this.saveData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.tableNewEdit});
       this.init();
     },
     deleteRecord() {
       this.$q
         .dialog({
-          title: "Confirmar",
-          message: "Desea Eliminar este Registro",
+          message: this.$q.lang.EliminarRegistro,
           cancel: true
         })
         .onOk(() => {
-          this.saveData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.dialogTable});
+          // console.log(this.dialogData)
+          this.saveData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.tableDelete});
           this.init();
         })
         .onCancel(() => {});
@@ -170,10 +172,13 @@ export default {
       where += " ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.filter.userby.value}).then(function(response) {
         self.defineTable(response);
-        self.defineDialog(self.columnDefs, "Recibos");
-
-        // self.dialogFields["Gestion"].options = self.$q.lang.gestion;
-        // self.dialogFields["Gestion"].type = "select";
+        self.defineDialog(self.columnDefs);
+        self.tableDelete = "Recibos";
+        self.tableNewEdit = "Recibos";
+        self.dialogFields["Gestion"].options = self.$q.lang.gestion;
+        self.dialogFields["Gestion"].type = "select";
+        self.dialogFields["Estado"].options = self.$q.lang.estados;
+        self.dialogFields["Estado"].type = "select";
         // self.dialogModel=true
       });
     },
@@ -205,18 +210,19 @@ export default {
     // SELECTED ROW
     rowSelected: function(params) {
       // console.log(params);
+      this.tableDelete = "Recibos";
       if (!params.length) {
         this.recibo.selected = false;
-        this.defineDialog(this.columnDefs, "Recibos");
+        this.defineDialog(this.columnDefs);
+        this.tableNewEdit = "Recibos";
+        this.dialogFields["Estado"].options = this.$q.lang.estados;
+        this.dialogFields["Gestion"].type = "select";
       } else {
         this.recibo.selected = true;
-        this.defineDialog(this.columnDefsSub, "RecibosGestion");
-        this.dialogFields["CodigoRecibo"].props = {hidden: true};
-        this.dialogFields["CodigoPoliza"].props = {hidden: true};
-        this.dialogFields["NombreTomador"].props = {hidden: true};
-        this.dialogFields["FechaGestion"].props = {hidden: true};
-        this.dialogFields["Usuario"].props = {hidden: true};
-        this.dialogFields["Comentarios"].props = {autogrow: true, autofocus: true};
+        this.defineDialog(this.columnDefsSub);
+        this.tableNewEdit = "RecibosGestion";
+        this.dialogFields["Gestion"].options = this.$q.lang.gestion;
+        this.dialogFields["Gestion"].type = "select";
         this.dialogData["CodigoRecibo"] = params[0].CodigoRecibo;
         this.dialogData["CodigoPoliza"] = params[0].CodigoPoliza;
         this.dialogData["NombreTomador"] = params[0].NombreTomador;
@@ -226,11 +232,16 @@ export default {
     },
     // SELECTED SUB ROWS
     rowSelectedSub: function(params) {
+      this.tableDelete = "RecibosGestion";
+      this.tableNewEdit = "RecibosGestion";
       if (params.length == 0) {
         this.recibo.selectedSub = false;
         return;
       }
+      this.defineDialog(this.columnDefsSub, params[0]);
       this.recibo.selectedSub = true;
+      this.dialogFields["Gestion"].options = this.$q.lang.gestion;
+      this.dialogFields["Gestion"].type = "select";
     },
     //CALCULATE
     gridData(data) {
@@ -244,6 +255,9 @@ export default {
     },
     // INITIALIZATION
     init() {
+      this.recibo.selected = null;
+      this.recibo.selectedSub = false;
+      this.dialogModel = false;
       if (this.$route.params.recibo == "bajas") this.callDataBajas();
       if (this.$route.params.recibo == "gestion") this.callDataGestion();
       if (this.$route.params.recibo == "liq") this.callDataLiq();

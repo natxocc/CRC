@@ -241,5 +241,7 @@ export default {
   Guardar: "Guardar",
   Cerrar: "Cerrar",
   DatosGuardados: "Datos Guardados",
-  ErrorOperacion: "Error en la operación"
+  ErrorOperacion: "Error en la operación",
+  EliminarRegistro: "¿Desea eliminar este registro?",
+  CampoObligatorio: "Campo obligatorio"
 }

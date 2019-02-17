@@ -278,6 +278,8 @@ class db
                     $result[$key]['minWidth'] = substr($columnName[1], strpos($columnName[1], "W") + 1, 2) * 16;
                 }
             }
+            $result[$key]['headerClass']['hidden'] = false;
+            $result[$key]['headerClass']['disable'] = false;
             if (isset($columnName[2])) {
                 if (strstr($columnName[2], "H")) $result[$key]['headerClass']['hidden'] = true;
                 if (strstr($columnName[2], "D")) $result[$key]['headerClass']['disable'] = true;
@@ -286,7 +288,7 @@ class db
                 if (strstr($columnName[2], "R")) $result[$key]['headerClass']['required'] = true;
                 if (strstr($columnName[2], "A")) $result[$key]['headerClass']['autocomplete'] = true;
                 if (strstr($columnName[2], "S")) $result[$key]['headerClass']['select'] = true;
-                
+
             }
             if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int") || strstr($fetch[$key]['Type'], "double")) $result[$key]['type'] = "number";
             if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "text";
@@ -419,7 +421,7 @@ class db
         $sqlquery = "DELETE FROM `" . $table . "` WHERE `" . $idkey . "` = :idvalue";
         $sql = $this->db->prepare($sqlquery);
         $sql->bindParam(":idvalue", $post['idvalue']);
-        echo $sqlquery;
+        //echo $sqlquery;
         try {
             $sql->execute();
             return true;
