@@ -320,6 +320,7 @@ class db
         try {
             $sql->execute();
             $result['success'] = true;
+            $result['table'] = $table;
             $result['data'] = $sql->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             echo $e;
