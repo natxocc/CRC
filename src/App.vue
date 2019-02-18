@@ -154,12 +154,12 @@ export default {
       let self = this;
       this.callData({cmd: "login", user: self.user.user, pass: self.user.pass})
         .then(function(response) {
-          if (response.data.success) {
-            localStorage.sid = response.data.data.sid;
-            localStorage.mail = response.data.info.data.email;
-            localStorage.username = response.data.info.data.fullname;
+          if (response.success) {
+            localStorage.sid = response.sid;
+            localStorage.mail = response.info.data.email;
+            localStorage.username = response.info.data.fullname;
             self.$q.notify({
-              message: self.$q.lang.Bienvenido + " " + response.data.info.data.fullname,
+              message: self.$q.lang.Bienvenido + " " + response.info.data.fullname,
               icon: "check",
               color: "positive"
             });
@@ -196,7 +196,7 @@ export default {
       let self = this;
       this.callData({cmd: "checkUser"})
         .then(function(response) {
-          if (response.data.success) {
+          if (response.success) {
             self.user.name = localStorage.username;
             self.user.mail = localStorage.mail;
           } else {

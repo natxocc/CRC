@@ -288,11 +288,11 @@ class db
                 if (strstr($columnName[2], "R")) $result[$key]['headerClass']['required'] = true;
                 if (strstr($columnName[2], "A")) $result[$key]['headerClass']['autocomplete'] = true;
                 if (strstr($columnName[2], "S")) $result[$key]['headerClass']['select'] = true;
-
             }
             if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int") || strstr($fetch[$key]['Type'], "double")) $result[$key]['type'] = "number";
             if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "text";
             if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "date";
+            if (strstr($fetch[$key]['Type'], "datetime")) $result[$key]['type'] = "datetime";
             if (strstr($fetch[$key]['Type'], "bit")) $result[$key]['type'] = "bit";
             //ID
             if (strstr($fetch[$key]['Key'], "PRI")) $result[$key]['groupId'] = true;

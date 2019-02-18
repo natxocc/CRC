@@ -13,14 +13,14 @@ export default {
       columnDefs: null,
       columnDefsSub: null,
       rowData: null,
+      quickFilter: null,
+      idKey: null,
+      table: null,
+      cmd: null,
       dialogModel: false,
       dialogData: {},
       dialogFields: {},
-      quickFilter: null,
-      idKey: null,
-      tableDelete: null,
-      tableNewEdit: null,
-      cmd: null
+      dialogTable: null
     }
   },
   methods: {
@@ -31,19 +31,20 @@ export default {
      * @returns Data from axios
      */
     callData(post) {
+      let self = this;
       showLoading();
       post.sid = localStorage.sid
       post.lang = this.$q.lang.db
-      return axios.post(localStorage.url, post).then((response) => {
+      return fetch(localStorage.url, {
+        method: 'post',
+        body: JSON.stringify(post)
+      }).then((response)=> {return response.json()}).then((response) => {
         hideLoading();
-        return response
-      });
-    },
-    saveData(post) {
-      // console.log(post)
-      let self = this;
-      this.callData(post).then(function (response) {
-        if (response.data.success == true) {
+        if (post.cmd == "getRecords") {
+          self.defineTable(response)
+          return response
+        }
+        if (response.success == true) {
           self.$q.notify({
             message: self.$q.lang.DatosGuardados,
             timeout: 1000,
@@ -56,6 +57,7 @@ export default {
             color: "negative"
           });
         }
+        return response
       })
     },
     /**
@@ -74,10 +76,11 @@ export default {
      * @returns
      */
     defineTable(data) {
-      if (data.data.success) {
-        this.columnDefs = data.data.columns;
-        this.rowData = data.data.data;
-        if (data.data.columnsSub) this.columnDefsSub = data.data.columnsSub
+      if (data.success) {
+        this.columnDefs = data.columns;
+        this.rowData = data.data;
+        this.table = data.table
+        if (data.columnsSub) this.columnDefsSub = data.columnsSub
         return true
       }
       else {
@@ -93,11 +96,10 @@ export default {
      *
      *
      * @param {*} columns
-     * @param {*} table
      * @param {*} data
      * @returns (true)
      */
-    defineDialog(columns, data) {
+    defineDialog(columns, data, table) {
       this.setId(columns)
       let result = {}
       result.data = {}
@@ -123,18 +125,20 @@ export default {
             result.fields[fields[i]].props.rules = [val => !!val || this.$q.lang.CampoObligatorio]
           }
         }
-
         // Values
-        this.cmd = "insertRecord"
+        result.data[fields[i]] = null
         if (!data) {
-          result.data[fields[i]] = null
+          this.cmd = "insertRecord"
           if (columns[i].type == "date") result.data[fields[i]] = new Date().toISOString().substr(0, 10)
+          if (columns[i].type == "datetime") result.data[fields[i]] = new Date().toISOString().slice(0, 19).replace('T', ' ');
           if (columns[i].type == "bit") result.data[fields[i]] = 0
         } else {
           this.cmd = "updateRecord"
           result.data[fields[i]] = data[fields[i]]
         }
       }
+      this.dialogTable = this.table;
+      if (table) this.dialogTable = table;
       this.dialogData = result.data;
       this.dialogFields = result.fields;
       // console.log(result)

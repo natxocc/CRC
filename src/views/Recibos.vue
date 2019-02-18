@@ -54,8 +54,8 @@
         <q-btn @click="dialogModel=true" dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">{{$q.lang.NuevoRecibo}}</q-btn>
         <q-btn @click="dialogModel=true" dense flat icon="add" v-if="recibo.selected">{{$q.lang.NuevaGestion}}</q-btn>
         <q-btn @click="dialogModel=true" dense flat icon="edit" v-if="recibo.selectedSub">{{$q.lang.EditarGestion}}</q-btn>
-        <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selected">{{$q.lang.EliminarRecibo}}</q-btn>
-        <q-btn @click="deleteRecord" color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
+        <q-btn @click="onDelete" color="warning" dense flat icon="delete" v-if="recibo.selected">{{$q.lang.EliminarRecibo}}</q-btn>
+        <q-btn @click="onDelete" color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
         <q-space/>
         <!-- COLORS HELP -->
         <div>
@@ -75,7 +75,7 @@
     </div>
     <!-- TABLA DE DATOS -->
     <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
-    <!-- DIALOGO DE CLIENTES -->
+    <!-- DIALOGO -->
     <n-dialog :data="dialogData" :fields="dialogFields" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"></n-dialog>
   </div>
 </template>
@@ -134,23 +134,22 @@ export default {
       } else {
         this.dialogFields["Importe"].props.disable = true;
       }
-      // console.log(value, key);
     },
     onSave() {
+      console.log(this.dialogData)
       this.dialogModel = false;
-      this.saveData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.tableNewEdit});
-      this.init();
+      let self = this;
+      this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(()=>self.init());
     },
-    deleteRecord() {
+    onDelete() {
+      let self = this;
       this.$q
         .dialog({
           message: this.$q.lang.EliminarRegistro,
           cancel: true
         })
         .onOk(() => {
-          // console.log(this.dialogData)
-          this.saveData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.tableDelete});
-          this.init();
+          this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(()=>self.init());
         })
         .onCancel(() => {});
     },
@@ -171,77 +170,64 @@ export default {
       if (!this.filter.alldata) where += " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')";
       where += " ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.filter.userby.value}).then(function(response) {
-        self.defineTable(response);
         self.defineDialog(self.columnDefs);
-        self.tableDelete = "Recibos";
-        self.tableNewEdit = "Recibos";
+        self.dialogTable = "Recibos";
         self.dialogFields["Gestion"].options = self.$q.lang.gestion;
         self.dialogFields["Gestion"].type = "select";
         self.dialogFields["Estado"].options = self.$q.lang.estados;
         self.dialogFields["Estado"].type = "select";
-        // self.dialogModel=true
       });
     },
     // CALL DATA BAJAS
     callDataBajas() {
       let self = this;
       let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
-      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineTable(response);
-      });
+      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
     },
     // CALL DATA LIQ
     callDataLiq() {
       let self = this;
       let days = this.getDaysWeek(this.filter.year, this.filter.month);
       let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
-      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineTable(response);
-      });
+      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
     },
     // CALL DATA RECIBO
     callDataRecibo() {
       let self = this;
       let where = "(CodigoRecibo='" + this.$route.params.recibo + "')";
-      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {
-        self.defineTable(response);
-      });
+      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
     },
     // SELECTED ROW
-    rowSelected: function(params) {
-      // console.log(params);
-      this.tableDelete = "Recibos";
-      if (!params.length) {
-        this.recibo.selected = false;
-        this.defineDialog(this.columnDefs);
-        this.tableNewEdit = "Recibos";
-        this.dialogFields["Estado"].options = this.$q.lang.estados;
-        this.dialogFields["Gestion"].type = "select";
-      } else {
+    rowSelected: function(data) {
+      if (data) {
         this.recibo.selected = true;
-        this.defineDialog(this.columnDefsSub);
-        this.tableNewEdit = "RecibosGestion";
-        this.dialogFields["Gestion"].options = this.$q.lang.gestion;
-        this.dialogFields["Gestion"].type = "select";
-        this.dialogData["CodigoRecibo"] = params[0].CodigoRecibo;
-        this.dialogData["CodigoPoliza"] = params[0].CodigoPoliza;
-        this.dialogData["NombreTomador"] = params[0].NombreTomador;
-        this.dialogData["FechaGestion"] = params[0].FechaGestion;
+        this.defineDialog(this.columnDefsSub, false, "RecibosGestion");
+        //Defaults
+        this.dialogData["CodigoRecibo"] = data.CodigoRecibo;
+        this.dialogData["CodigoPoliza"] = data.CodigoPoliza;
+        this.dialogData["NombreTomador"] = data.NombreTomador;
         this.dialogData["Usuario"] = localStorage.username;
+      } else {
+        this.recibo.selected = false;
+        this.defineDialog(this.columnDefs, false, "Recibos");
+        this.dialogFields["Estado"].options = this.$q.lang.estados;
+        this.dialogFields["Estado"].type = "select";
       }
+      this.dialogFields["Gestion"].options = this.$q.lang.gestion;
+      this.dialogFields["Gestion"].type = "select";
     },
     // SELECTED SUB ROWS
-    rowSelectedSub: function(params) {
-      this.tableDelete = "RecibosGestion";
-      this.tableNewEdit = "RecibosGestion";
-      if (params.length == 0) {
+    rowSelectedSub: function(data) {
+      this.dialogTable = "RecibosGestion";
+      if (data) {
+        this.defineDialog(this.columnDefsSub, data);
+        this.recibo.selectedSub = true;
+        this.dialogFields["Gestion"].options = this.$q.lang.gestion;
+        this.dialogFields["Gestion"].type = "select";
+      } else {
         this.recibo.selectedSub = false;
         return;
       }
-      this.defineDialog(this.columnDefsSub, params[0]);
-      this.recibo.selectedSub = true;
-      this.dialogFields["Gestion"].options = this.$q.lang.gestion;
-      this.dialogFields["Gestion"].type = "select";
     },
     //CALCULATE
     gridData(data) {
@@ -258,6 +244,9 @@ export default {
       this.recibo.selected = null;
       this.recibo.selectedSub = false;
       this.dialogModel = false;
+      this.filter.months = this.getMonths();
+      this.filter.weeks = this.getWeeks();
+      this.filter.years = this.getYears();
       if (this.$route.params.recibo == "bajas") this.callDataBajas();
       if (this.$route.params.recibo == "gestion") this.callDataGestion();
       if (this.$route.params.recibo == "liq") this.callDataLiq();
@@ -265,9 +254,6 @@ export default {
     }
   },
   beforeMount() {
-    this.filter.months = this.getMonths();
-    this.filter.weeks = this.getWeeks();
-    this.filter.years = this.getYears();
     this.init();
   },
   watch: {

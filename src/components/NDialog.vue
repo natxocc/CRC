@@ -25,7 +25,7 @@
                 <!-- ES BIT -->
                 <q-toggle :label="fields[key].name" dense v-bind="fields[key].props" v-if="fields[key].type =='bit'" v-model="data[key]"/>
                 <!-- ES FECHA -->
-                <q-input :label="fields[key].name" @input="onChange(data[key], key)" dense mask="date" v-bind="fields[key].props" v-if="fields[key].type =='date'" v-model="data[key]">
+                <q-input :label="fields[key].name" @input="onChange(data[key], key)" dense mask="date" v-bind="fields[key].props" v-if="fields[key].type.includes('date')" v-model="data[key]">
                   <q-icon class="cursor-pointer" name="event" slot="append">
                     <q-popup-proxy>
                       <q-date @input="onChange(data[key], key)" minimal todayBtn v-model="data[key]"/>

@@ -72,6 +72,9 @@ export default {
         date: {
           filter: "agSetColumnFilter"
         },
+        datetime: {
+          filter: "agSetColumnFilter"
+        },
         text: {
           filter: "agSetColumnFilter"
         },
@@ -158,7 +161,7 @@ export default {
     onSelectionChanged(params) {
       let row=[];
       row = this.gridApi.getSelectedRows();
-      this.$emit("rowSelected", row);
+      this.$emit("rowSelected", row[0]);
     },
     onCellValueChanged(value) {},
     createSubtable() {
@@ -181,7 +184,7 @@ export default {
           onSelectionChanged(event) {
             let row={};
             row = this.gridApi.getSelectedRows();
-            self.$emit("rowSelectedSub", row);
+            self.$emit("rowSelectedSub", row[0]);
           }
         },
         getDetailRowData: (params) => {
