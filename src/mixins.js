@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { Loading } from "quasar";
 function showLoading(options) {
   Loading.show(options);
@@ -28,7 +27,7 @@ export default {
      *
      *
      * @param {*} post
-     * @returns Data from axios
+     * @returns Data from fetch
      */
     callData(post) {
       let self = this;
@@ -38,7 +37,7 @@ export default {
       return fetch(localStorage.url, {
         method: 'post',
         body: JSON.stringify(post)
-      }).then((response)=> {return response.json()}).then((response) => {
+      }).then((response) => { return response.json() }).then((response) => {
         hideLoading();
         if (post.cmd == "getRecords") {
           self.defineTable(response)

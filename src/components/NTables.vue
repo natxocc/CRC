@@ -39,7 +39,6 @@
 //           :rowMultiSelectWithClick="false"
 import {AgGridVue} from "ag-grid-vue";
 import Vue from "vue";
-import axios from "axios";
 import localeText from "../lang/es.tables";
 
 // EXPORT DEFAULT

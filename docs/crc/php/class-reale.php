@@ -17,7 +17,6 @@ class reale
     $empresa = [4, 10];
     $post['table'] = "Recibos";
     $dateini = date("Y-m", strtotime("-1 month", strtotime(date('Y-m-d')))) . "-01";
-    // $dateini = date("Y-m", strtotime("-5 day", strtotime(date('Y-m-d')))) . "-01";
     $dateend = date("Y-m-d");
     $wsdl = "https://lba.realeonline.net/Reale.B2b.Services.Multitarificadores.IisHost/DescargaCompletaRecibos.svc?wsdl";
     foreach ($empresa as $emp) {
@@ -50,7 +49,7 @@ class reale
       }
       $resultado = $resultado->ListaRecibos->ReciboAmpliado;
         // var_dump($resultado);
-        // echo json_encode($resultado);
+      //echo json_encode($resultado);
       $i = 0;
       foreach ($resultado as $key => $value) {
       // Conversiones de Fechas
