@@ -1,62 +1,46 @@
 <template>
-  <div>
+  <div class="container">
     <!-- TABS -->
-    <v-tabs align-with-title centered color="secondary" icons-and-text>
-      <v-tabs-slider color="primary"></v-tabs-slider>
-      <v-tab to="/recibos/gestion">
-        {{lang.Gestion}}
-        <v-icon>assignment_turned_in</v-icon>
-      </v-tab>
-      <v-tab to="/recibos/bajas">
-        {{lang.BajasPendientes}}
-        <v-icon>assignment_returned</v-icon>
-      </v-tab>
-      <v-tab to="/recibos/liq">
-        {{lang.Liquidacion}}
-        <v-icon>credit_card</v-icon>
-      </v-tab>
-      <v-tab disabled>
-        {{calculos.importe}}
-        <v-icon>euro_symbol</v-icon>
-      </v-tab>
-      <!-- <v-tab-item :key="i" :value="'tab-' + i" v-for="i in 3">
-      <v-card flat>-->
-      <!-- <v-card-text>{{ text }}</v-card-text> -->
-      <!-- </v-card>
-      </v-tab-item>-->
-    </v-tabs>
+    <q-tabs active-bg-color="primary" active-color="white" class="bg-secondary text-primary" dense indicator-color="transparent" inline-label top-indicator v-model="myRoute">
+      <q-route-tab :label="$q.lang.Gestion" icon="assignment_turned_in" name="gestion" to="/recibos/gestion"/>
+      <q-route-tab :label="$q.lang.BajasPendientes" icon="assignment_returned" name="bajas" to="/recibos/bajas"/>
+      <q-route-tab :label="$q.lang.Liquidacion" icon="credit_card" name="liq" to="/recibos/liq"/>
+      <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
+    </q-tabs>
     <!-- SELECT FILTERS TOTALS-->
-    <v-layout row wrap>
-      <v-flex class="pa-1" md4 shrink xs12>
-        <v-text-field :label="lang.FiltroRapido" clearable hide-details v-model="quickFilter"></v-text-field>
-      </v-flex>
-      <!-- FILTER ONLY GESTION -->
-      <template v-if="this.$route.params.recibo=='gestion'">
-        <v-flex class="pa-1" md4 shrink xs12>
-          <v-select :items="this.lang.estados" :label="lang.FiltrosDeEstado" @input="callDataGestion" hide-details multiple return-object v-model="filter.estadosSel"></v-select>
-        </v-flex>
-        <v-flex class="pa-1" md2 shrink xs6>
-          <v-select :items="this.lang.userby" :label="lang.HistorialUsuario" @input="callDataGestion" hide-details return-object v-model="filter.userby"></v-select>
-        </v-flex>
-        <v-flex class="pa-1" md2 shrink xs6>
-          <v-switch :label="lang.TodosLosRegistros" @change="callDataGestion" hide-details v-model="filter.alldata"></v-switch>
-        </v-flex>
-      </template>
-    <!-- FILTER ONLY BAJAS -->
-      <template v-if="this.$route.params.recibo=='bajas'">
-        <v-flex class="pa-1" md8 shrink xs12>
-          <v-dialog full-width ref="dialog" width="290px">
-            <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.yearmonth"></v-text-field>
-            <v-date-picker :locale="locale" scrollable type="month" v-model="filter.yearmonth">
-              <v-spacer></v-spacer>
-              <v-btn @click="$refs.dialog.save();callDataBajas" color="primary" flat>OK</v-btn>
-            </v-date-picker>
-          </v-dialog>
-        </v-flex>
-      </template>
-    </v-layout>
-    <!-- FILTER ONLY LIQ & CAJA -->
-    <!-- <template v-else-if="this.$route.params.recibo=='liq'">
+    <div>
+      <div class="row text-center">
+        <div class="col-xs-12 col-md-4" style="padding: 10px">
+          <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
+            <q-icon name="filter_list" slot="prepend"/>
+            <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
+          </q-input>
+        </div>
+        <!-- FILTER ONLY GESTION -->
+        <template v-if="this.$route.params.recibo=='gestion'">
+          <div class="col-xs-12 col-md-4" style="padding: 10px">
+            <q-select :label="$q.lang.FiltrosDeEstado" :options="this.$q.lang.estados" @input="callDataGestion" dense expandBesides multiple optionsDense v-model="filter.estadosSel"/>
+          </div>
+          <div class="col-xs-6 col-md-2" style="padding: 10px">
+            <q-select :label="$q.lang.HistorialUsuario" :options="this.$q.lang.userby" @input="callDataGestion" dense expandBesides optionsDense v-model="filter.userby"/>
+          </div>
+          <div class="col-xs-6 col-md-2" style="padding: 10px">
+            <q-toggle :label="$q.lang.TodosLosRegistros" @input="callDataGestion" dense v-model="filter.alldata">
+              <q-tooltip anchor="top middle" self="bottom middle">{{$q.lang.TodosLosRegistrosT}}</q-tooltip>
+            </q-toggle>
+          </div>
+        </template>
+        <!-- FILTER ONLY BAJAS -->
+        <template v-else-if="this.$route.params.recibo=='bajas'">
+          <div class="col-xs-12 col-md-4" style="padding: 10px">
+            <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.year"/>
+          </div>
+          <div class="col-xs-12 col-md-4" style="padding: 10px">
+            <q-select :label="$q.lang.mes" :options="filter.months" @input="callDataBajas" dense expandBesides optionsDense v-model="filter.month"/>
+          </div>
+        </template>
+        <!-- FILTER ONLY LIQ & CAJA -->
+        <template v-else-if="this.$route.params.recibo=='liq'">
           <div class="col-xs-12 col-md-4" style="padding: 10px">
             <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.year"/>
           </div>
@@ -64,17 +48,17 @@
             <q-select :label="$q.lang.semana" :options="filter.weeks" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.week"/>
           </div>
         </template>
-    </div>-->
-    <!-- MINI TOOLBAR-->
-    <!-- <q-bar class="bg-primary text-white">
+      </div>
+      <!-- MINI TOOLBAR-->
+      <q-bar class="bg-primary text-white">
         <q-btn @click="dialogModel=true" dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">{{$q.lang.NuevoRecibo}}</q-btn>
         <q-btn @click="dialogModel=true" dense flat icon="add" v-if="recibo.selected">{{$q.lang.NuevaGestion}}</q-btn>
         <q-btn @click="dialogModel=true" dense flat icon="edit" v-if="recibo.selectedSub">{{$q.lang.EditarGestion}}</q-btn>
         <q-btn @click="onDelete" color="warning" dense flat icon="delete" v-if="recibo.selected">{{$q.lang.EliminarRecibo}}</q-btn>
         <q-btn @click="onDelete" color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
-    <q-space/>-->
-    <!-- COLORS HELP -->
-    <!-- <div>
+        <q-space/>
+        <!-- COLORS HELP -->
+        <div>
           <q-btn color="primary" icon="help_outline" size="sm">
             <q-popup-proxy>
               <q-list dense>
@@ -86,37 +70,41 @@
               </q-list>
             </q-popup-proxy>
           </q-btn>
-    </div>-->
+        </div>
+      </q-bar>
+    </div>
     <!-- TABLA DE DATOS -->
-    <data-table :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :localeText="lang.table" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
+    <n-tables :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO -->
-    <dialog-edit :data="dialogData" :fields="dialogFields" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"/>
+    <n-dialog :data="dialogData" :fields="dialogFields" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"></n-dialog>
   </div>
 </template>
 
 <script>
-import DataTable from "../components/DataTable.vue";
-import DialogEdit from "../components/DialogEdit.vue";
-import mixins from "../mixins";
+import NTables from "../components/NTables.vue";
+import NDialog from "../components/NDialog.vue";
+import Custom from "../mixins";
 export default {
   components: {
-    DataTable,
-    DialogEdit
+    NTables,
+    NDialog
   },
-  mixins: [mixins],
+  mixins: [Custom],
   data() {
     return {
-      locale: localStorage.lang,
       filters: null,
       filter: {
         userby: {
-          value: "NombreTomador"
-          // label: this.lang.userby[0].label
+          value: "NombreTomador",
+          label: this.$q.lang.userby[0].label
         },
-        estadosSel: null,
+        estadosSel: [{value: "PENDIENTE", label: this.$q.lang.estados[0].label}, {value: "DEVUELTO", label: this.$q.lang.estados[1].label}],
         alldata: false,
+        years: [],
         weeks: [],
-        yearmonth: new Date().toISOString().substr(0, 7),
+        months: [],
+        month: parseInt(("0" + (new Date().getMonth() + 1)).slice(-2)),
+        year: new Date().getFullYear(),
         week: 1
       },
       rowClassRules: {
@@ -148,26 +136,25 @@ export default {
       }
     },
     onSave() {
-      console.log(this.dialogData);
+      console.log(this.dialogData)
       this.dialogModel = false;
       let self = this;
-      this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
+      this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(()=>self.init());
     },
     onDelete() {
       let self = this;
       this.$q
         .dialog({
-          message: this.lang.EliminarRegistro,
+          message: this.$q.lang.EliminarRegistro,
           cancel: true
         })
         .onOk(() => {
-          this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
+          this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(()=>self.init());
         })
         .onCancel(() => {});
     },
     // CALL DATA GESTION
     callDataGestion() {
-      console.log(this.filter.estadosSel);
       let self = this;
       let dateini = new Date();
       dateini.setMonth(dateini.getMonth() - 13);
@@ -185,24 +172,24 @@ export default {
       this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.filter.userby.value}).then(function(response) {
         self.defineDialog(self.columnDefs);
         self.dialogTable = "Recibos";
-        self.dialogFields["Gestion"].options = self.lang.gestion;
+        self.dialogFields["Gestion"].options = self.$q.lang.gestion;
         self.dialogFields["Gestion"].type = "select";
-        self.dialogFields["Estado"].options = self.lang.estados;
+        self.dialogFields["Estado"].options = self.$q.lang.estados;
         self.dialogFields["Estado"].type = "select";
       });
     },
     // CALL DATA BAJAS
     callDataBajas() {
       let self = this;
-      let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.yearmonth + "%')";
+      let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
     },
     // CALL DATA LIQ
     callDataLiq() {
-      // let self = this;
-      // let days = this.getDaysWeek(this.filter.year, this.filter.month);
-      // let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
-      // this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
+      let self = this;
+      let days = this.getDaysWeek(this.filter.year, this.filter.month);
+      let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
+      this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
     },
     // CALL DATA RECIBO
     callDataRecibo() {
@@ -223,10 +210,10 @@ export default {
       } else {
         this.recibo.selected = false;
         this.defineDialog(this.columnDefs, false, "Recibos");
-        this.dialogFields["Estado"].options = this.lang.estados;
+        this.dialogFields["Estado"].options = this.$q.lang.estados;
         this.dialogFields["Estado"].type = "select";
       }
-      this.dialogFields["Gestion"].options = this.lang.gestion;
+      this.dialogFields["Gestion"].options = this.$q.lang.gestion;
       this.dialogFields["Gestion"].type = "select";
     },
     // SELECTED SUB ROWS
@@ -235,7 +222,7 @@ export default {
       if (data) {
         this.defineDialog(this.columnDefsSub, data);
         this.recibo.selectedSub = true;
-        this.dialogFields["Gestion"].options = this.lang.gestion;
+        this.dialogFields["Gestion"].options = this.$q.lang.gestion;
         this.dialogFields["Gestion"].type = "select";
       } else {
         this.recibo.selectedSub = false;
@@ -254,7 +241,6 @@ export default {
     },
     // INITIALIZATION
     init() {
-      this.filter.estadosSel = [{value: "PENDIENTE", text: this.lang.estados[0].text}, {value: "DEVUELTO", text: this.lang.estados[1].text}];
       this.recibo.selected = null;
       this.recibo.selectedSub = false;
       this.dialogModel = false;
@@ -268,12 +254,8 @@ export default {
     }
   },
   beforeMount() {
-    this.getLang(localStorage.lang);
-    // console.log(localStorage.lang)
-    // this.getLang(localStorage.lang);
     this.init();
   },
-  created() {},
   watch: {
     $route: "init"
   }

@@ -36,14 +36,12 @@
 </template>
 
 <script>
-//           :rowMultiSelectWithClick="false"
 import {AgGridVue} from "ag-grid-vue";
 import Vue from "vue";
-import localeText from "../lang/es.tables";
 
 // EXPORT DEFAULT
 export default {
-  name: "NTables",
+  name: "DataTable",
   props: {
     columnDefs: null,
     columnDefsSub: null,
@@ -51,7 +49,8 @@ export default {
     masterDetail: null,
     rowClassRules: null,
     filters: null,
-    quickFilter: null
+    quickFilter: null,
+    localeText: ""
   },
   data() {
     return {
@@ -109,8 +108,7 @@ export default {
         ],
         defaultToolPanel: "",
         enablePivot: false
-      },
-      localeText: null
+      }
     };
   },
   components: {
@@ -158,7 +156,7 @@ export default {
       this.$emit("cellClicked", event);
     },
     onSelectionChanged(params) {
-      let row=[];
+      let row = [];
       row = this.gridApi.getSelectedRows();
       this.$emit("rowSelected", row[0]);
     },
@@ -172,7 +170,7 @@ export default {
           columnDefs: this.columnDefsSub,
           defaultColDef: this.defaultColDef,
           columnTypes: this.columnTypes,
-          localeText: localeText,
+          localeText: this.localeText,
           onGridReady(params) {
             this.gridApi = params.api;
           },
@@ -181,7 +179,7 @@ export default {
           },
           onCellValueChanged(value) {},
           onSelectionChanged(event) {
-            let row={};
+            let row = {};
             row = this.gridApi.getSelectedRows();
             self.$emit("rowSelectedSub", row[0]);
           }
@@ -196,8 +194,6 @@ export default {
     }
   },
   beforeMount() {
-    var lang = require(`../lang/${localStorage.lang}.tables`);
-    this.localeText = lang.default;
   },
   created() {},
   watch: {

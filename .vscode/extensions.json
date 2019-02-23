@@ -6,7 +6,6 @@
 	"recommendations": [
 		"emeraldwalk.runonsave",
 		"octref.vetur",
-		"rexshi.phpdoc-comment-vscode-plugin",
 		"ms-ceintl.vscode-language-pack-es",
 		"bmewburn.vscode-intelephense-client"
 		

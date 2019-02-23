@@ -1,155 +1,113 @@
 <template>
   <div id="app">
-    <q-layout>
-      <!-- HEADER Y TOOLBAR -->
-      <q-header :bordered="true" :elevated="true" :reveal="true">
-        <q-toolbar>
-          <q-btn @click="menu.left = !menu.left" dense flat icon="menu" round/>
-          <q-toolbar-title>
-            <strong>CRC</strong> Reale
-          </q-toolbar-title>
-          <q-space/>
-          <q-btn :label="lang" color="secondary" size="sm" text-color="primary">
-            <q-menu>
-              <q-list dense>
-                <q-item @click="lang='ca'" clickable v-close-menu>
-                  <q-item-section>CATALÀ</q-item-section>
-                </q-item>
-                <q-item @click="lang='es'" clickable v-close-menu>
-                  <q-item-section>ESPAÑOL</q-item-section>
-                </q-item>
-                <q-separator/>
-              </q-list>
-            </q-menu>
-          </q-btn>
-          <q-btn @click="sendBug" dense flat icon="bug_report" round/>
-          <q-btn @click="menuUser" dense flat icon="person" round/>
-        </q-toolbar>
-      </q-header>
-      <q-page-container>
-        <!-- DIALOGO USUARIO -->
-        <div class="justify-around">
-          <q-dialog v-model="user.dialog">
-            <q-card>
-              <q-card-section class="row items-center">
-                <q-avatar color="primary" icon="person" text-color="white"/>
-                <span class="q-ml-sm text-h4">{{$q.lang.InicioSesion}}</span>
-              </q-card-section>
-              <q-card-section class="row items-center">
-                <div class="row q-col-gutter-x-2 q-col-gutter-y-sm">
-                  <div class="col-12">
-                    <q-input :label="$q.lang.Usuario" type="text" v-model="user.user">
-                      <q-icon name="person" slot="prepend"/>
-                      <q-icon @click="user.user = ''" class="cursor-pointer" name="close" slot="append"/>
-                    </q-input>
-                  </div>
-                  <div class="col-12">
-                    <q-input :label="$q.lang.Clave" :type="user.passShow ? 'text' : 'password'" @keyup.enter="login " v-model="user.pass">
-                      <q-icon name="lock" slot="prepend"/>
-                      <q-icon @click="user.pass = ''" class="cursor-pointer" name="close" slot="append"/>
-                      <q-icon :name="user.passShow ? 'visibility' : 'visibility_off'" @click="user.passShow=!user.passShow" class="cursor-pointer" slot="append"/>
-                    </q-input>
-                  </div>
-                </div>
-              </q-card-section>
-              <q-card-actions align="right">
-                <q-btn :label="$q.lang.label.cancel" @click="user.dialog=false" color="negative" flat/>
-                <q-btn :label="$q.lang.label.ok" @click="login" color="primary" flat/>
-              </q-card-actions>
-            </q-card>
-          </q-dialog>
+    <v-app id="inspire" v-cloak>
+      <!-- MENU LATERAL IZQUIERDO -->
+      <v-navigation-drawer app disable-resize-watcher fixed v-model="menu.left">
+        <template>
+          <v-card>
+            <v-card-actions>
+              <v-btn block color="primary" flat to="/">
+                <v-icon>home</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+        <v-list>
+          <v-list-tile :key="index" :to="value.to" v-for="(value, key, index) in menu.leftList">
+            <v-list-tile-avatar>
+              <v-icon>{{ value.icon }}</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title>{{ value.name }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+      </v-navigation-drawer>
+      <!-- TOOLBAR -->
+      <v-toolbar :scroll-threshold="200" app color="primary" dark fixed scroll-off-screen>
+        <v-toolbar-side-icon @click.stop="menu.left = !menu.left" color="secondary" flat></v-toolbar-side-icon>
+        <v-toolbar-title>CRC Reale Valls</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <!-- BOTON USUARIO -->
+        <div>
+          <v-btn @click="user.dialog=true" color="red" flat icon>
+            <v-icon>person</v-icon>
+          </v-btn>
         </div>
-        <!-- MENU LEFT -->
-        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="left" v-model="menu.left">
-          <q-btn class="full-width" flat icon="home" inline to="/"></q-btn>
-          <q-list :separator="true" bordered>
-            <q-item :key="i" :to="option.to" clickable v-for="(option,i) in menu.leftList" v-ripple>
-              <q-item-section avatar>
-                <q-icon :name="option.icon" color="primary"/>
-              </q-item-section>
-              <q-item-section>{{$q.lang.menu[option.name]}}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-drawer>
-        <!-- MENU RIGHT -->
-        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="right" v-model="menu.right">
-          <div class="row text-center">
-            <div class="col">
-              <q-chip :label="user.name" color="primary" icon="person" outline square text-color="white"/>
-            </div>
-          </div>
-          <div class="row text-center">
-            <div class="col">
-              <q-chip :label="user.mail" color="primary" icon="email" outline square text-color="white"/>
-            </div>
-          </div>
-          <div class="row text-center">
-            <div class="col">
-              <q-btn @click="logout" class="q-mt-md" color="secondary">{{$q.lang.CerrarSesion}}</q-btn>
-            </div>
-          </div>
-        </q-drawer>
-        <!-- ROUTER VIEW -->
-        <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in">
-          <router-view/>
-        </transition>
-      </q-page-container>
-    </q-layout>
+      </v-toolbar>
+      <!-- DIALOG USER -->
+      <v-dialog @keydown.esc="user.dialog=false" v-model="user.dialog">
+        <v-card>
+          <v-card-title class="headline secondary" primary-title>Inicio de sesión</v-card-title>
+          <v-card-text>
+            <v-form>
+              <v-text-field clearable label="Usuario" required v-model="user.name"></v-text-field>
+              <v-text-field @keyup.enter="user.dialog=false" clearable label="Contraseña" required type="password" v-model="user.pass"></v-text-field>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="user.dialog=false" color="warning" flat>{{lang.Cancelar}}</v-btn>
+            <v-btn @click="user.dialog=false" color="primary" flat>{{lang.Aceptar}}</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <!-- GO UP BUTTON -->
+      <v-fab-transition>
+        <v-btn :style="{bottom: $vuetify.breakpoint.smOnly ? '64px' : '' }" @click="toTop" bottom color="red" dark fab fixed right v-scroll="onScroll" v-show="gotop">
+          <v-icon>keyboard_arrow_up</v-icon>
+        </v-btn>
+      </v-fab-transition>
+      <!-- ROUTER VIEW -->
+      <v-content>
+        <v-container fill-height fluid>
+          <v-layout align-center justify-center>
+            <v-flex text-xs-center>
+              <router-view></router-view>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-content>
+      <!-- FOOTER -->
+      <v-footer app color="primary" dark>
+        <span class="white--text">&copy; Ntx Software v0.1</span>
+      </v-footer>
+      <!-- NOTIFICATIONS -->
+      <v-snackbar :color="notify.color" :timeout="1500" v-model="notify.model">{{ notify.text}}</v-snackbar>
+    </v-app>
   </div>
 </template>
 <script>
-import Custom from "./mixins";
+import mixins from "./mixins";
 export default {
-  mixins: [Custom],
+  mixins: [mixins],
   data() {
     return {
+      gotop: false,
       menu: {
         left: false,
         right: false,
-        leftList: [
-          {
-            icon: "euro_symbol",
-            name: this.$q.lang.menu.Recibos,
-            to: "/recibos/gestion"
-          },
-          {
-            icon: "timeline",
-            name: this.$q.lang.menu.Polizas,
-            to: "/polizas/altas"
-          },
-          {
-            icon: "contacts",
-            name: this.$q.lang.menu.Clientes,
-            to: "/clientes"
-          },
-          {
-            icon: "healing",
-            name: this.$q.lang.menu.Siniestros,
-            to: "/recibos"
-          },
-          {
-            icon: "person",
-            name: this.$q.lang.menu.Usuarios,
-            to: "/usuarios"
-          },
-          {
-            icon: "person",
-            name: this.$q.lang.menu.Registros,
-            to: "/registros"
-          }
-        ]
+        leftList: null
       },
       user: {
         user: null,
         pass: null,
         name: null,
         mail: null,
-        passShow: false,
         dialog: false
       }
     };
   },
   methods: {
+    onScroll() {
+      // if (typeof window === "undefined") return;
+      const top = window.pageYOffset || document.documentElement.offsetTop || 0;
+      this.gotop = top > 200;
+    },
+    toTop() {
+      this.$router.push({hash: ""});
+      this.$vuetify.goTo(0);
+    },
     login() {
       let self = this;
       this.callData({cmd: "login", user: self.user.user, pass: self.user.pass})
@@ -158,26 +116,14 @@ export default {
             localStorage.sid = response.sid;
             localStorage.mail = response.info.data.email;
             localStorage.username = response.info.data.fullname;
-            self.$q.notify({
-              message: self.$q.lang.Bienvenido + " " + response.info.data.fullname,
-              icon: "check",
-              color: "positive"
-            });
+            self.newMessage(self.lang.Bienvenido, "success");
           } else {
-            //this.logout();
-            self.$q.notify({
-              message: self.$q.lang.UsuarioClaveIncorrecta,
-              icon: "close",
-              color: "negative"
-            });
+            self.newMessage(self.lang.UsuarioClaveIncorrecta, "error");
             self.logout();
           }
         })
         .catch(function(response) {
-          self.$q.notify({
-            message: self.$q.lang.ErrorRed,
-            color: "negative"
-          });
+          self.newMessage(self.lang.ErrorRed, "error");
         });
       this.user.dialog = false;
     },
@@ -194,15 +140,14 @@ export default {
     },
     checkUser() {
       let self = this;
-      this.callData({cmd: "checkUser"})
-        .then(function(response) {
-          if (response.success) {
-            self.user.name = localStorage.username;
-            self.user.mail = localStorage.mail;
-          } else {
-            self.logout();
-          }
-        })
+      this.callData({cmd: "checkUser"}).then(function(response) {
+        if (response.success) {
+          self.user.name = localStorage.username;
+          self.user.mail = localStorage.mail;
+        } else {
+          self.logout();
+        }
+      });
     },
     menuUser() {
       if (localStorage.sid) {
@@ -219,6 +164,40 @@ export default {
     if (localStorage.sid) this.checkUser();
     localStorage.url = "http://servidor/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
+    this.getLang(localStorage.lang);
+    console.log(this.lang);
+    this.menu.leftList = [
+      {
+        icon: "euro_symbol",
+        name: this.lang.menu.Recibos,
+        to: "/recibos/gestion"
+      },
+      {
+        icon: "timeline",
+        name: this.lang.menu.Polizas,
+        to: "/polizas/altas"
+      },
+      {
+        icon: "contacts",
+        name: this.lang.menu.Clientes,
+        to: "/clientes"
+      },
+      {
+        icon: "healing",
+        name: this.lang.menu.Siniestros,
+        to: "/recibos"
+      },
+      {
+        icon: "person",
+        name: this.lang.menu.Usuarios,
+        to: "/usuarios"
+      },
+      {
+        icon: "person",
+        name: this.lang.menu.Registros,
+        to: "/registros"
+      }
+    ];
   },
   created() {}
 };
