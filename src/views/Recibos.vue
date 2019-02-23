@@ -48,7 +48,7 @@
         <v-flex class="px-1" md8 shrink xs12>
           <v-dialog full-width ref="dialog" width="290px">
             <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.yearmonth"></v-text-field>
-            <v-date-picker :locale="locale" scrollable type="month" v-model="filter.yearmonth">
+            <v-date-picker no-title :locale="locale" scrollable type="month" v-model="filter.yearmonth">
               <v-spacer></v-spacer>
               <v-btn @click="$refs.dialog.save();callDataBajas" color="primary" flat>OK</v-btn>
             </v-date-picker>
