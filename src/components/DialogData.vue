@@ -13,7 +13,22 @@
             {{lang.Guardar}}
           </v-btn>
         </v-toolbar>
-        <div style="flex: 1 1 auto;"></div>
+        <v-layout row wrap>
+          <template v-for="(value,key, index) in data">
+            <v-flex :key="index" class="px-1" lg1 md3 sm4 v-bind="fields[key].props" xs12>
+              <!-- ES TEXTO -->
+              <v-text-field :label="fields[key].name" @input="onChange(data[key], key)" type="text" v-bind="fields[key].props" v-if="fields[key].type =='text'" v-model="data[key]"></v-text-field>
+              <!-- ES NUMERO -->
+              <v-text-field :label="fields[key].name" @input="onChange(data[key], key)" type="number" v-bind="fields[key].props" v-if="fields[key].type =='number'" v-model="data[key]"></v-text-field>
+              <!-- ES SELECT -->
+              <v-select :items="fields[key].options" :label="fields[key].name" v-bind="fields[key].props" v-if="fields[key].type =='select'" v-model="data[key]"></v-select>
+              <!-- ES AUTOCOMPLETE -->
+              <v-autocomplete :items="fields[key].options" :label="fields[key].name" v-bind="fields[key].props" v-if="fields[key].type =='autocomplete'" v-model="data[key]"></v-autocomplete>
+              <!-- ES BIT -->
+              <v-switch :label="fields[key].name" v-bind="fields[key].props" v-if="fields[key].type =='bit'" v-model="data[key]"></v-switch>
+            </v-flex>
+          </template>
+        </v-layout>
       </v-card>
     </v-dialog>
     <!-- <q-dialog :maximized="true" transition-hide="slide-down" transition-show="slide-up" v-model="model">
@@ -68,6 +83,7 @@ export default {
   },
   methods: {
     onSave: function() {
+      console.log(this.data);
       this.$emit("onSave", true);
     },
     onCancel: function() {

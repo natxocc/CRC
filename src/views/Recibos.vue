@@ -286,7 +286,7 @@ export default {
     }
   },
   beforeMount() {
-    this.getLang(localStorage.lang);
+    this.setLang(localStorage.lang);
     // console.log(localStorage.lang)
     // this.getLang(localStorage.lang);
     this.init();

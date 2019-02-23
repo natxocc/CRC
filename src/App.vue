@@ -34,6 +34,21 @@
             <v-icon>person</v-icon>
           </v-btn>
         </div>
+
+        <!-- SELECCION IDIOMA -->
+        <v-menu bottom transition="slide-y-transition" class="align-center">
+          <v-btn dark icon slot="activator">
+            <v-icon>more_vert</v-icon>
+          </v-btn>
+          <v-list>
+            <v-list-tile @click="setLang('es')">
+              <v-list-tile-title>Español</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="setLang('ca')">
+              <v-list-tile-title>Català</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
       </v-toolbar>
       <!-- DIALOG USER -->
       <v-dialog @keydown.esc="user.dialog=false" v-model="user.dialog">
@@ -60,8 +75,8 @@
       </v-fab-transition>
       <!-- ROUTER VIEW -->
       <v-content>
-        <v-container fill-height fluid class="pa-1">
-          <v-layout align-start justify-center >
+        <v-container class="pa-1" fill-height fluid>
+          <v-layout align-start justify-center>
             <v-flex text-xs-center>
               <router-view></router-view>
             </v-flex>
@@ -164,7 +179,7 @@ export default {
     if (localStorage.sid) this.checkUser();
     localStorage.url = "http://servidor/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
-    this.getLang(localStorage.lang);
+    this.setLang(localStorage.lang);
     // console.log(this.lang);
     this.menu.leftList = [
       {

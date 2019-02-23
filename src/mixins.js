@@ -112,9 +112,9 @@ export default {
               : "select";
           }
           if (columns[i].headerClass.required) {
-            result.fields[fields[i]].props.rules = [
-              val => !!val || lang.CampoObligatorio
-            ];
+            // result.fields[fields[i]].props.rules = [
+            //   val => !!val || lang.CampoObligatorio
+            // ];
           }
         }
         // Values
@@ -193,7 +193,7 @@ export default {
       }
       return weeks;
     },
-    getLang(lang) {
+    setLang(lang) {
       if (!localStorage.lang || !lang) lang = "es";
       this.lang = this.$lang[lang];
       if (localStorage.lang != lang) {
