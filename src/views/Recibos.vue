@@ -25,26 +25,27 @@
       <!-- </v-card>
       </v-tab-item>-->
     </v-tabs>
+
     <!-- SELECT FILTERS TOTALS-->
-    <v-layout row wrap>
-      <v-flex class="pa-1" md4 shrink xs12>
+    <v-layout align-start row wrap>
+      <v-flex class="px-1" md4 shrink xs12>
         <v-text-field :label="lang.FiltroRapido" clearable hide-details v-model="quickFilter"></v-text-field>
       </v-flex>
       <!-- FILTER ONLY GESTION -->
       <template v-if="this.$route.params.recibo=='gestion'">
-        <v-flex class="pa-1" md4 shrink xs12>
+        <v-flex class="px-1" md4 shrink xs12>
           <v-select :items="this.lang.estados" :label="lang.FiltrosDeEstado" @input="callDataGestion" hide-details multiple return-object v-model="filter.estadosSel"></v-select>
         </v-flex>
-        <v-flex class="pa-1" md2 shrink xs6>
+        <v-flex class="px-1" md2 shrink xs6>
           <v-select :items="this.lang.userby" :label="lang.HistorialUsuario" @input="callDataGestion" hide-details return-object v-model="filter.userby"></v-select>
         </v-flex>
-        <v-flex class="pa-1" md2 shrink xs6>
+        <v-flex class="px-1" md2 shrink xs6>
           <v-switch :label="lang.TodosLosRegistros" @change="callDataGestion" hide-details v-model="filter.alldata"></v-switch>
         </v-flex>
       </template>
-    <!-- FILTER ONLY BAJAS -->
+      <!-- FILTER ONLY BAJAS -->
       <template v-if="this.$route.params.recibo=='bajas'">
-        <v-flex class="pa-1" md8 shrink xs12>
+        <v-flex class="px-1" md8 shrink xs12>
           <v-dialog full-width ref="dialog" width="290px">
             <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.yearmonth"></v-text-field>
             <v-date-picker :locale="locale" scrollable type="month" v-model="filter.yearmonth">
@@ -66,13 +67,30 @@
         </template>
     </div>-->
     <!-- MINI TOOLBAR-->
-    <!-- <q-bar class="bg-primary text-white">
-        <q-btn @click="dialogModel=true" dense flat icon="add" v-if="!recibo.selected && !recibo.selectedSub">{{$q.lang.NuevoRecibo}}</q-btn>
-        <q-btn @click="dialogModel=true" dense flat icon="add" v-if="recibo.selected">{{$q.lang.NuevaGestion}}</q-btn>
-        <q-btn @click="dialogModel=true" dense flat icon="edit" v-if="recibo.selectedSub">{{$q.lang.EditarGestion}}</q-btn>
-        <q-btn @click="onDelete" color="warning" dense flat icon="delete" v-if="recibo.selected">{{$q.lang.EliminarRecibo}}</q-btn>
-        <q-btn @click="onDelete" color="warning" dense flat icon="delete" v-if="recibo.selectedSub">{{$q.lang.EliminarGestion}}</q-btn>
-    <q-space/>-->
+    <v-flex class="pt-1">
+      <v-toolbar color="primary" dense>
+        <v-btn @click="dialogModel=true" color="secondary black--text" small v-if="!recibo.selected && !recibo.selectedSub">
+          <v-icon>add</v-icon>
+          {{lang.NuevoRecibo}}
+        </v-btn>
+        <v-btn @click="dialogModel=true" color="secondary black--text" small v-if="recibo.selected">
+          <v-icon>add</v-icon>
+          {{lang.NuevaGestion}}
+        </v-btn>
+        <v-btn @click="dialogModel=true" color="secondary black--text" small v-if="recibo.selectedSub">
+          <v-icon>edit</v-icon>
+          {{lang.EditarGestion}}
+        </v-btn>
+        <v-btn @click="dialogModel=true" color="error" small v-if="recibo.selected">
+          <v-icon>delete</v-icon>
+          {{lang.EliminarRecibo}}
+        </v-btn>
+        <v-btn @click="dialogModel=true" color="error" small v-if="recibo.selectedSub">
+          <v-icon>delete</v-icon>
+          {{lang.EliminarGestion}}
+        </v-btn>
+      </v-toolbar>
+    </v-flex>
     <!-- COLORS HELP -->
     <!-- <div>
           <q-btn color="primary" icon="help_outline" size="sm">
@@ -90,18 +108,18 @@
     <!-- TABLA DE DATOS -->
     <data-table :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :localeText="lang.table" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO -->
-    <dialog-edit :data="dialogData" :fields="dialogFields" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"/>
+    <dialog-data :data="dialogData" :fields="dialogFields" :model="dialogModel" :lang="lang" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"/>
   </div>
 </template>
 
 <script>
 import DataTable from "../components/DataTable.vue";
-import DialogEdit from "../components/DialogEdit.vue";
+import DialogData from "../components/DialogData.vue";
 import mixins from "../mixins";
 export default {
   components: {
     DataTable,
-    DialogEdit
+    DialogData
   },
   mixins: [mixins],
   data() {
@@ -141,33 +159,33 @@ export default {
   },
   methods: {
     onChange(value, key) {
-      if (this.dialogData["Gestion"] == "COME" || this.dialogData["Gestion"] == "COTR") {
-        this.dialogFields["Importe"].props.disable = false;
-      } else {
-        this.dialogFields["Importe"].props.disable = true;
-      }
+      // if (this.dialogData["Gestion"] == "COME" || this.dialogData["Gestion"] == "COTR") {
+      //   this.dialogFields["Importe"].props.disable = false;
+      // } else {
+      //   this.dialogFields["Importe"].props.disable = true;
+      // }
     },
     onSave() {
-      console.log(this.dialogData);
+      // console.log(this.dialogData);
       this.dialogModel = false;
-      let self = this;
-      this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
+      // let self = this;
+      // this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
     },
     onDelete() {
-      let self = this;
-      this.$q
-        .dialog({
-          message: this.lang.EliminarRegistro,
-          cancel: true
-        })
-        .onOk(() => {
-          this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
-        })
-        .onCancel(() => {});
+      // let self = this;
+      // this.$q
+      //   .dialog({
+      //     message: this.lang.EliminarRegistro,
+      //     cancel: true
+      //   })
+      //   .onOk(() => {
+      //     this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
+      //   })
+      //   .onCancel(() => {});
     },
     // CALL DATA GESTION
     callDataGestion() {
-      console.log(this.filter.estadosSel);
+      // console.log(this.filter.estadosSel);
       let self = this;
       let dateini = new Date();
       dateini.setMonth(dateini.getMonth() - 13);

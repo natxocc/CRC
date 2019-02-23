@@ -14,6 +14,7 @@ export default {
       dialogData: {},
       dialogFields: {},
       dialogTable: null,
+      dialogTitle: null,
       notify: {
         model: false,
         color: '',
@@ -128,8 +129,10 @@ export default {
               .slice(0, 19)
               .replace("T", " ");
           if (columns[i].type == "bit") result.data[fields[i]] = 0;
+          this.dialogTitle=this.lang.Nuevo
         } else {
           this.cmd = "updateRecord";
+          this.dialogTitle = this.lang.Editar
           result.data[fields[i]] = data[fields[i]];
         }
       }

@@ -60,8 +60,8 @@
       </v-fab-transition>
       <!-- ROUTER VIEW -->
       <v-content>
-        <v-container fill-height fluid>
-          <v-layout align-center justify-center>
+        <v-container fill-height fluid class="pa-1">
+          <v-layout align-start justify-center >
             <v-flex text-xs-center>
               <router-view></router-view>
             </v-flex>
@@ -165,7 +165,7 @@ export default {
     localStorage.url = "http://servidor/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
     this.getLang(localStorage.lang);
-    console.log(this.lang);
+    // console.log(this.lang);
     this.menu.leftList = [
       {
         icon: "euro_symbol",
