@@ -28,24 +28,24 @@
 
     <!-- SELECT FILTERS TOTALS-->
     <v-layout align-start row wrap>
-      <v-flex class="px-1" md4 shrink xs12>
+      <v-flex class="px-1" md4 xs12>
         <v-text-field :label="lang.FiltroRapido" clearable hide-details v-model="quickFilter"></v-text-field>
       </v-flex>
       <!-- FILTER ONLY GESTION -->
       <template v-if="this.$route.params.recibo=='gestion'">
-        <v-flex class="px-1" md4 shrink xs12>
+        <v-flex class="px-1" md4 xs12>
           <v-select :items="this.lang.estados" :label="lang.FiltrosDeEstado" @input="callDataGestion" hide-details multiple return-object v-model="filter.estadosSel"></v-select>
         </v-flex>
-        <v-flex class="px-1" md2 shrink xs6>
+        <v-flex class="px-1" md2 xs6>
           <v-select :items="this.lang.userby" :label="lang.HistorialUsuario" @input="callDataGestion" hide-details return-object v-model="filter.userby"></v-select>
         </v-flex>
-        <v-flex class="px-1" md2 shrink xs6>
+        <v-flex class="px-1" md2 xs6>
           <v-switch :label="lang.TodosLosRegistros" @change="callDataGestion" hide-details v-model="filter.alldata"></v-switch>
         </v-flex>
       </template>
       <!-- FILTER ONLY BAJAS -->
       <template v-if="this.$route.params.recibo=='bajas'">
-        <v-flex class="px-1" md8 shrink xs12>
+        <v-flex class="px-1" md8 xs12>
           <v-dialog full-width ref="dialog" width="290px">
             <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.yearmonth"></v-text-field>
             <v-date-picker no-title :locale="locale" scrollable type="month" v-model="filter.yearmonth">
@@ -276,9 +276,7 @@ export default {
       this.recibo.selected = null;
       this.recibo.selectedSub = false;
       this.dialogModel = false;
-      this.filter.months = this.getMonths();
       this.filter.weeks = this.getWeeks();
-      this.filter.years = this.getYears();
       if (this.$route.params.recibo == "bajas") this.callDataBajas();
       if (this.$route.params.recibo == "gestion") this.callDataGestion();
       if (this.$route.params.recibo == "liq") this.callDataLiq();

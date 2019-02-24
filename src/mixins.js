@@ -124,12 +124,9 @@ export default {
           if (columns[i].type == "date")
             result.data[fields[i]] = new Date().toISOString().substr(0, 10);
           if (columns[i].type == "datetime")
-            result.data[fields[i]] = new Date()
-              .toISOString()
-              .slice(0, 19)
-              .replace("T", " ");
+            result.data[fields[i]] = new Date().toISOString().slice(0, 19).replace("T", " ");
           if (columns[i].type == "bit") result.data[fields[i]] = 0;
-          this.dialogTitle=this.lang.Nuevo
+          this.dialogTitle = this.lang.Nuevo
         } else {
           this.cmd = "updateRecord";
           this.dialogTitle = this.lang.Editar
@@ -140,7 +137,7 @@ export default {
       if (table) this.dialogTable = table;
       this.dialogData = result.data;
       this.dialogFields = result.fields;
-      // console.log(result)
+      console.log(result)
       return true;
     },
     getDaysWeek(year, week) {
@@ -170,21 +167,8 @@ export default {
       };
       return result;
     },
-    getYears() {
-      let year = new Date().getFullYear();
-      let years = [];
-      for (let i = 0; i < 20; i++) {
-        years[i] = year - i;
-      }
-      return years;
-    },
-    getMonths() {
-      let months = [];
-      for (let i = 0; i < 12; i++) {
-        months[i + 1] = ("0" + (i + 1)).slice(-2);
-      }
-      months[0] = "";
-      return months;
+    getDateTime(date) {
+      return new Date(date).toISOString().slice(0, 19).replace("T", " ");
     },
     getWeeks() {
       let weeks = [];
@@ -203,5 +187,5 @@ export default {
     }
   },
   beforeMount() {
-   }
+  }
 };
