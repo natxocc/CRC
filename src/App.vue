@@ -177,7 +177,7 @@ export default {
   },
   beforeMount() {
     if (localStorage.sid) this.checkUser();
-    localStorage.url = "http://localhost/crc/php/post.php";
+    localStorage.url = "http://servidor/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
     this.setLang(localStorage.lang);
     // console.log(this.lang);

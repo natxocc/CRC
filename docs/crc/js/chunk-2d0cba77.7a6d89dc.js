@@ -1,1 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0cba77"],{"4b1d":function(a){a.exports=[{isoName:"ca",nativeName:"Català"},{isoName:"es",nativeName:"Español"}]}}]);

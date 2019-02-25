@@ -46,6 +46,7 @@ if ($cmd == "logout") $db->logout($post);
 if ($cmd == "checkUser") $db->checkUser($post);
 // Comprueba si está conectado
 //if (!$db->isLogged($post)) exit("Error Auth");
+//echo "ok";
 if (!isset($post['table'])) exit();
 $_SESSION['tables'][$post['table']] = 3; // PROVISIONAL PARA SALTAR LA SEGURIDAD
 // Resto de consultas

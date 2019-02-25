@@ -27,27 +27,16 @@
                 <v-autocomplete :items="fields[key].options" :label="fields[key].name" v-bind="fields[key].props" v-if="fields[key].type =='autocomplete'" v-model="data[key]"></v-autocomplete>
                 <!-- ES BIT -->
                 <v-switch :label="fields[key].name" v-bind="fields[key].props" v-if="fields[key].type =='bit'" v-model="data[key]"></v-switch>
-                <!-- ES FECHA -->
-                <v-dialog full-width v-if="fields[key].type=='date'" v-model="dataDialog[key]" width="290px">
-                  <v-text-field :label="fields[key].name" @input="onChange(data[key], key)" prepend-icon="event" readonly slot="activator" v-bind="fields[key].props" v-model="data[key]"></v-text-field>
-                  <v-date-picker :locale="locale" no-title scrollable v-model="data[key]">
-                    <v-spacer></v-spacer>
-                    <v-btn @click="onChange(data[key], key)" color="primary" flat>OK</v-btn>
-                  </v-date-picker>
-                </v-dialog>
-                <!-- ES FECHAHORA -->
-                <v-dialog full-width v-if="fields[key].type=='datetime'" v-model="dataDialog[key]" width="290px">
-                  <v-text-field :label="fields[key].name" @input="onChange(data[key], key)" prepend-icon="event" readonly slot="activator" v-bind="fields[key].props" v-model="data[key]"></v-text-field>
-                  <v-date-picker :locale="locale" no-title scrollable v-model="data[key]">
-                    <v-spacer></v-spacer>
-                    <v-btn @click="onChange(data[key], key)" color="primary" flat>OK</v-btn>
-                  </v-date-picker>
-                </v-dialog>
+                <!-- ES FECHA U HORA -->
+                <v-text-field :label="fields[key].name" @click:append="getDate(data[key], key)" @input="onChange(data[key], key)" append-icon="event" v-bind="fields[key].props" v-if="fields[key].type.includes('date')" v-model="data[key]"></v-text-field>
               </v-flex>
             </template>
           </v-layout>
         </v-container>
       </v-card>
+    </v-dialog>
+    <v-dialog v-model="dateDialog" width="290px">
+      <v-date-picker :locale="locale" @input="setDateTime(dateModel)" no-title scrollable v-model="dateModel"></v-date-picker>
     </v-dialog>
   </div>
 </template>
@@ -64,33 +53,47 @@ export default {
   data() {
     return {
       locale: localStorage.lang,
-      dataDialog: []
+      dateModel: "",
+      timeModel: "",
+      dateDialog: false,
+      key: null
     };
   },
   methods: {
     onSave: function() {
-      // console.log(this.data);
-      // this.$emit("onSave", true);
+      this.$emit("onSave", true);
     },
     onCancel: function() {
       this.$emit("onCancel", true);
       this.model = false;
     },
     onChange: function(value, key) {
-      this.dataDialog[key] = false;
-      console.log(this.getDateTime(value));
-      // if (this.data[key].value) this.data[key] = this.data[key].value;
-      // this.$emit("onChange", this.data[key], key);
+      if (this.data[key].value) this.data[key] = this.data[key].value;
+      this.$emit("onChange", this.data[key], key);
     },
-    getDateTime(date) {
-      let now = new Date();
-      let dateSent = new Date(date);
-      dateSent.setHours(now.getHours() + 1, now.getMinutes(), 0);
-      return dateSent
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ");
+    getDate(value, key) {
+      this.dateModel = this.data[key].substr(0, 10);
+      this.timeModel = this.data[key].substr(10, 16);
+      this.key = key;
+      this.dateDialog = true;
+    },
+    setDateTime(value) {
+      if (this.fields[this.key].type == "date") {
+        this.data[this.key] = value;
+      } else {
+        let now = new Date();
+        let date = new Date(value);
+        date.setHours(now.getHours() + 1, now.getMinutes(), 0);
+        this.data[this.key] = date
+          .toISOString()
+          .slice(0, 16)
+          .replace("T", " ");
+      }
+      this.dateDialog = false;
     }
+  },
+  computed: {
+    computedDate() {}
   }
 };
 </script>

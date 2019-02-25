@@ -260,7 +260,7 @@ class db
         foreach ($fetch as $key => $value) {
             $result[$key]['groupId'] = false;
             $result[$key]['type'] = "general";
-            $result[$key]['headerClass'] = "";
+            $result[$key]['headerClass'] = [];
             $result[$key]['field'] = $fetch[$key]['Field'];
             $columnName = explode("|", $fetch[$key]['Comment']);
             $result[$key]['headerName'] = isset($lang[$fetch[$key]['Field']]) ? $lang[$fetch[$key]['Field']] : $columnName[0];
@@ -279,10 +279,10 @@ class db
                 }
             }
             $result[$key]['headerClass']['hidden'] = false;
-            $result[$key]['headerClass']['disable'] = false;
+            $result[$key]['headerClass']['disabled'] = false;
             if (isset($columnName[2])) {
                 if (strstr($columnName[2], "H")) $result[$key]['headerClass']['hidden'] = true;
-                if (strstr($columnName[2], "D")) $result[$key]['headerClass']['disable'] = true;
+                if (strstr($columnName[2], "D")) $result[$key]['headerClass']['disabled'] = true;
                 if (strstr($columnName[2], "T")) $result[$key]['headerClass']['autogrow'] = true;
                 if (strstr($columnName[2], "F")) $result[$key]['headerClass']['autofocus'] = true;
                 if (strstr($columnName[2], "R")) $result[$key]['headerClass']['required'] = true;

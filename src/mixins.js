@@ -103,7 +103,7 @@ export default {
             .autogrow
             ? columns[i].headerClass.autogrow
             : false;
-          if (columns[i].headerClass.select) {
+          if (columns[i].headerClass.select || columns[i].headerClass.autocomplete) {
             result.fields[fields[i]].options = [
               ...new Set(this.rowData.map(x => x[fields[i]]))
             ];
@@ -166,9 +166,6 @@ export default {
         dateend
       };
       return result;
-    },
-    getDateTime(date) {
-      return new Date(date).toISOString().slice(0, 19).replace("T", " ");
     },
     getWeeks() {
       let weeks = [];
