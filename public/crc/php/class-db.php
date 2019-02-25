@@ -397,6 +397,7 @@ class db
             $comma = ",";
         }
         $sqlquery .= " WHERE `" . $idkey . "` = :idvalue";
+        // echo $sqlquery;
         $sql = $this->db->prepare($sqlquery);
         $sql->bindParam(":idvalue", $post['idvalue']);
         try {

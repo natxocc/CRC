@@ -166,10 +166,10 @@ export default {
       // }
     },
     onSave() {
-      // console.log(this.dialogData);
+      console.log(this.dialogData);
       this.dialogModel = false;
-      // let self = this;
-      // this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
+      let self = this;
+      this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
     },
     onDelete() {
       // let self = this;
@@ -185,7 +185,6 @@ export default {
     },
     // CALL DATA GESTION
     callDataGestion() {
-      // console.log(this.filter.estadosSel);
       let self = this;
       let dateini = new Date();
       dateini.setMonth(dateini.getMonth() - 13);
@@ -251,7 +250,7 @@ export default {
     rowSelectedSub: function(data) {
       this.dialogTable = "RecibosGestion";
       if (data) {
-        this.defineDialog(this.columnDefsSub, data);
+        this.defineDialog(this.columnDefsSub, data, "RecibosGestion");
         this.recibo.selectedSub = true;
         this.dialogFields["Gestion"].options = this.lang.gestion;
         this.dialogFields["Gestion"].type = "select";
@@ -285,8 +284,6 @@ export default {
   },
   beforeMount() {
     this.setLang(localStorage.lang);
-    // console.log(localStorage.lang)
-    // this.getLang(localStorage.lang);
     this.init();
   },
   created() {},

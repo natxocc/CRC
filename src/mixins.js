@@ -112,9 +112,9 @@ export default {
               : "select";
           }
           if (columns[i].headerClass.required) {
-            // result.fields[fields[i]].props.rules = [
-            //   val => !!val || lang.CampoObligatorio
-            // ];
+            result.fields[fields[i]].props.rules = [
+              val => !!val || lang.CampoObligatorio
+            ];
           }
         }
         // Values
