@@ -92,8 +92,6 @@ export default {
       this.dateDialog = false;
     }
   },
-  computed: {
-    computedDate() {}
-  }
+  computed: {}
 };
 </script>

@@ -26,11 +26,16 @@
       <!-- TOOLBAR -->
       <v-toolbar :scroll-threshold="200" app color="primary" dark fixed scroll-off-screen>
         <v-toolbar-side-icon @click.stop="menu.left = !menu.left" color="secondary" flat></v-toolbar-side-icon>
-        <v-toolbar-title>CRC Reale Valls</v-toolbar-title>
+        <v-toolbar-title>CRC Reale Valls {{notify.model}}</v-toolbar-title>
         <v-spacer></v-spacer>
         <!-- BOTON USUARIO -->
         <div>
           <v-btn @click="user.dialog=true" color="red" flat icon>
+            <v-icon>person</v-icon>
+          </v-btn>
+        </div>
+        <div>
+          <v-btn @click="newMessage('lnlk','success')" color="success" flat icon>
             <v-icon>person</v-icon>
           </v-btn>
         </div>
@@ -88,14 +93,19 @@
         <span class="white--text">&copy; Ntx Software v0.1</span>
       </v-footer>
       <!-- NOTIFICATIONS -->
-      <v-snackbar :color="notify.color" :timeout="1500" v-model="notify.model">{{ notify.text}}</v-snackbar>
+      <!-- <v-snackbar :color="notify.color" :timeout="1500" v-model="notify.model">{{ notify.text}}</v-snackbar> -->
+      <snack-bar :text="notify.text" :model="notify.model" :color="notify.color"></snack-bar>
     </v-app>
   </div>
 </template>
 <script>
 import mixins from "./mixins";
+import SnackBar from "./components/SnackBar.vue"
 export default {
   mixins: [mixins],
+  components: {
+    SnackBar
+  },
   data() {
     return {
       gotop: false,

@@ -166,7 +166,7 @@ export default {
       // }
     },
     onSave() {
-      console.log(this.dialogData);
+      // console.log(this.dialogData);
       this.dialogModel = false;
       let self = this;
       this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
@@ -229,6 +229,7 @@ export default {
     },
     // SELECTED ROW
     rowSelected: function(data) {
+      this.newMessage("Okis","red")
       if (data) {
         this.recibo.selected = true;
         this.defineDialog(this.columnDefsSub, false, "RecibosGestion");
@@ -248,7 +249,6 @@ export default {
     },
     // SELECTED SUB ROWS
     rowSelectedSub: function(data) {
-      this.dialogTable = "RecibosGestion";
       if (data) {
         this.defineDialog(this.columnDefsSub, data, "RecibosGestion");
         this.recibo.selectedSub = true;

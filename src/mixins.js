@@ -25,6 +25,7 @@ export default {
   methods: {
     callData(post) {
       let self = this;
+      this.newMessage(self.lang.SinAutorizacion, "error")
       post.sid = localStorage.sid;
       post.lang = this.lang.db;
       return fetch(localStorage.url, {
@@ -51,6 +52,7 @@ export default {
       this.notify.text = text
       this.notify.color = color
       this.notify.model = true
+      console.log(this.notify.model)
     },
     setId(columns) {
       let idkey = columns.find(function (x) {
@@ -66,11 +68,7 @@ export default {
         if (data.columnsSub) this.columnDefsSub = data.columnsSub;
         return true;
       } else {
-        this.$q.notify({
-          message: lang.SinAutorizacion,
-          icon: "close",
-          color: "negative"
-        });
+        this.newMessage(self.lang.SinAutorizacion, "error")
         return false;
       }
     },
@@ -113,7 +111,7 @@ export default {
           }
           if (columns[i].headerClass.required) {
             result.fields[fields[i]].props.rules = [
-              val => !!val || lang.CampoObligatorio
+              val => !!val || this.lang.CampoObligatorio
             ];
           }
         }
@@ -133,11 +131,10 @@ export default {
           result.data[fields[i]] = data[fields[i]];
         }
       }
-      this.dialogTable = this.table;
       if (table) this.dialogTable = table;
       this.dialogData = result.data;
       this.dialogFields = result.fields;
-      console.log(result)
+      // console.log(result)
       return true;
     },
     getDaysWeek(year, week) {
