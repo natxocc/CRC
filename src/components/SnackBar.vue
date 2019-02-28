@@ -1,7 +1,5 @@
 <template>
-  <v-snackbar v-model="model" :color="color" :timeout="1500">
-    {{text}}
-  </v-snackbar>
+  <v-snackbar :color="color" :timeout="1500" v-model="model">{{text}}</v-snackbar>
 </template>
 
 <script>
@@ -12,8 +10,7 @@ export default {
     text: ""
   },
   data() {
-    return {
-    };
+    return {};
   }
 };
 </script>

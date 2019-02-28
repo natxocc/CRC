@@ -49,10 +49,11 @@ export default {
         });
     },
     newMessage(text, color) {
+      this.$store.state.notify.model=true
       this.notify.text = text
       this.notify.color = color
       this.notify.model = true
-      console.log(this.notify.model)
+      console.log(this.$store)
     },
     setId(columns) {
       let idkey = columns.find(function (x) {

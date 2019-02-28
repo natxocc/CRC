@@ -14,10 +14,14 @@ Vue.use(Vuetify, {
     accent: "#82B1FF"
   }
 });
+// import notify from "./plugins/notify.js";
+// Vue.use(notify)
+import {store} from './store.js'
 Vue.use(HighchartsVue);
 Vue.prototype.$lang = locale;
 Vue.config.productionTip = false;
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount("#app");

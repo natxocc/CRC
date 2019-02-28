@@ -26,7 +26,7 @@
       <!-- TOOLBAR -->
       <v-toolbar :scroll-threshold="200" app color="primary" dark fixed scroll-off-screen>
         <v-toolbar-side-icon @click.stop="menu.left = !menu.left" color="secondary" flat></v-toolbar-side-icon>
-        <v-toolbar-title>CRC Reale Valls {{notify.model}}</v-toolbar-title>
+        <v-toolbar-title>CRC Reale Valls </v-toolbar-title>
         <v-spacer></v-spacer>
         <!-- BOTON USUARIO -->
         <div>
@@ -90,11 +90,10 @@
       </v-content>
       <!-- FOOTER -->
       <v-footer app color="primary" dark>
-        <span class="white--text">&copy; Ntx Software v0.1</span>
+        <span class="white--text">&copy; Ntx Software v0.1 {{$store.state.notify.model}}</span>
       </v-footer>
       <!-- NOTIFICATIONS -->
-      <!-- <v-snackbar :color="notify.color" :timeout="1500" v-model="notify.model">{{ notify.text}}</v-snackbar> -->
-      <snack-bar :text="notify.text" :model="notify.model" :color="notify.color"></snack-bar>
+      <v-snackbar color="success" :timeout="1500" v-model="$store.state.notify.model">{{ notify.text}}</v-snackbar>
     </v-app>
   </div>
 </template>
@@ -186,6 +185,7 @@ export default {
     }
   },
   beforeMount() {
+    // console.log(this.$store)
     if (localStorage.sid) this.checkUser();
     localStorage.url = "http://servidor/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
