@@ -293,6 +293,7 @@ export default {
     //REGISTROS
     Nuevo: "Nuevo",
     Editar: "Editar",
+    Eliminar: "Eliminar",
     Guardar: "Guardar",
     Cerrar: "Cerrar",
     DatosGuardados: "Datos Guardados",
@@ -592,6 +593,7 @@ export default {
     //REGISTROS
     Nuevo: "Nou",
     Editar: "Editar",
+    Eliminar: "Eliminar",
     Guardar: "Guardar",
     Cerrar: "Tancar",
     DatosGuardados: "Dades enregistrades",

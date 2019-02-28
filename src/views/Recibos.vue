@@ -15,15 +15,6 @@
         {{lang.Liquidacion}}
         <v-icon>credit_card</v-icon>
       </v-tab>
-      <v-tab disabled>
-        {{calculos.importe}}
-        <v-icon>euro_symbol</v-icon>
-      </v-tab>
-      <!-- <v-tab-item :key="i" :value="'tab-' + i" v-for="i in 3">
-      <v-card flat>-->
-      <!-- <v-card-text>{{ text }}</v-card-text> -->
-      <!-- </v-card>
-      </v-tab-item>-->
     </v-tabs>
 
     <!-- SELECT FILTERS TOTALS-->
@@ -46,11 +37,11 @@
       <!-- FILTER ONLY BAJAS -->
       <template v-if="this.$route.params.recibo=='bajas'">
         <v-flex class="px-1" md8 xs12>
-          <v-dialog full-width ref="dialog" width="290px">
+          <v-dialog full-width v-model="filter.dateMonth" width="290px">
             <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.yearmonth"></v-text-field>
             <v-date-picker :locale="locale" no-title scrollable type="month" v-model="filter.yearmonth">
               <v-spacer></v-spacer>
-              <v-btn @click="$refs.dialog.save();callDataBajas" color="primary" flat>OK</v-btn>
+              <v-btn @click="callDataBajas" color="primary" flat>OK</v-btn>
             </v-date-picker>
           </v-dialog>
         </v-flex>
@@ -89,22 +80,20 @@
           <v-icon>delete</v-icon>
           {{lang.EliminarGestion}}
         </v-btn>
+        <v-spacer></v-spacer>
+        <!-- COLORS HELP -->
+        <v-menu offset-y open-on-hover top>
+          <v-btn color="secondary" icon slot="activator" small>
+            <v-icon>help_outline</v-icon>
+          </v-btn>
+          <v-list>
+            <v-list-tile :key="index" :style="{'background-color': helpColors[key]}" v-for="(value, key, index) in lang.ayuda">
+              <v-list-tile-title>{{ value }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
       </v-toolbar>
     </v-flex>
-    <!-- COLORS HELP -->
-    <!-- <div>
-          <q-btn color="primary" icon="help_outline" size="sm">
-            <q-popup-proxy>
-              <q-list dense>
-                <q-item :key="key" :style="{'background-color': helpColors[key]}" v-for="(value, key) in $q.lang.ayuda">
-                  <q-item-section>
-                    <q-item-label>{{value}}</q-item-label>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-popup-proxy>
-          </q-btn>
-    </div>-->
     <!-- CONFIRM DELETE -->
     <v-dialog max-width="290" persistent v-model="recibo.deleteModel">
       <v-card>
@@ -137,6 +126,7 @@ export default {
     return {
       locale: localStorage.lang,
       filters: null,
+      fec: "02",
       filter: {
         userby: {
           value: "NombreTomador"
@@ -146,13 +136,20 @@ export default {
         alldata: false,
         weeks: [],
         yearmonth: new Date().toISOString().substr(0, 7),
-        week: 1
+        week: 1,
+        dateMonth: false
       },
       rowClassRules: {
         error: "data.Estado.includes('COBRADO') && data.Gestion.includes('ANULADO')",
         pendiente: "data.Estado.includes('PENDIENTE') && data.Gestion.includes('PE')",
         anulado: "data.Estado.includes('ANULADO') || (data.Gestion.includes('AN') && !data.Estado.includes('COBRADO'))",
-        cobrado: "data.Estado.includes('COBRADO') || (data.Gestion.includes('CO') && data.Importe == data.Cobrado)"
+        cobrado: "data.Estado.includes('COBRADO') || (data.Gestion.includes('CO') && data.Importe == data.Cobrado)",
+        urgente: function(params) {
+          let now = new Date();
+          let date = new Date(params.data.FechaEfecto);
+          now.setDate(now.getDate() - 25);
+          return date < now;
+        }
       },
       // RECIBO
       recibo: {
@@ -171,11 +168,12 @@ export default {
   },
   methods: {
     onChange(value, key) {
-      // if (this.dialogData["Gestion"] == "COME" || this.dialogData["Gestion"] == "COTR") {
-      //   this.dialogFields["Importe"].props.disable = false;
-      // } else {
-      //   this.dialogFields["Importe"].props.disable = true;
-      // }
+      // console.log(this.dialogFields);
+      if (this.dialogData["Gestion"] == "COME" || this.dialogData["Gestion"] == "COTR") {
+        this.dialogFields["Importe"].props.disabled = false;
+      } else {
+        this.dialogFields["Importe"].props.disabled = true;
+      }
     },
     onSave() {
       // console.log(this.dialogData);
@@ -184,9 +182,13 @@ export default {
       this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
     },
     onDelete() {
-      this.recibo.deleteModel = false
+      this.recibo.deleteModel = false;
       let self = this;
-      this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
+      if ((this.table == "Recibos" && this.dialogData["Usuario"] > 0) || (this.table == "RecibosGestion" && this.dialogData["Gestion"] == "PEPE")) {
+        this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
+      } else {
+        this.newMessage(this.lang.SinAutorizacion, "error");
+      }
     },
     // CALL DATA GESTION
     callDataGestion() {
@@ -215,8 +217,9 @@ export default {
     },
     // CALL DATA BAJAS
     callDataBajas() {
+      this.filter.dateMonth = false;
       let self = this;
-      let where = "(Gestion LIKE 'ANULADO') AND (FechaEfecto LIKE '" + this.filter.yearmonth + "%')";
+      let where = "(Gestion LIKE 'AN%') AND (FechaEfecto LIKE '" + this.filter.yearmonth + "%')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
     },
     // CALL DATA LIQ

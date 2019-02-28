@@ -34,12 +34,6 @@
             <v-icon>person</v-icon>
           </v-btn>
         </div>
-        <div>
-          <v-btn @click="newMessage('lnlk','success')" color="success" flat icon>
-            <v-icon>person</v-icon>
-          </v-btn>
-        </div>
-
         <!-- SELECCION IDIOMA -->
         <v-menu bottom class="align-center" transition="slide-y-transition">
           <v-btn dark icon slot="activator">
@@ -88,7 +82,7 @@
                 <v-card>
                   <v-card-text>
                     <div class="text-xs-center">
-                    <v-progress-circular color="secondary" indeterminate></v-progress-circular>
+                      <v-progress-circular color="secondary" indeterminate></v-progress-circular>
                     </div>
                   </v-card-text>
                 </v-card>
@@ -195,8 +189,8 @@ export default {
     }
   },
   beforeMount() {
-    this.$store.state.notify.model = false
-    this.$store.state.loading = false
+    this.$store.state.notify.model = false;
+    this.$store.state.loading = false;
     // console.log(this.$store)
     if (localStorage.sid) this.checkUser();
     localStorage.url = "http://servidor/crc/php/post.php";
@@ -236,7 +230,6 @@ export default {
       }
     ];
   },
-  created() {
-  }
+  created() {}
 };
 </script>

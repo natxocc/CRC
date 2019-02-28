@@ -80,9 +80,9 @@ export default {
         result.fields[fields[i]].options = [];
         if (columns[i].headerClass != "") {
           result.fields[fields[i]].props = {};
-          result.fields[fields[i]].props.disable = columns[i].headerClass
-            .disable
-            ? columns[i].headerClass.disable
+          result.fields[fields[i]].props.disabled = columns[i].headerClass
+            .disabled
+            ? columns[i].headerClass.disabled
             : false;
           result.fields[fields[i]].props.hidden = columns[i].headerClass.hidden
             ? columns[i].headerClass.hidden
@@ -131,6 +131,7 @@ export default {
       }
       this.dialogData = result.data;
       this.dialogFields = result.fields;
+      // console.log(result)
       return true;
     },
     getDaysWeek(year, week) {

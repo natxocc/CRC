@@ -6,7 +6,7 @@
       </v-flex>
     </v-layout>
     <!-- TABLA DE DATOS -->
-    <data-table :columnDefs="columnDefs" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData"/>
+    <data-table :localeText="lang.table" :columnDefs="columnDefs" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData"/>
   </div>
 </template>
 
