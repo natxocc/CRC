@@ -18,7 +18,7 @@ import mixins from '../mixins'
 export default {
   mixins: [mixins],
   beforeMount() {
-    this.getLang(localStorage.lang)
+    this.setLang(localStorage.lang);
   }
 };
 </script>

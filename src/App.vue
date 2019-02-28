@@ -84,7 +84,6 @@
           <v-layout align-start justify-center>
             <v-flex text-xs-center>
               <!-- LOADING -->
-              <v-progress-linear :indeterminate="false"></v-progress-linear>
               <v-dialog persistent v-model="$store.state.loading" width="100">
                 <v-card>
                   <v-card-text>
@@ -196,6 +195,8 @@ export default {
     }
   },
   beforeMount() {
+    this.$store.state.notify.model = false
+    this.$store.state.loading = false
     // console.log(this.$store)
     if (localStorage.sid) this.checkUser();
     localStorage.url = "http://servidor/crc/php/post.php";
@@ -236,7 +237,6 @@ export default {
     ];
   },
   created() {
-    // console.log(this.$store.state.lang)
   }
 };
 </script>
