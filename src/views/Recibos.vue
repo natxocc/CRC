@@ -48,7 +48,7 @@
         <v-flex class="px-1" md8 xs12>
           <v-dialog full-width ref="dialog" width="290px">
             <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.yearmonth"></v-text-field>
-            <v-date-picker no-title :locale="locale" scrollable type="month" v-model="filter.yearmonth">
+            <v-date-picker :locale="locale" no-title scrollable type="month" v-model="filter.yearmonth">
               <v-spacer></v-spacer>
               <v-btn @click="$refs.dialog.save();callDataBajas" color="primary" flat>OK</v-btn>
             </v-date-picker>
@@ -81,11 +81,11 @@
           <v-icon>edit</v-icon>
           {{lang.EditarGestion}}
         </v-btn>
-        <v-btn @click="dialogModel=true" color="error" small v-if="recibo.selected">
+        <v-btn @click="recibo.deleteModel=true" color="error" small v-if="recibo.selected">
           <v-icon>delete</v-icon>
           {{lang.EliminarRecibo}}
         </v-btn>
-        <v-btn @click="dialogModel=true" color="error" small v-if="recibo.selectedSub">
+        <v-btn @click="recibo.deleteModel=true" color="error" small v-if="recibo.selectedSub">
           <v-icon>delete</v-icon>
           {{lang.EliminarGestion}}
         </v-btn>
@@ -105,10 +105,21 @@
             </q-popup-proxy>
           </q-btn>
     </div>-->
+    <!-- CONFIRM DELETE -->
+    <v-dialog max-width="290" persistent v-model="recibo.deleteModel">
+      <v-card>
+        <v-card-text>{{lang.EliminarRegistro}}</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="recibo.deleteModel = false" color="warning" flat>{{lang.Cancelar}}</v-btn>
+          <v-btn @click="onDelete" color="success" flat>{{lang.Aceptar}}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!-- TABLA DE DATOS -->
     <data-table :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :localeText="lang.table" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO -->
-    <dialog-data :data="dialogData" :fields="dialogFields" :model="dialogModel" :lang="lang" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"/>
+    <dialog-data :data="dialogData" :fields="dialogFields" :lang="lang" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"/>
   </div>
 </template>
 
@@ -146,7 +157,8 @@ export default {
       // RECIBO
       recibo: {
         selected: null,
-        selectedSub: false
+        selectedSub: false,
+        deleteModel: false
       },
       // GESTION
       myRoute: this.$route.params.recibo,
@@ -172,16 +184,9 @@ export default {
       this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
     },
     onDelete() {
-      // let self = this;
-      // this.$q
-      //   .dialog({
-      //     message: this.lang.EliminarRegistro,
-      //     cancel: true
-      //   })
-      //   .onOk(() => {
-      //     this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
-      //   })
-      //   .onCancel(() => {});
+      this.recibo.deleteModel = false
+      let self = this;
+      this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
     },
     // CALL DATA GESTION
     callDataGestion() {
@@ -229,7 +234,6 @@ export default {
     },
     // SELECTED ROW
     rowSelected: function(data) {
-      this.newMessage("Okis","red")
       if (data) {
         this.recibo.selected = true;
         this.defineDialog(this.columnDefsSub, false, "RecibosGestion");

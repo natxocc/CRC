@@ -16,7 +16,7 @@ Vue.use(Vuetify, {
 });
 // import notify from "./plugins/notify.js";
 // Vue.use(notify)
-import {store} from './store.js'
+import { store } from './store.js'
 Vue.use(HighchartsVue);
 Vue.prototype.$lang = locale;
 Vue.config.productionTip = false;

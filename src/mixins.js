@@ -9,25 +9,19 @@ export default {
       idKey: null,
       table: null,
       cmd: null,
-      loading: false,
       dialogModel: false,
       dialogData: {},
       dialogFields: {},
       dialogTable: null,
-      dialogTitle: null,
-      notify: {
-        model: false,
-        color: '',
-        text: ''
-      }
+      dialogTitle: null
     };
   },
   methods: {
     callData(post) {
       let self = this;
-      this.newMessage(self.lang.SinAutorizacion, "error")
       post.sid = localStorage.sid;
       post.lang = this.lang.db;
+      this.$store.state.loading = true
       return fetch(localStorage.url, {
         method: "post",
         body: JSON.stringify(post)
@@ -36,6 +30,7 @@ export default {
           return response.json();
         })
         .then(response => {
+          self.$store.state.loading = false
           if (post.cmd == "getRecords") {
             self.defineTable(response);
             return response;
@@ -49,11 +44,9 @@ export default {
         });
     },
     newMessage(text, color) {
-      this.$store.state.notify.model=true
-      this.notify.text = text
-      this.notify.color = color
-      this.notify.model = true
-      console.log(this.$store)
+      this.$store.state.notify.text = text
+      this.$store.state.notify.color = color
+      this.$store.state.notify.model = true
     },
     setId(columns) {
       let idkey = columns.find(function (x) {
@@ -132,10 +125,12 @@ export default {
           result.data[fields[i]] = data[fields[i]];
         }
       }
-      if (table) this.dialogTable = table;
+      if (table) {
+        this.table = table;
+        this.dialogTable = table;
+      }
       this.dialogData = result.data;
       this.dialogFields = result.fields;
-      // console.log(result)
       return true;
     },
     getDaysWeek(year, week) {

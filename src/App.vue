@@ -26,7 +26,7 @@
       <!-- TOOLBAR -->
       <v-toolbar :scroll-threshold="200" app color="primary" dark fixed scroll-off-screen>
         <v-toolbar-side-icon @click.stop="menu.left = !menu.left" color="secondary" flat></v-toolbar-side-icon>
-        <v-toolbar-title>CRC Reale Valls </v-toolbar-title>
+        <v-toolbar-title>CRC Reale Valls</v-toolbar-title>
         <v-spacer></v-spacer>
         <!-- BOTON USUARIO -->
         <div>
@@ -41,7 +41,7 @@
         </div>
 
         <!-- SELECCION IDIOMA -->
-        <v-menu bottom transition="slide-y-transition" class="align-center">
+        <v-menu bottom class="align-center" transition="slide-y-transition">
           <v-btn dark icon slot="activator">
             <v-icon>more_vert</v-icon>
           </v-btn>
@@ -83,6 +83,17 @@
         <v-container class="pa-1" fill-height fluid>
           <v-layout align-start justify-center>
             <v-flex text-xs-center>
+              <!-- LOADING -->
+              <v-progress-linear :indeterminate="false"></v-progress-linear>
+              <v-dialog persistent v-model="$store.state.loading" width="100">
+                <v-card>
+                  <v-card-text>
+                    <div class="text-xs-center">
+                    <v-progress-circular color="secondary" indeterminate></v-progress-circular>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-dialog>
               <router-view></router-view>
             </v-flex>
           </v-layout>
@@ -90,16 +101,16 @@
       </v-content>
       <!-- FOOTER -->
       <v-footer app color="primary" dark>
-        <span class="white--text">&copy; Ntx Software v0.1 {{$store.state.notify.model}}</span>
+        <span class="white--text">&copy; Ntx Software v0.1</span>
       </v-footer>
       <!-- NOTIFICATIONS -->
-      <v-snackbar color="success" :timeout="1500" v-model="$store.state.notify.model">{{ notify.text}}</v-snackbar>
+      <v-snackbar :color="$store.state.notify.color" :timeout="1500" v-model="$store.state.notify.model">{{ $store.state.notify.text}}</v-snackbar>
     </v-app>
   </div>
 </template>
 <script>
 import mixins from "./mixins";
-import SnackBar from "./components/SnackBar.vue"
+import SnackBar from "./components/SnackBar.vue";
 export default {
   mixins: [mixins],
   components: {
@@ -224,6 +235,8 @@ export default {
       }
     ];
   },
-  created() {}
+  created() {
+    // console.log(this.$store.state.lang)
+  }
 };
 </script>

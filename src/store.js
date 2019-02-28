@@ -1,18 +1,15 @@
 import Vue from "vue";
 import Vuex from "vuex"
+import lang from "./lang"
 Vue.use(Vuex)
 export const store = new Vuex.Store({
   state: {
-    count: 5,
+    lang,
+    loading: true,
     notify: {
-      model: true,
+      model: false,
       color: '',
-      text: 'Prueba'
-    }
-  },
-  mutations: {
-    increment(state) {
-      state.count++
+      text: ''
     }
   }
 })
