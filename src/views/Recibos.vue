@@ -171,7 +171,9 @@ export default {
     onDelete() {
       this.recibo.deleteModel = false;
       let self = this;
-      if ((this.table == "Recibos" && this.dialogData["Usuario"] > 0) || (this.table == "RecibosGestion" && this.dialogData["Gestion"] == "PEPE")) {
+      if ((this.table == "Recibos" && this.dialogData["Usuario"] > 0) || (this.table == "RecibosGestion" 
+      // && this.dialogData["Gestion"] == "PEPE"
+      )) {
         this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
       } else {
         this.newMessage(this.lang.SinAutorizacion, "error");

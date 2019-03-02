@@ -125,8 +125,6 @@ export default {
       let week = this.getWeek(filterdate);
       let days = this.getDaysWeek(year, week);
       let where = "(Gestion='COME' OR Gestion='COTR') AND ((FechaGestion>=FechaEfecto AND FechaGestion BETWEEN '"+days.dateini+"' AND '"+days.dateend+"') or (FechaGestion<FechaEfecto AND FechaEfecto BETWEEN '"+days.dateini+"' AND '"+days.dateend+"'))";
-      console.log(where)
-      // AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Caja", where}).then(function(response) {
         self.defineDialog(self.columnDefs, false, "Caja");
         self.dialogFields["CodigoRecibo"].props.disabled = true;
