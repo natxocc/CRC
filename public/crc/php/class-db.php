@@ -252,7 +252,6 @@ class db
      */
     public function getColumns($table, $lang = false)
     {
-        //var_dump($lang);
         $sql = $this->db->prepare("SHOW FULL COLUMNS FROM $table");
         $sql->execute();
         $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
@@ -262,6 +261,7 @@ class db
             $result[$key]['type'] = "general";
             $result[$key]['headerClass'] = [];
             $result[$key]['field'] = $fetch[$key]['Field'];
+            // $result[$key]['headerTooltip'] = $fetch[$key]['Field'];
             $columnName = explode("|", $fetch[$key]['Comment']);
             $result[$key]['headerName'] = isset($lang[$fetch[$key]['Field']]) ? $lang[$fetch[$key]['Field']] : $columnName[0];
             if (isset($columnName[1])) {
@@ -288,6 +288,7 @@ class db
                 if (strstr($columnName[2], "R")) $result[$key]['headerClass']['required'] = true;
                 if (strstr($columnName[2], "A")) $result[$key]['headerClass']['autocomplete'] = true;
                 if (strstr($columnName[2], "S")) $result[$key]['headerClass']['select'] = true;
+                if (strstr($columnName[2], "C")) $result[$key]['headerClass']['combo'] = true;
             }
             if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int") || strstr($fetch[$key]['Type'], "double")) $result[$key]['type'] = "number";
             if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "text";
@@ -433,3 +434,4 @@ class db
         }
     }
 }
+

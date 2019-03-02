@@ -28,16 +28,10 @@
         <v-toolbar-side-icon @click.stop="menu.left = !menu.left" color="secondary" flat></v-toolbar-side-icon>
         <v-toolbar-title>CRC Reale Valls</v-toolbar-title>
         <v-spacer></v-spacer>
-        <!-- BOTON USUARIO -->
-        <div>
-          <v-btn @click="user.dialog=true" color="red" flat icon>
-            <v-icon>person</v-icon>
-          </v-btn>
-        </div>
         <!-- SELECCION IDIOMA -->
         <v-menu bottom class="align-center" transition="slide-y-transition">
           <v-btn dark icon slot="activator">
-            <v-icon>more_vert</v-icon>
+            <v-icon>language</v-icon>
           </v-btn>
           <v-list>
             <v-list-tile @click="setLang('es')">
@@ -48,6 +42,12 @@
             </v-list-tile>
           </v-list>
         </v-menu>
+        <!-- BOTON USUARIO -->
+        <div>
+          <v-btn @click="user.dialog=true" color="red" flat icon>
+            <v-icon>person</v-icon>
+          </v-btn>
+        </div>
       </v-toolbar>
       <!-- DIALOG USER -->
       <v-dialog @keydown.esc="user.dialog=false" v-model="user.dialog">
@@ -95,6 +95,7 @@
       <!-- FOOTER -->
       <v-footer app color="primary" dark>
         <span class="white--text">&copy; Ntx Software v0.1</span>
+        <v-spacer></v-spacer>
       </v-footer>
       <!-- NOTIFICATIONS -->
       <v-snackbar :color="$store.state.notify.color" :timeout="1500" v-model="$store.state.notify.model">{{ $store.state.notify.text}}</v-snackbar>

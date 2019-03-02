@@ -25,26 +25,53 @@
       </v-flex>
       <!-- SELECT FILTERS GESTION ALTAS Y BAJAS-->
       <v-flex class="px-1" md8 xs12>
-        <v-dialog full-width width="290px" v-model="filter.dialogMonth">
+        <v-dialog full-width v-model="filter.dialogMonth" width="290px">
           <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.yearmonth"></v-text-field>
-          <v-date-picker :locale="locale" no-title scrollable type="month" v-model="filter.yearmonth">
+          <v-date-picker :locale="locale" no-title scrollable type="month" v-model="filter.yearmonth" :first-day-of-week="1">
             <v-spacer></v-spacer>
             <v-btn @click="callDataAltas" color="primary" flat>OK</v-btn>
           </v-date-picker>
         </v-dialog>
       </v-flex>
+      <!-- MINI TOOLBAR-->
+      <v-flex class="pt-1">
+        <v-toolbar color="primary" dense>
+          <v-btn @click="dialogModel=true" color="secondary black--text" small v-if="!poliza.selected">
+            <v-icon>add</v-icon>
+            {{lang.Nuevo}}
+          </v-btn>
+          <v-btn @click="dialogModel=true" color="secondary black--text" small v-if="poliza.selected">
+            <v-icon>add</v-icon>
+            {{lang.Editar}}
+          </v-btn>
+          <v-btn @click="poliza.deleteModel=true" color="error" small v-if="poliza.selected">
+            <v-icon>delete</v-icon>
+            {{lang.Eliminar}}
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary black--text font-weight-medium">
+            {{calculos.importe}}
+            <v-icon dark right>euro_symbol</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-flex>
     </v-layout>
+
     <!-- TABLA DE DATOS -->
-    <data-table :columnDefs="columnDefs" :quickFilter="quickFilter" :localeText="lang.table" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData"/>
+    <data-table :columnDefs="columnDefs" :localeText="lang.table" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @filterData="filterData" @rowSelected="rowSelected"/>
+    <!-- DIALOG -->
+    <dialog-data :data="dialogData" :fields="dialogFields" :lang="lang" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"/>
   </div>
 </template>
 
 <script>
 import DataTable from "../components/DataTable.vue";
+import DialogData from "../components/DialogData.vue";
 import mixins from "../mixins";
 export default {
   components: {
-    DataTable
+    DataTable,
+    DialogData
   },
   mixins: [mixins],
   data() {
@@ -54,37 +81,61 @@ export default {
       rowClassRules: {},
       filter: {
         yearmonth: new Date().toISOString().substr(0, 7),
-        dialogMonth:false
+        dialogMonth: false
       },
       tab: this.$route.params.poliza,
       // CALCULOS
       calculos: {
         importe: null,
         cobrado: null
+      },
+      poliza: {
+        selected: false,
+        deleteModel: false
       }
     };
   },
   methods: {
+    onChange() {},
+    onSave() {
+      this.dialogModel = false;
+      let self = this;
+      this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
+    },
+    onDelete() {
+      this.user.deleteModel = false;
+      let self = this;
+      this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
+    },
     // CALL ALTAS
     callDataAltas() {
-      this.filter.dialogMonth=false
+      this.filter.dialogMonth = false;
       let self = this;
-      let where = "(TipoInformacion LIKE 'Nueva%' ) AND (FechaAlta LIKE '"  + this.filter.yearmonth + "%')";
+      let where = "(TipoInformacion LIKE 'Nueva%' ) AND (FechaAlta LIKE '" + this.filter.yearmonth + "%')";
       this.callData({cmd: "getRecords", table: "Polizas", where}).then(function(response) {
-        self.defineTable(response);
+        self.defineDialog(self.columnDefs, false, "Polizas");
       });
     },
     // CALL BAJAS
     callDataBajas() {
-      this.filter.dialogMonth=false
+      this.filter.dialogMonth = false;
       let self = this;
-      let where = "(TipoInformacion LIKE 'Anula%' )  AND (FechaBaja LIKE '"  + this.filter.yearmonth + "%')";
+      let where = "(TipoInformacion LIKE 'Anula%' )  AND (FechaBaja LIKE '" + this.filter.yearmonth + "%')";
       this.callData({cmd: "getRecords", table: "Polizas", where}).then(function(response) {
-        self.defineTable(response);
+        self.defineDialog(self.columnDefs, false, "Polizas");
       });
     },
-    //CALCULATE
-    gridData(data) {
+    // SELECTED ROW
+    rowSelected: function(data) {
+      if (data) {
+        this.poliza.selected = true;
+        this.defineDialog(this.columnDefs, data, "Polizas");
+      } else {
+        this.poliza.selected = false;
+        this.defineDialog(this.columnDefs, false, "Polizas");
+      }
+    }, //CALCULATE
+    filterData(data) {
       let sumCobrado = 0;
       let sumImporte = 0;
       for (let i = 0; i < data.length; i++) {

@@ -149,7 +149,7 @@ export default {
     },
     onFilterChanged(event) {
       if (this.gridApi) {
-        this.$emit("gridData", this.gridApi.rowModel.rootNode.childrenAfterFilter);
+        this.$emit("filterData", this.gridApi.rowModel.rootNode.childrenAfterFilter);
       }
     },
     onCellClicked(event) {

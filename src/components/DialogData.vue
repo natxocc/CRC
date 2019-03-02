@@ -3,32 +3,34 @@
     <v-dialog fullscreen hide-overlay scrollable transition="dialog-bottom-transition" v-model="model">
       <v-card tile>
         <v-toolbar card color="primary" dark dense>
-          <v-btn @click="$emit('cancel', true)" dark icon>
-            <v-icon>close</v-icon>
-          </v-btn>
-          <v-toolbar-title>Settings</v-toolbar-title>
-          <v-spacer></v-spacer>
           <v-btn @click="onSave" dark flat>
             <v-icon>save</v-icon>
             {{lang.Guardar}}
+          </v-btn>
+          <!-- <v-toolbar-title>Settings</v-toolbar-title> -->
+          <v-spacer></v-spacer>
+          <v-btn @click="$emit('cancel', true)" dark icon>
+            <v-icon>close</v-icon>
           </v-btn>
         </v-toolbar>
         <v-container fluid>
           <v-layout row wrap>
             <template v-for="(value,key, index) in data">
-              <v-flex :key="index" lg2 md4 pa-1 sm6 xs12 v-show="!fields[key].props.hidden">
+              <v-flex :key="index" lg2 md4 pa-1 sm6 v-show="!fields[key].props.hidden" xs12>
                 <!-- ES TEXTO -->
-                <v-text-field :label="fields[key].name" @input="onChange(data[key], key)" type="text" :disabled="fields[key].props.disabled" :rules="fields[key].props.rules" v-if="fields[key].type =='text'" v-model="data[key]"></v-text-field>
+                <v-text-field :disabled="fields[key].props.disabled" :label="fields[key].name" :rules="fields[key].props.rules" @input="onChange(data[key], key)" type="text" v-if="fields[key].type =='text'" v-model="data[key]"></v-text-field>
                 <!-- ES NUMERO -->
-                <v-text-field :label="fields[key].name" @input="onChange(data[key], key)" type="number" :disabled="fields[key].props.disabled" :rules="fields[key].props.rules" v-if="fields[key].type =='number'" v-model="data[key]"></v-text-field>
+                <v-text-field :disabled="fields[key].props.disabled" :label="fields[key].name" :rules="fields[key].props.rules" @input="onChange(data[key], key)" type="number" v-if="fields[key].type =='number'" v-model="data[key]"></v-text-field>
                 <!-- ES SELECT -->
-                <v-select :items="fields[key].options" :label="fields[key].name" @input="onChange(data[key], key)" :disabled="fields[key].props.disabled" :rules="fields[key].props.rules" v-if="fields[key].type =='select'" v-model="data[key]"></v-select>
+                <v-select :disabled="fields[key].props.disabled" :items="fields[key].options" :label="fields[key].name" :rules="fields[key].props.rules" @input="onChange(data[key], key)" v-if="fields[key].type =='select'" v-model="data[key]"></v-select>
                 <!-- ES AUTOCOMPLETE -->
-                <v-autocomplete :items="fields[key].options" :label="fields[key].name" @input="onChange(data[key], key)" :disabled="fields[key].props.disabled" :rules="fields[key].props.rules" v-if="fields[key].type =='autocomplete'" v-model="data[key]"></v-autocomplete>
+                <v-autocomplete :disabled="fields[key].props.disabled" :items="fields[key].options" :label="fields[key].name" :rules="fields[key].props.rules" @input="onChange(data[key], key)" v-if="fields[key].type =='autocomplete'" v-model="data[key]"></v-autocomplete>
+                <!-- ES COMBO -->
+                <v-combobox :disabled="fields[key].props.disabled" :items="fields[key].options" :label="fields[key].name" :rules="fields[key].props.rules" @input="onChange(data[key], key)" v-if="fields[key].type =='combo'" v-model="data[key]"></v-combobox>
                 <!-- ES BIT -->
-                <v-switch :label="fields[key].name" :disabled="fields[key].props.disabled" v-if="fields[key].type =='bit'" v-model="data[key]"></v-switch>
+                <v-switch :disabled="fields[key].props.disabled" :label="fields[key].name" v-if="fields[key].type =='bit'" v-model="data[key]"></v-switch>
                 <!-- ES FECHA U HORA -->
-                <v-text-field :label="fields[key].name" @click:append="getDate(data[key], key)" @input="onChange(data[key], key)" append-icon="event" :disabled="fields[key].props.disabled" v-if="fields[key].type.includes('date')" v-model="data[key]"></v-text-field>
+                <v-text-field :disabled="fields[key].props.disabled" :label="fields[key].name" @click:append="getDate(data[key], key)" @input="onChange(data[key], key)" append-icon="event" v-if="fields[key].type.includes('date')" v-model="data[key]"></v-text-field>
               </v-flex>
             </template>
           </v-layout>
@@ -36,7 +38,7 @@
       </v-card>
     </v-dialog>
     <v-dialog v-model="dateDialog" width="290px">
-      <v-date-picker :locale="locale" @input="setDateTime(dateModel)" no-title scrollable v-model="dateModel"></v-date-picker>
+      <v-date-picker :locale="locale" @input="setDateTime(dateModel)" no-title scrollable v-model="dateModel" :first-day-of-week="1"></v-date-picker>
     </v-dialog>
   </div>
 </template>

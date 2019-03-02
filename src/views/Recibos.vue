@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- TABS -->
-    <v-tabs align-with-title centered color="secondary" icons-and-text>
+    <v-tabs show-arrows align-with-title centered color="secondary" icons-and-text>
       <v-tabs-slider color="primary"></v-tabs-slider>
       <v-tab to="/recibos/gestion">
         {{lang.Gestion}}
@@ -48,6 +48,19 @@
       </template>
     </v-layout>
     <!-- FILTER ONLY LIQ & CAJA -->
+    <v-layout align-start row wrap>
+      <template v-if="this.$route.params.recibo=='liq'">
+        <v-flex class="px-1" md8 xs12>
+          <v-dialog full-width v-model="filter.dateDialog" width="290px">
+            <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.date"></v-text-field>
+            <v-date-picker :locale="locale" no-title scrollable show-week v-model="filter.date" :first-day-of-week="1">
+              <v-spacer></v-spacer>
+              <v-btn @click="callDataLiq" color="primary" flat>OK</v-btn>
+            </v-date-picker>
+          </v-dialog>
+        </v-flex>
+      </template>
+    </v-layout>
     <!-- <template v-else-if="this.$route.params.recibo=='liq'">
           <div class="col-xs-12 col-md-4" style="padding: 10px">
             <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.year"/>
@@ -81,6 +94,10 @@
           {{lang.EliminarGestion}}
         </v-btn>
         <v-spacer></v-spacer>
+        <v-btn color="secondary black--text">
+          {{calculos.importe}}
+          <v-icon dark right>euro_symbol</v-icon>
+        </v-btn>
         <!-- COLORS HELP -->
         <v-menu offset-y open-on-hover top>
           <v-btn color="secondary" icon slot="activator" small>
@@ -106,7 +123,7 @@
       </v-card>
     </v-dialog>
     <!-- TABLA DE DATOS -->
-    <data-table :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :localeText="lang.table" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
+    <data-table :columnDefs="columnDefs" :columnDefsSub="columnDefsSub" :filters="filters" :localeText="lang.table" :masterDetail="true" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @filterData="filterData" @rowSelected="rowSelected" @rowSelectedSub="rowSelectedSub"/>
     <!-- DIALOGO -->
     <dialog-data :data="dialogData" :fields="dialogFields" :lang="lang" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"/>
   </div>
@@ -134,6 +151,8 @@ export default {
         },
         estadosSel: null,
         alldata: false,
+        date: null,
+        dateDialog: false,
         weeks: [],
         yearmonth: new Date().toISOString().substr(0, 7),
         week: 1,
@@ -207,12 +226,9 @@ export default {
       if (!this.filter.alldata) where += " AND (FechaEfecto BETWEEN '" + dateini + "' AND '" + dateend + "')";
       where += " ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Recibos", where, subtable: "RecibosGestion", id: this.filter.userby.value}).then(function(response) {
-        self.defineDialog(self.columnDefs);
-        self.dialogTable = "Recibos";
-        self.dialogFields["Gestion"].options = self.lang.gestion;
-        self.dialogFields["Gestion"].type = "select";
-        self.dialogFields["Estado"].options = self.lang.estados;
-        self.dialogFields["Estado"].type = "select";
+        self.defineDialog(self.columnDefs, false, "Recibos");
+        self.setItems("Gestion", "select", self.lang.gestion);
+        self.setItems("Estado", "select", self.lang.estados);
       });
     },
     // CALL DATA BAJAS
@@ -224,7 +240,8 @@ export default {
     },
     // CALL DATA LIQ
     callDataLiq() {
-      // let self = this;
+      this.filter.dateDialog = false
+      let self = this;
       // let days = this.getDaysWeek(this.filter.year, this.filter.month);
       // let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
       // this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
@@ -267,7 +284,7 @@ export default {
       }
     },
     //CALCULATE
-    gridData(data) {
+    filterData(data) {
       let sumCobrado = 0;
       let sumImporte = 0;
       for (let i = 0; i < data.length; i++) {
@@ -282,7 +299,6 @@ export default {
       this.recibo.selected = null;
       this.recibo.selectedSub = false;
       this.dialogModel = false;
-      this.filter.weeks = this.getWeeks();
       if (this.$route.params.recibo == "bajas") this.callDataBajas();
       if (this.$route.params.recibo == "gestion") this.callDataGestion();
       if (this.$route.params.recibo == "liq") this.callDataLiq();

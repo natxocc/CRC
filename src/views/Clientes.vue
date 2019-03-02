@@ -64,7 +64,7 @@ export default {
     callDataClients() {
       let self = this;
       this.callData({cmd: "getRecords", table: "Clientes"}).then(function(response) {
-        self.defineDialog(self.columnDefs);
+        self.defineDialog(self.columnDefs, false, "Clientes");
       });
     },
     // SELECTED ROW

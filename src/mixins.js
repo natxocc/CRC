@@ -95,13 +95,23 @@ export default {
             .autogrow
             ? columns[i].headerClass.autogrow
             : false;
-          if (columns[i].headerClass.select || columns[i].headerClass.autocomplete) {
+          if (columns[i].headerClass.select) {
             result.fields[fields[i]].options = [
               ...new Set(this.rowData.map(x => x[fields[i]]))
             ];
-            result.fields[fields[i]].type = columns[i].headerClass.autocomplete
-              ? "autocomplete"
-              : "select";
+            result.fields[fields[i]].type = "select";
+          }
+          if (columns[i].headerClass.autocomplete) {
+            result.fields[fields[i]].options = [
+              ...new Set(this.rowData.map(x => x[fields[i]]))
+            ];
+            result.fields[fields[i]].type = "autocomplete";
+          }
+          if (columns[i].headerClass.combo) {
+            result.fields[fields[i]].options = [
+              ...new Set(this.rowData.map(x => x[fields[i]]))
+            ];
+            result.fields[fields[i]].type = "combo";
           }
           if (columns[i].headerClass.required) {
             result.fields[fields[i]].props.rules = [
@@ -134,6 +144,24 @@ export default {
       // console.log(result)
       return true;
     },
+    setItems(field, type, items) {
+      this.dialogFields[field].options = items;
+      this.dialogFields[field].type = type;
+    },
+    getWeek(d) {
+      // Copy date so don't modify original
+      d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      // Set to nearest Thursday: current date + 4 - current day number
+      // Make Sunday's day number 7
+      d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+      // Get first day of year
+      var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      // Calculate full weeks to nearest Thursday
+      var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      // Return array of year and week number
+      // return [d.getUTCFullYear(), weekNo];
+      return weekNo;
+    },
     getDaysWeek(year, week) {
       var dateini = new Date(year, 0, 1),
         offset = dateini.getTimezoneOffset();
@@ -160,13 +188,6 @@ export default {
         dateend
       };
       return result;
-    },
-    getWeeks() {
-      let weeks = [];
-      for (let i = 0; i < 55; i++) {
-        weeks[i] = i + 1;
-      }
-      return weeks;
     },
     setLang(lang) {
       if (!localStorage.lang || !lang) lang = "es";
