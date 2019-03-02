@@ -172,7 +172,9 @@ export default {
       Comentarios: "Comentarios",
       FechaAviso: "Fecha Aviso",
       Fecha: "Fecha",
-      Operacion: "Operacion"
+      Operacion: "Operacion",
+      // CAJA
+      Concepto: "Concepto"
     },
     // GESTION
     gestion: [
@@ -250,6 +252,17 @@ export default {
         value: "CodigoPoliza",
         text: "Poliza"
       }
+    ],
+    // CAJA GESTION
+    caja: [
+      {
+        value: "COME",
+        text: "Metálico"
+      },
+      {
+        value: "COTR",
+        text: "Transferencia"
+      },
     ],
     ayuda: [
       "Recibos sin tratamiento",
@@ -474,7 +487,9 @@ export default {
       Comentarios: "Comentaris",
       FechaAviso: "Data Avís",
       Fecha: "Data",
-      Operacion: "Operació"
+      Operacion: "Operació",
+      // CAJA
+      Concepto: "Concepte"
     },
     // GESTIO
     gestion: [
@@ -552,6 +567,17 @@ export default {
         value: "EMITIDO",
         text: "EMÉS"
       }
+    ],
+    // CAJA GESTION
+    caja: [
+      {
+        value: "COME",
+        text: "Metàlic"
+      },
+      {
+        value: "COTR",
+        text: "Transferència"
+      },
     ],
     ayuda: [
       "Rebuts sense tractament",

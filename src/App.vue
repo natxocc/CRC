@@ -204,7 +204,7 @@ export default {
     // console.log(this.lang);
     this.menu.leftList = [
       {
-        icon: "euro_symbol",
+        icon: "assignment",
         name: this.lang.menu.Recibos,
         to: "/recibos/gestion"
       },
@@ -229,12 +229,12 @@ export default {
         to: "/recibos"
       },
       {
-        icon: "person",
+        icon: "people",
         name: this.lang.menu.Usuarios,
         to: "/usuarios"
       },
       {
-        icon: "person",
+        icon: "view_headline",
         name: this.lang.menu.Registros,
         to: "/registros"
       }

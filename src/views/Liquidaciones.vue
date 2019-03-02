@@ -34,8 +34,16 @@
           {{lang.Eliminar}}
         </v-btn>
         <v-spacer></v-spacer>
+        <v-btn color="primary white--text">
+          {{calculos.metalico}}
+          <v-icon dark right>monetization_on</v-icon>
+        </v-btn>
+        <v-btn color="primary white--text">
+          {{calculos.transferencia}}
+          <v-icon dark right>account_balance</v-icon>
+        </v-btn>
         <v-btn color="secondary black--text">
-          {{calculos.importe}}
+          {{calculos.total}}
           <v-icon dark right>euro_symbol</v-icon>
         </v-btn>
       </v-toolbar>
@@ -87,7 +95,9 @@ export default {
       },
       // CALCULOS
       calculos: {
-        importe: null
+        transferencia: null,
+        metalico: null,
+        total: null
       }
     };
   },
@@ -119,9 +129,9 @@ export default {
       // AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
       this.callData({cmd: "getRecords", table: "Caja", where}).then(function(response) {
         self.defineDialog(self.columnDefs, false, "Caja");
-        self.dialogFields["Gestion"].props.disabled = true;
         self.dialogFields["CodigoRecibo"].props.disabled = true;
         self.dialogFields["Usuario"].props.disabled = true;
+        self.setItems("Gestion", "select", self.lang.caja);
       });
     },
     // SELECTED ROW
@@ -133,17 +143,21 @@ export default {
         this.recibo.selected = false;
         this.defineDialog(this.columnDefs, false, "Caja");
       }
-      this.dialogFields["Gestion"].props.disabled = true;
       this.dialogFields["CodigoRecibo"].props.disabled = true;
       this.dialogFields["Usuario"].props.disabled = true;
+      this.setItems("Gestion", "select", this.lang.caja);
     },
     //CALCULATE
     filterData(data) {
-      let sumImporte = 0;
+      let sumTransferencia = 0;
+      let sumMetalico = 0;
       for (let i = 0; i < data.length; i++) {
-        sumImporte = sumImporte + data[i].data.Importe;
+        if (data[i].data.Gestion == "COME") sumMetalico = sumMetalico + data[i].data.Importe;
+        if (data[i].data.Gestion == "COTR") sumTransferencia = sumTransferencia + data[i].data.Importe;
       }
-      this.calculos.importe = Number(sumImporte).toFixed(1);
+      this.calculos.transferencia = Number(sumTransferencia).toFixed(1);
+      this.calculos.metalico = Number(sumMetalico).toFixed(1);
+      this.calculos.total = Number(sumMetalico + sumTransferencia).toFixed(1);
     },
     // INITIALIZATION
     init() {
