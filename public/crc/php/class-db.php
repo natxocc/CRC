@@ -93,9 +93,6 @@ class db
         $result = $syno->login($post);
         if ($result->success) {
             session_regenerate_id(true);
-            $sql = $this->db->query("SELECT Permisos, Filtros FROM Usuarios WHERE Usuario='" . $post['user'] . "'");
-            $customUser = $sql->fetchAll(PDO::FETCH_ASSOC);
-            $_SESSION['customUser'] = $customUser;
             $_SESSION['sid'] = $result->data->sid;
             $_SESSION['IPaddress'] = $this->getRealIP();
             $_SESSION['userAgent'] = $_SERVER['HTTP_USER_AGENT'];
@@ -108,6 +105,14 @@ class db
                     }
                 }
             }
+            // Recoge las tablas de Uuarios con permisos
+            $sql = $this->db->query("SELECT * FROM Usuarios WHERE Usuario='" . $this->sanitize($post['user']) . "'");
+            $user = $sql->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($user as $key => $value) {
+                $table[$key] = $value;
+            }
+            $_SESSION['tables'] = $table;
+            $result->tables = $_SESSION['tables'];
         } else {
             $this->logout($post);
         }
@@ -142,7 +147,7 @@ class db
     function isLogged($post)
     {
         if (isset($_SESSION['sid'])) {
-            if ($_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $post['sid'] == $_SESSION['sid']) return true;
+            if ($_SESSION['userAgent'] == $_SERVER['HTTP_USER_AGENT'] && $_SESSION['IPaddress'] == $this->getRealIP() && $this->sanitize($post['sid']) == $_SESSION['sid']) return true;
         }
         $this->logout($post);
         return false;
@@ -160,11 +165,12 @@ class db
         require_once("class-syno.php");
         $syno = new syno();
         $result = $syno->getUserInfo($post['sid']);
-        if (!$result) {
+        if (!$result && !isset($_SESSION['sid'])) {
             $this->logout($post);
         }
         echo json_encode($result);
     }
+
     /**
      * sendMail
      *
@@ -246,15 +252,16 @@ class db
      */
     public function getColumns($table, $lang = false)
     {
-        //var_dump($lang);
         $sql = $this->db->prepare("SHOW FULL COLUMNS FROM $table");
         $sql->execute();
         $fetch = $sql->fetchAll(PDO::FETCH_ASSOC);
+        // var_dump($fetch);
         foreach ($fetch as $key => $value) {
-            $result[$key]['type'] = "generalColumn";
-            $result[$key]['headerTooltip'] = $fetch[$key]['Field'];
-            $result[$key]['tooltipField'] = "";
+            $result[$key]['groupId'] = false;
+            $result[$key]['type'] = "general";
+            $result[$key]['headerClass'] = [];
             $result[$key]['field'] = $fetch[$key]['Field'];
+            // $result[$key]['headerTooltip'] = $fetch[$key]['Field'];
             $columnName = explode("|", $fetch[$key]['Comment']);
             $result[$key]['headerName'] = isset($lang[$fetch[$key]['Field']]) ? $lang[$fetch[$key]['Field']] : $columnName[0];
             if (isset($columnName[1])) {
@@ -271,15 +278,25 @@ class db
                     $result[$key]['minWidth'] = substr($columnName[1], strpos($columnName[1], "W") + 1, 2) * 16;
                 }
             }
+            $result[$key]['headerClass']['hidden'] = false;
+            $result[$key]['headerClass']['disabled'] = false;
             if (isset($columnName[2])) {
-                if (strstr($columnName[2], "R")) $result[$key]['tooltipField'] .= 'Required';
-                if (strstr($columnName[2], "A")) $result[$key]['tooltipField'] .= 'Autocomplete';
-                if (strstr($columnName[2], "H")) $result[$key]['tooltipField'] .= 'Hidden';
+                if (strstr($columnName[2], "H")) $result[$key]['headerClass']['hidden'] = true;
+                if (strstr($columnName[2], "D")) $result[$key]['headerClass']['disabled'] = true;
+                if (strstr($columnName[2], "T")) $result[$key]['headerClass']['autogrow'] = true;
+                if (strstr($columnName[2], "F")) $result[$key]['headerClass']['autofocus'] = true;
+                if (strstr($columnName[2], "R")) $result[$key]['headerClass']['required'] = true;
+                if (strstr($columnName[2], "A")) $result[$key]['headerClass']['autocomplete'] = true;
+                if (strstr($columnName[2], "S")) $result[$key]['headerClass']['select'] = true;
+                if (strstr($columnName[2], "C")) $result[$key]['headerClass']['combo'] = true;
             }
-            if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int")) $result[$key]['type'] = "numberColumn";
-            if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "textColumn";
-            if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "dateColumn";
-            if (strstr($fetch[$key]['Type'], "bit")) $result[$key]['type'] = "bitColumn";
+            if (strstr($fetch[$key]['Type'], "float") || strstr($fetch[$key]['Type'], "int") || strstr($fetch[$key]['Type'], "double")) $result[$key]['type'] = "number";
+            if (strstr($fetch[$key]['Type'], "char") || strstr($fetch[$key]['Type'], "text")) $result[$key]['type'] = "text";
+            if (strstr($fetch[$key]['Type'], "date")) $result[$key]['type'] = "date";
+            if (strstr($fetch[$key]['Type'], "datetime")) $result[$key]['type'] = "datetime";
+            if (strstr($fetch[$key]['Type'], "bit")) $result[$key]['type'] = "bit";
+            //ID
+            if (strstr($fetch[$key]['Key'], "PRI")) $result[$key]['groupId'] = true;
         }
         return $result;
     }
@@ -287,7 +304,7 @@ class db
     /**
      * getRecords
      *
-     * @param  mixed $post (table, where, subtable, id)
+     * @param  mixed $post (table, where, subtable, id) OPTIONAL (noColumns)
      *
      * @return void
      */
@@ -295,7 +312,7 @@ class db
     {
         $table = $this->sanitize($post['table']);
         $lang = isset($post['lang']) ? $post['lang'] : false;
-        $result['columns'] = $this->getColumns($table, $lang);
+        $result['columns'] = isset($post['noColumns']) ? false : $this->getColumns($table, $lang);
         $sqlquery = "SELECT * FROM `" . $post['table'] . "`";
         $where = isset($post['where']) ? " WHERE " . $this->sanitize($post['where'], false) : "";
         $sqlquery .= $where;
@@ -303,6 +320,8 @@ class db
         $sql = $this->db->prepare($sqlquery);
         try {
             $sql->execute();
+            $result['success'] = true;
+            $result['table'] = $table;
             $result['data'] = $sql->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
             echo $e;
@@ -310,7 +329,7 @@ class db
         }
         if (isset($post['subtable'])) {
             $table = $this->sanitize($post['subtable']);
-            $result['columnsSub'] = $this->getColumns($table);
+            $result['columnsSub'] = $this->getColumns($table, $lang);
             $sqlquery = " SELECT * FROM `" . $table . "`";
             $id = $this->sanitize($post['id']);
             $sql = $this->db->prepare($sqlquery);
@@ -329,9 +348,7 @@ class db
             }
             $result['data'] = $subtable['temp'];
         }
-        echo json_encode($result, JSON_NUMERIC_CHECK);
-        return $result['data'];
-        exit();
+        return $result;
     }
 
     /**
@@ -356,7 +373,7 @@ class db
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            //echo $e;
+            echo $e;
             return false;
         }
     }
@@ -381,13 +398,14 @@ class db
             $comma = ",";
         }
         $sqlquery .= " WHERE `" . $idkey . "` = :idvalue";
+        // echo $sqlquery;
         $sql = $this->db->prepare($sqlquery);
         $sql->bindParam(":idvalue", $post['idvalue']);
         try {
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            //echo $e;
+            echo $e;
             return false;
         }
     }
@@ -403,19 +421,17 @@ class db
     {
         $table = $this->sanitize($post['table']);
         $idkey = $this->sanitize($post['idkey']);
-        $user = $this->sanitize($post['user']);
         $sqlquery = "DELETE FROM `" . $table . "` WHERE `" . $idkey . "` = :idvalue";
-        if ($_SESSION['isAdmin'] <> 1) {
-            $sqlquery .= " AND `Usuario` ='$user'";
-        }
         $sql = $this->db->prepare($sqlquery);
         $sql->bindParam(":idvalue", $post['idvalue']);
+        //echo $sqlquery;
         try {
             $sql->execute();
             return true;
         } catch (Exception $e) {
-            //echo $e;
+            echo $e;
             return false;
         }
     }
 }
+

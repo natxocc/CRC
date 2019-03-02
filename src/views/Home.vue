@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <q-img :ratio="16/9" :src="require('../assets/office.jpg')" alt="Image" contain spinner-color="white"/>
-  </div>
+  <div></div>
 </template>
 
 <script>
 export default {
-  name: "home"
+  name: "Home"
 };
 </script>

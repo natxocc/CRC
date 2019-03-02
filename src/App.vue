@@ -1,179 +1,159 @@
 <template>
   <div id="app">
-    <q-layout>
-      <!-- HEADER Y TOOLBAR -->
-      <q-header :bordered="true" :elevated="true" :reveal="true">
-        <q-toolbar>
-          <q-btn @click="menu.left = !menu.left" dense flat icon="menu" round/>
-          <q-toolbar-title>
-            <strong>CRC</strong> Reale
-          </q-toolbar-title>
-          <q-space/>
-          <q-btn :label="lang" color="secondary" size="sm" text-color="primary">
-            <q-menu>
-              <q-list dense>
-                <q-item @click="lang='ca'" clickable v-close-menu>
-                  <q-item-section>CATALÀ</q-item-section>
-                </q-item>
-                <q-item @click="lang='es'" clickable v-close-menu>
-                  <q-item-section>ESPAÑOL</q-item-section>
-                </q-item>
-                <q-separator/>
-              </q-list>
-            </q-menu>
-          </q-btn>
-          <q-btn @click="sendBug" dense flat icon="bug_report" round/>
-          <q-btn @click="menuUser" dense flat icon="person" round/>
-        </q-toolbar>
-      </q-header>
-      <q-page-container>
-        <!-- DIALOGO USUARIO -->
-        <div class="justify-around">
-          <q-dialog v-model="user.dialog">
-            <q-card>
-              <q-card-section class="row items-center">
-                <q-avatar color="primary" icon="person" text-color="white"/>
-                <span class="q-ml-sm text-h4">{{$q.lang.InicioSesion}}</span>
-              </q-card-section>
-              <q-card-section class="row items-center">
-                <div class="row q-col-gutter-x-2 q-col-gutter-y-sm">
-                  <div class="col-12">
-                    <q-input :label="$q.lang.Usuario" type="text" v-model="user.user">
-                      <q-icon name="person" slot="prepend"/>
-                      <q-icon @click="user.user = ''" class="cursor-pointer" name="close" slot="append"/>
-                    </q-input>
-                  </div>
-                  <div class="col-12">
-                    <q-input :label="$q.lang.Clave" :type="user.passShow ? 'text' : 'password'" @keyup.enter="login " v-model="user.pass">
-                      <q-icon name="lock" slot="prepend"/>
-                      <q-icon @click="user.pass = ''" class="cursor-pointer" name="close" slot="append"/>
-                      <q-icon :name="user.passShow ? 'visibility' : 'visibility_off'" @click="user.passShow=!user.passShow" class="cursor-pointer" slot="append"/>
-                    </q-input>
-                  </div>
-                </div>
-              </q-card-section>
-              <q-card-actions align="right">
-                <q-btn :label="$q.lang.label.cancel" @click="user.dialog=false" color="negative" flat/>
-                <q-btn :label="$q.lang.label.ok" @click="login" color="primary" flat/>
-              </q-card-actions>
-            </q-card>
-          </q-dialog>
+    <v-app id="inspire" v-cloak>
+      <!-- MENU LATERAL IZQUIERDO -->
+      <v-navigation-drawer app disable-resize-watcher fixed v-model="menu.left">
+        <template>
+          <v-card>
+            <v-card-actions>
+              <v-btn block color="primary" flat to="/">
+                <v-icon>home</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </template>
+        <v-list>
+          <v-list-tile :key="index" :to="value.to" v-for="(value, key, index) in menu.leftList">
+            <v-list-tile-avatar>
+              <v-icon>{{ value.icon }}</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title>{{ value.name }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+      </v-navigation-drawer>
+      <!-- TOOLBAR -->
+      <v-toolbar :scroll-threshold="200" app color="primary" dark fixed scroll-off-screen>
+        <v-toolbar-side-icon @click.stop="menu.left = !menu.left" color="secondary" flat></v-toolbar-side-icon>
+        <v-toolbar-title>CRC Reale Valls</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <!-- SELECCION IDIOMA -->
+        <v-menu bottom class="align-center" transition="slide-y-transition">
+          <v-btn dark icon slot="activator">
+            <v-icon>language</v-icon>
+          </v-btn>
+          <v-list>
+            <v-list-tile @click="setLang('es')">
+              <v-list-tile-title>Español</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="setLang('ca')">
+              <v-list-tile-title>Català</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+        <!-- BOTON USUARIO -->
+        <div>
+          <v-btn @click="user.dialog=true" color="red" flat icon>
+            <v-icon>person</v-icon>
+          </v-btn>
         </div>
-        <!-- MENU LEFT -->
-        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="left" v-model="menu.left">
-          <q-btn class="full-width" flat icon="home" inline to="/"></q-btn>
-          <q-list :separator="true" bordered>
-            <q-item :key="i" :to="option.to" clickable v-for="(option,i) in menu.leftList" v-ripple>
-              <q-item-section avatar>
-                <q-icon :name="option.icon" color="primary"/>
-              </q-item-section>
-              <q-item-section>{{$q.lang.menu[option.name]}}</q-item-section>
-            </q-item>
-          </q-list>
-        </q-drawer>
-        <!-- MENU RIGHT -->
-        <q-drawer :bordered="true" :elevated="true" :overlay="true" side="right" v-model="menu.right">
-          <div class="row text-center">
-            <div class="col">
-              <q-chip :label="user.name" color="primary" icon="person" outline square text-color="white"/>
-            </div>
-          </div>
-          <div class="row text-center">
-            <div class="col">
-              <q-chip :label="user.mail" color="primary" icon="email" outline square text-color="white"/>
-            </div>
-          </div>
-          <div class="row text-center">
-            <div class="col">
-              <q-btn @click="logout" class="q-mt-md" color="secondary">{{$q.lang.CerrarSesion}}</q-btn>
-            </div>
-          </div>
-        </q-drawer>
-        <!-- ROUTER VIEW -->
-        <transition enter-active-class="animated fadeIn" leave-active-class="animated fadeOut" mode="out-in">
-          <router-view/>
-        </transition>
-      </q-page-container>
-    </q-layout>
+      </v-toolbar>
+      <!-- DIALOG USER -->
+      <v-dialog @keydown.esc="user.dialog=false" v-model="user.dialog">
+        <v-card>
+          <v-card-title class="headline secondary" primary-title>Inicio de sesión</v-card-title>
+          <v-card-text>
+            <v-form>
+              <v-text-field clearable label="Usuario" required v-model="$store.state.user.user"></v-text-field>
+              <v-text-field @keyup.enter="user.dialog=false" clearable label="Contraseña" required type="password" v-model="$store.state.user.pass"></v-text-field>
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="user.dialog=false" color="warning" flat>{{lang.Cancelar}}</v-btn>
+            <v-btn @click="login" color="primary" flat>{{lang.Aceptar}}</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <!-- GO UP BUTTON -->
+      <v-fab-transition>
+        <v-btn :style="{bottom: $vuetify.breakpoint.smOnly ? '64px' : '' }" @click="toTop" bottom color="red" dark fab fixed right v-scroll="onScroll" v-show="gotop">
+          <v-icon>keyboard_arrow_up</v-icon>
+        </v-btn>
+      </v-fab-transition>
+      <!-- ROUTER VIEW -->
+      <v-content>
+        <v-container class="pa-1" fill-height fluid>
+          <v-layout align-start justify-center>
+            <v-flex text-xs-center>
+              <!-- LOADING -->
+              <v-dialog persistent v-model="$store.state.loading" width="100">
+                <v-card>
+                  <v-card-text>
+                    <div class="text-xs-center">
+                      <v-progress-circular color="secondary" indeterminate></v-progress-circular>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-dialog>
+              <router-view></router-view>
+            </v-flex>
+          </v-layout>
+        </v-container>
+      </v-content>
+      <!-- FOOTER -->
+      <v-footer app color="primary" dark>
+        <span class="white--text">&copy; Ntx Software v0.1</span>
+        <v-spacer></v-spacer>
+      </v-footer>
+      <!-- NOTIFICATIONS -->
+      <v-snackbar :color="$store.state.notify.color" :timeout="1500" v-model="$store.state.notify.model">{{ $store.state.notify.text}}</v-snackbar>
+    </v-app>
   </div>
 </template>
 <script>
-import Custom from "./mixins";
+import mixins from "./mixins";
+import SnackBar from "./components/SnackBar.vue";
 export default {
-  mixins: [Custom],
+  mixins: [mixins],
+  components: {
+    SnackBar
+  },
   data() {
     return {
-      lang: this.$q.lang.isoName,
+      gotop: false,
       menu: {
         left: false,
         right: false,
-        leftList: [
-          {
-            icon: "euro_symbol",
-            name: this.$q.lang.menu.Recibos,
-            to: "/recibos/gestion"
-          },
-          {
-            icon: "timeline",
-            name: this.$q.lang.menu.Polizas,
-            to: "/polizas/altas"
-          },
-          {
-            icon: "contacts",
-            name: this.$q.lang.menu.Clientes,
-            to: "/clientes"
-          },
-          {
-            icon: "healing",
-            name: this.$q.lang.menu.Siniestros,
-            to: "/recibos"
-          },
-          {
-            icon: "person",
-            name: this.$q.lang.menu.Usuarios,
-            to: "/usuarios"
-          }
-        ]
+        leftList: null
       },
       user: {
         user: null,
         pass: null,
         name: null,
         mail: null,
-        passShow: false,
         dialog: false
       }
     };
   },
   methods: {
+    onScroll() {
+      // if (typeof window === "undefined") return;
+      const top = window.pageYOffset || document.documentElement.offsetTop || 0;
+      this.gotop = top > 200;
+    },
+    toTop() {
+      this.$router.push({hash: ""});
+      this.$vuetify.goTo(0);
+    },
     login() {
       let self = this;
-      this.callData({cmd: "login", user: self.user.user, pass: self.user.pass})
+      this.callData({cmd: "login", user: self.$store.state.user.user, pass: self.$store.state.user.pass})
         .then(function(response) {
-          if (response.data.success) {
-            localStorage.sid = response.data.data.sid;
-            localStorage.mail = response.data.info.data.email;
-            localStorage.username = response.data.info.data.fullname;
-            self.$q.notify({
-              message: self.$q.lang.Bienvenido + " " + response.data.info.data.fullname,
-              icon: "check",
-              color: "positive"
-            });
+          if (response.success) {
+            localStorage.sid = response.sid;
+            localStorage.mail = response.info.data.email;
+            localStorage.username = response.info.data.fullname;
+            localStorage.user = response.info.data.user;
+            self.newMessage(self.lang.Bienvenido, "success");
           } else {
-            //this.logout();
-            self.$q.notify({
-              message: self.$q.lang.UsuarioClaveIncorrecta,
-              icon: "close",
-              color: "negative"
-            });
+            self.newMessage(self.lang.UsuarioClaveIncorrecta, "error");
             self.logout();
           }
         })
         .catch(function(response) {
-          self.$q.notify({
-            message: self.$q.lang.ErrorRed,
-            color: "negative"
-          });
+          self.newMessage(self.lang.ErrorRed, "error");
         });
       this.user.dialog = false;
     },
@@ -183,22 +163,23 @@ export default {
       localStorage.removeItem("sid");
       localStorage.removeItem("mail");
       localStorage.removeItem("username");
-      self.user.name = localStorage.username;
-      self.user.mail = localStorage.mail;
+      self.$store.state.user.user = localStorage.user;
+      self.$store.state.user.name = localStorage.username;
+      self.$store.state.user.mail = localStorage.mail;
       this.menu.left = false;
       this.menu.right = false;
     },
     checkUser() {
       let self = this;
-      this.callData({cmd: "checkUser"})
-        .then(function(response) {
-          if (response.data.success) {
-            self.user.name = localStorage.username;
-            self.user.mail = localStorage.mail;
-          } else {
-            self.logout();
-          }
-        })
+      this.callData({cmd: "checkUser"}).then(function(response) {
+        if (response.success) {
+          self.$store.state.user.name = localStorage.username;
+          self.$store.state.user.user = localStorage.user;
+          self.$store.state.user.mail = localStorage.mail;
+        } else {
+          self.logout();
+        }
+      });
     },
     menuUser() {
       if (localStorage.sid) {
@@ -212,10 +193,52 @@ export default {
     }
   },
   beforeMount() {
+    this.setLang(localStorage.lang);
+    this.$store.state.notify.model = false;
+    this.$store.state.loading = false;
+    // console.log(this.$store)
     if (localStorage.sid) this.checkUser();
-    localStorage.url = "http://casa.natxocc.com/crc/php/post.php";
+    localStorage.url = "http://servidor/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
-    if (localStorage.lang != "es") this.lang = localStorage.lang;
+    
+    // console.log(this.lang);
+    this.menu.leftList = [
+      {
+        icon: "assignment",
+        name: this.lang.menu.Recibos,
+        to: "/recibos/gestion"
+      },
+      {
+        icon: "euro_symbol",
+        name: this.lang.menu.Liquidaciones,
+        to: "/liquidaciones"
+      },
+      {
+        icon: "timeline",
+        name: this.lang.menu.Polizas,
+        to: "/polizas/altas"
+      },
+      {
+        icon: "contacts",
+        name: this.lang.menu.Clientes,
+        to: "/clientes"
+      },
+      {
+        icon: "healing",
+        name: this.lang.menu.Siniestros,
+        to: "/recibos"
+      },
+      {
+        icon: "people",
+        name: this.lang.menu.Usuarios,
+        to: "/usuarios"
+      },
+      {
+        icon: "view_headline",
+        name: this.lang.menu.Registros,
+        to: "/registros"
+      }
+    ];
   },
   created() {}
 };

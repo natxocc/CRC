@@ -36,15 +36,12 @@
 </template>
 
 <script>
-//           :rowMultiSelectWithClick="false"
 import {AgGridVue} from "ag-grid-vue";
 import Vue from "vue";
-import axios from "axios";
-import localeText from "../lang/es.tables";
 
 // EXPORT DEFAULT
 export default {
-  name: "NTables",
+  name: "DataTable",
   props: {
     columnDefs: null,
     columnDefsSub: null,
@@ -52,7 +49,8 @@ export default {
     masterDetail: null,
     rowClassRules: null,
     filters: null,
-    quickFilter: null
+    quickFilter: null,
+    localeText: ""
   },
   data() {
     return {
@@ -69,38 +67,34 @@ export default {
         sortable: true
       },
       columnTypes: {
-        dateColumn: {
+        date: {
           filter: "agSetColumnFilter"
         },
-        textColumn: {
+        datetime: {
           filter: "agSetColumnFilter"
         },
-        numberColumn: {
+        text: {
+          filter: "agSetColumnFilter"
+        },
+        number: {
           filter: "agNumberColumnFilter",
           enableValue: true,
           enableRowGroup: true
         },
-        generalColumn: {
+        general: {
           filter: "agSetColumnFilter",
           enableRowGroup: true
         },
-        bitColumn: {
+        bit: {
           filter: "agSetColumnFilter",
           enableRowGroup: true,
           cellRenderer: function(params) {
-            return `<input type='checkbox' onclick="return false;" ${
-              params.value ? "checked" : ""
-            } />`;
+            return `<input type='checkbox' onclick="return false;" ${params.value ? "checked" : ""} />`;
           }
         }
       },
       statusBar: {
-        statusPanels: [
-          {statusPanel: "agTotalRowCountComponent", align: "left"},
-          {statusPanel: "agFilteredRowCountComponent"},
-          {statusPanel: "agSelectedRowCountComponent"},
-          {statusPanel: "agAggregationComponent"}
-        ]
+        statusPanels: [{statusPanel: "agTotalRowCountComponent", align: "left"}, {statusPanel: "agFilteredRowCountComponent"}, {statusPanel: "agSelectedRowCountComponent"}, {statusPanel: "agAggregationComponent"}]
       },
       sideBar: {
         toolPanels: [
@@ -114,8 +108,7 @@ export default {
         ],
         defaultToolPanel: "",
         enablePivot: false
-      },
-      localeText: null
+      }
     };
   },
   components: {
@@ -156,18 +149,16 @@ export default {
     },
     onFilterChanged(event) {
       if (this.gridApi) {
-        this.$emit(
-          "gridData",
-          this.gridApi.rowModel.rootNode.childrenAfterFilter
-        );
+        this.$emit("filterData", this.gridApi.rowModel.rootNode.childrenAfterFilter);
       }
     },
     onCellClicked(event) {
       this.$emit("cellClicked", event);
     },
     onSelectionChanged(params) {
-      let row = this.gridApi.getSelectedRows();
-      this.$emit("rowSelected", row);
+      let row = [];
+      row = this.gridApi.getSelectedRows();
+      this.$emit("rowSelected", row[0]);
     },
     onCellValueChanged(value) {},
     createSubtable() {
@@ -179,7 +170,7 @@ export default {
           columnDefs: this.columnDefsSub,
           defaultColDef: this.defaultColDef,
           columnTypes: this.columnTypes,
-          localeText: localeText,
+          localeText: this.localeText,
           onGridReady(params) {
             this.gridApi = params.api;
           },
@@ -188,26 +179,21 @@ export default {
           },
           onCellValueChanged(value) {},
           onSelectionChanged(event) {
-            let row = this.gridApi.getSelectedRows();
-            self.$emit("rowSelectedSub", row);
+            let row = {};
+            row = this.gridApi.getSelectedRows();
+            self.$emit("rowSelectedSub", row[0]);
           }
         },
         getDetailRowData: (params) => {
           params.successCallback(params.data.callRecords);
         },
         template: function(params) {
-          return (
-            '<div style="height: 100%; background-color: #EDF6FF; padding: 20px; box-sizing: border-box;">' +
-            '  <div ref="eDetailGrid" style="height: 90%;"></div>' +
-            "</div>"
-          );
+          return '<div style="height: 100%; background-color: #EDF6FF; padding: 20px; box-sizing: border-box;">' + '  <div ref="eDetailGrid" style="height: 90%;"></div>' + "</div>";
         }
       };
     }
   },
   beforeMount() {
-    var lang = require(`../lang/${localStorage.lang}.tables`);
-    this.localeText = lang.default;
   },
   created() {},
   watch: {

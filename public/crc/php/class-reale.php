@@ -17,7 +17,6 @@ class reale
     $empresa = [4, 10];
     $post['table'] = "Recibos";
     $dateini = date("Y-m", strtotime("-1 month", strtotime(date('Y-m-d')))) . "-01";
-    // $dateini = date("Y-m", strtotime("-5 day", strtotime(date('Y-m-d')))) . "-01";
     $dateend = date("Y-m-d");
     $wsdl = "https://lba.realeonline.net/Reale.B2b.Services.Multitarificadores.IisHost/DescargaCompletaRecibos.svc?wsdl";
     foreach ($empresa as $emp) {
@@ -40,7 +39,7 @@ class reale
         'IncluirNuevos' => true,
       );
       $resultado = $consulta->DescargarNew($parametros);
-        //echo json_encode($resultado);
+      // echo json_encode($resultado);
       if (!isset($resultado->ListaRecibos->ReciboAmpliado)) {
         $result['success'] = false;
         $result['empresa'] = $emp;
@@ -50,7 +49,7 @@ class reale
       }
       $resultado = $resultado->ListaRecibos->ReciboAmpliado;
         // var_dump($resultado);
-        // echo json_encode($resultado);
+      //echo json_encode($resultado);
       $i = 0;
       foreach ($resultado as $key => $value) {
       // Conversiones de Fechas
@@ -99,10 +98,9 @@ class reale
   function updatePolizas()
   {
     global $db;
-    $empresa = [4, 10];
+    $empresa = [4];
     $post['table'] = "Polizas";
     $dateini = date("Y-m", strtotime("-1 month", strtotime(date('Y-m-d')))) . "-01";
-    // $dateini = date("Y-m", strtotime("-5 day", strtotime(date('Y-m-d')))) . "-01";
     $dateend = date("Y-m-d");
     $wsdl = "https://lba.realeonline.net/Reale.B2b.Services.Multitarificadores.IisHost/DescargaPolizas.svc?wsdl";
     $consulta = new SoapClient($wsdl, array(
@@ -130,8 +128,7 @@ class reale
         return false;
       }
       $resultado = $resultado->ListaPolizas->Poliza;
-      //echo json_encode($resultado, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
-      // exit();
+      // echo json_encode($resultado, JSON_PRETTY_PRINT | JSON_NUMERIC_CHECK);
       $i = 0;
       foreach ($resultado as $key => $value) {
             // Conversiones de Fechas

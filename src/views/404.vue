@@ -4,15 +4,23 @@
       <div class="notfound">
         <div class="notfound-404"></div>
         <h1>404</h1>
-        <h2>Oops! Página inexistente</h2>
-        <p>Lo sentimos, la página solicitada no existe, fué eliminada, cambiada de nombre o está temporalmente indisponible</p>
-        <a href="#">Volver a Inicio</a>
+        <h2>Oops!{{lang.error404.PaginaError}}</h2>
+        <p>{{lang.error404.PaginaText}}</p>
+        <v-btn color="primary" flat icon to="/">
+          <v-icon>home</v-icon>
+        </v-btn>
       </div>
     </div>
   </div>
 </template>
 <script>
-export default {};
+import mixins from '../mixins'
+export default {
+  mixins: [mixins],
+  beforeMount() {
+    this.setLang(localStorage.lang);
+  }
+};
 </script>
 
 <style>

@@ -67,7 +67,6 @@ class syno
    */
   function getUserInfo($sid)
   {
-    $return = array();
     $data = file_get_contents('http://localhost:5000/webapi/entry.cgi?api=SYNO.Core.NormalUser&method=get&version=1&_sid=' . $sid);
     $result = json_decode($data);
     if ($result->success) {

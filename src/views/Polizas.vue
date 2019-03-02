@@ -1,79 +1,141 @@
 <template>
-  <div class="container">
+  <div>
     <!-- TABS -->
-    <q-tabs active-bg-color="primary" active-color="white" class="bg-secondary text-primary" dense indicator-color="transparent" inline-label top-indicator v-model="tab">
-      <q-route-tab :label="$q.lang.Altas" icon="assignment_turned_in" name="gestion" to="/polizas/altas"/>
-      <q-route-tab :label="$q.lang.Bajas" icon="assignment_returned" name="bajas" to="/polizas/bajas"/>
-      <q-tab :label="calculos.importe" class="text-primary" disabled icon="euro_symbol"/>
-    </q-tabs>
-    <!-- SELECT FILTERS GESTION ALTAS Y BAJAS-->
-    <div class="row text-center">
-      <div class="col-xs-12 col-sm-4" style="padding: 10px">
-        <q-input :label="$q.lang.FiltroRapido" dense type="text" v-model="quickFilter">
-          <q-icon name="filter_list" slot="prepend"/>
-          <q-icon @click="quickFilter = ''" class="cursor-pointer" name="close" slot="append"/>
-        </q-input>
-      </div>
-      <div class="col-xs-12 col-sm-4" style="padding: 10px">
-        <q-select :label="$q.lang.ano" :options="filter.years" @input="init" dense expandBesides optionsDense v-model="filter.year"/>
-      </div>
-      <div class="col-xs-12 col-sm-4" style="padding: 10px">
-        <q-select :label="$q.lang.mes" :options="filter.months" @input="init" dense expandBesides optionsDense v-model="filter.month"/>
-      </div>
-    </div>
+    <v-tabs align-with-title centered color="secondary" icons-and-text>
+      <v-tabs-slider color="primary"></v-tabs-slider>
+      <v-tab to="/polizas/altas">
+        {{lang.Altas}}
+        <v-icon>assignment_turned_in</v-icon>
+      </v-tab>
+      <v-tab to="/polizas/bajas">
+        {{lang.Bajas}}
+        <v-icon>assignment_returned</v-icon>
+      </v-tab>
+      <!-- <v-tab-item :key="i" :value="'tab-' + i" v-for="i in 3">
+      <v-card flat>-->
+      <!-- <v-card-text>{{ text }}</v-card-text> -->
+      <!-- </v-card>
+      </v-tab-item>-->
+    </v-tabs>
+    <!-- TABS -->
+    <!-- SELECT FILTERS TOTALS-->
+    <v-layout align-start row wrap>
+      <v-flex class="px-1" md4 xs12>
+        <v-text-field :label="lang.FiltroRapido" clearable hide-details v-model="quickFilter"></v-text-field>
+      </v-flex>
+      <!-- SELECT FILTERS GESTION ALTAS Y BAJAS-->
+      <v-flex class="px-1" md8 xs12>
+        <v-dialog full-width v-model="filter.dialogMonth" width="290px">
+          <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.yearmonth"></v-text-field>
+          <v-date-picker :locale="locale" no-title scrollable type="month" v-model="filter.yearmonth" :first-day-of-week="1">
+            <v-spacer></v-spacer>
+            <v-btn @click="callDataAltas" color="primary" flat>OK</v-btn>
+          </v-date-picker>
+        </v-dialog>
+      </v-flex>
+      <!-- MINI TOOLBAR-->
+      <v-flex class="pt-1">
+        <v-toolbar color="primary" dense>
+          <v-btn @click="dialogModel=true" color="secondary black--text" small v-if="!poliza.selected">
+            <v-icon>add</v-icon>
+            {{lang.Nuevo}}
+          </v-btn>
+          <v-btn @click="dialogModel=true" color="secondary black--text" small v-if="poliza.selected">
+            <v-icon>add</v-icon>
+            {{lang.Editar}}
+          </v-btn>
+          <v-btn @click="poliza.deleteModel=true" color="error" small v-if="poliza.selected">
+            <v-icon>delete</v-icon>
+            {{lang.Eliminar}}
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary black--text font-weight-medium">
+            {{calculos.importe}}
+            <v-icon dark right>euro_symbol</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-flex>
+    </v-layout>
+
     <!-- TABLA DE DATOS -->
-    <n-tables :columnDefs="columnDefs" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @gridData="gridData"/>
+    <data-table :columnDefs="columnDefs" :localeText="lang.table" :quickFilter="quickFilter" :rowClassRules="rowClassRules" :rowData="rowData" @filterData="filterData" @rowSelected="rowSelected"/>
+    <!-- DIALOG -->
+    <dialog-data :data="dialogData" :fields="dialogFields" :lang="lang" :model="dialogModel" @cancel="dialogModel=false" @onChange="onChange" @onSave="onSave"/>
   </div>
 </template>
 
 <script>
-import NTables from "../components/NTables.vue";
-import Custom from "../mixins";
+import DataTable from "../components/DataTable.vue";
+import DialogData from "../components/DialogData.vue";
+import mixins from "../mixins";
 export default {
   components: {
-    NTables
+    DataTable,
+    DialogData
   },
-  mixins: [Custom],
+  mixins: [mixins],
   data() {
     return {
+      locale: localStorage.lang,
       // TABLE
-      columnDefs: [],
-      rowData: null,
-      quickFilter: null,
       rowClassRules: {},
       filter: {
-        years: [],
-        months: [],
-        month: ("0" + (new Date().getMonth() + 1)).slice(-2),
-        year: new Date().getFullYear()
+        yearmonth: new Date().toISOString().substr(0, 7),
+        dialogMonth: false
       },
       tab: this.$route.params.poliza,
       // CALCULOS
       calculos: {
         importe: null,
         cobrado: null
+      },
+      poliza: {
+        selected: false,
+        deleteModel: false
       }
     };
   },
   methods: {
+    onChange() {},
+    onSave() {
+      this.dialogModel = false;
+      let self = this;
+      this.callData({cmd: this.cmd, idkey: this.idKey, idvalue: this.dialogData[this.idKey], data: this.dialogData, table: this.dialogTable}).then(() => self.init());
+    },
+    onDelete() {
+      this.user.deleteModel = false;
+      let self = this;
+      this.callData({cmd: "deleteRecord", idkey: this.idKey, idvalue: this.dialogData[this.idKey], table: this.table}).then(() => self.init());
+    },
     // CALL ALTAS
     callDataAltas() {
+      this.filter.dialogMonth = false;
       let self = this;
-      let where = "(TipoInformacion LIKE 'Nueva%' ) AND (FechaAlta LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
+      let where = "(TipoInformacion LIKE 'Nueva%' ) AND (FechaAlta LIKE '" + this.filter.yearmonth + "%')";
       this.callData({cmd: "getRecords", table: "Polizas", where}).then(function(response) {
-        self.defineTable(response);
+        self.defineDialog(self.columnDefs, false, "Polizas");
       });
     },
     // CALL BAJAS
     callDataBajas() {
+      this.filter.dialogMonth = false;
       let self = this;
-      let where = "(TipoInformacion LIKE 'Anula%' )  AND (FechaBaja LIKE '" + this.filter.year + "-" + this.filter.month + "%')";
+      let where = "(TipoInformacion LIKE 'Anula%' )  AND (FechaBaja LIKE '" + this.filter.yearmonth + "%')";
       this.callData({cmd: "getRecords", table: "Polizas", where}).then(function(response) {
-        self.defineTable(response);
+        self.defineDialog(self.columnDefs, false, "Polizas");
       });
     },
-    //CALCULATE
-    gridData(data) {
+    // SELECTED ROW
+    rowSelected: function(data) {
+      if (data) {
+        this.poliza.selected = true;
+        this.defineDialog(this.columnDefs, data, "Polizas");
+      } else {
+        this.poliza.selected = false;
+        this.defineDialog(this.columnDefs, false, "Polizas");
+      }
+    }, //CALCULATE
+    filterData(data) {
       let sumCobrado = 0;
       let sumImporte = 0;
       for (let i = 0; i < data.length; i++) {
@@ -90,9 +152,8 @@ export default {
     }
   },
   beforeMount() {
+    this.setLang(localStorage.lang);
     this.init();
-    this.filter.months = this.getMonths();
-    this.filter.years = this.getYears();
   },
   watch: {
     $route: "init"
