@@ -180,7 +180,7 @@ export default {
       );
       dateini.setDate(dateini.getDate() - 2); // Antes -3 pero comienza en Domingo
       let dateend = new Date(dateini);
-      dateend.setDate(dateini.getDate() + 6);
+      dateend.setDate(dateini.getDate() + 7);// Antes +6 pero faltaba incluir el domingo en MtSQL
       dateini = dateini.toISOString().substr(0, 10);
       dateend = dateend.toISOString().substr(0, 10);
       let result = {
