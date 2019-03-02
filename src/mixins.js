@@ -178,7 +178,7 @@ export default {
       dateini.setTime(
         dateini.getTime() + (dateini.getTimezoneOffset() - offset) * 60 * 1000
       );
-      dateini.setDate(dateini.getDate() - 3);
+      dateini.setDate(dateini.getDate() - 2); // Antes -3 pero comienza en Domingo
       let dateend = new Date(dateini);
       dateend.setDate(dateini.getDate() + 6);
       dateini = dateini.toISOString().substr(0, 10);

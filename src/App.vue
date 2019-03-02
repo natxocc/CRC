@@ -55,14 +55,14 @@
           <v-card-title class="headline secondary" primary-title>Inicio de sesión</v-card-title>
           <v-card-text>
             <v-form>
-              <v-text-field clearable label="Usuario" required v-model="user.name"></v-text-field>
-              <v-text-field @keyup.enter="user.dialog=false" clearable label="Contraseña" required type="password" v-model="user.pass"></v-text-field>
+              <v-text-field clearable label="Usuario" required v-model="$store.state.user.user"></v-text-field>
+              <v-text-field @keyup.enter="user.dialog=false" clearable label="Contraseña" required type="password" v-model="$store.state.user.pass"></v-text-field>
             </v-form>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn @click="user.dialog=false" color="warning" flat>{{lang.Cancelar}}</v-btn>
-            <v-btn @click="user.dialog=false" color="primary" flat>{{lang.Aceptar}}</v-btn>
+            <v-btn @click="login" color="primary" flat>{{lang.Aceptar}}</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -139,12 +139,13 @@ export default {
     },
     login() {
       let self = this;
-      this.callData({cmd: "login", user: self.user.user, pass: self.user.pass})
+      this.callData({cmd: "login", user: self.$store.state.user.user, pass: self.$store.state.user.pass})
         .then(function(response) {
           if (response.success) {
             localStorage.sid = response.sid;
             localStorage.mail = response.info.data.email;
             localStorage.username = response.info.data.fullname;
+            localStorage.user = response.info.data.user;
             self.newMessage(self.lang.Bienvenido, "success");
           } else {
             self.newMessage(self.lang.UsuarioClaveIncorrecta, "error");
@@ -162,8 +163,9 @@ export default {
       localStorage.removeItem("sid");
       localStorage.removeItem("mail");
       localStorage.removeItem("username");
-      self.user.name = localStorage.username;
-      self.user.mail = localStorage.mail;
+      self.$store.state.user.user = localStorage.user;
+      self.$store.state.user.name = localStorage.username;
+      self.$store.state.user.mail = localStorage.mail;
       this.menu.left = false;
       this.menu.right = false;
     },
@@ -171,8 +173,9 @@ export default {
       let self = this;
       this.callData({cmd: "checkUser"}).then(function(response) {
         if (response.success) {
-          self.user.name = localStorage.username;
-          self.user.mail = localStorage.mail;
+          self.$store.state.user.name = localStorage.username;
+          self.$store.state.user.user = localStorage.user;
+          self.$store.state.user.mail = localStorage.mail;
         } else {
           self.logout();
         }
@@ -190,19 +193,25 @@ export default {
     }
   },
   beforeMount() {
+    this.setLang(localStorage.lang);
     this.$store.state.notify.model = false;
     this.$store.state.loading = false;
     // console.log(this.$store)
     if (localStorage.sid) this.checkUser();
     localStorage.url = "http://servidor/crc/php/post.php";
     if (window.location.hostname != "localhost") localStorage.url = "http://" + window.location.hostname + "/crc/php/post.php";
-    this.setLang(localStorage.lang);
+    
     // console.log(this.lang);
     this.menu.leftList = [
       {
         icon: "euro_symbol",
         name: this.lang.menu.Recibos,
         to: "/recibos/gestion"
+      },
+      {
+        icon: "euro_symbol",
+        name: this.lang.menu.Liquidaciones,
+        to: "/liquidaciones"
       },
       {
         icon: "timeline",

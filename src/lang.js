@@ -94,6 +94,7 @@ export default {
     // MENU
     menu: {
       Recibos: "Recibos",
+      Liquidaciones: "Liquidaciones",
       Polizas: "Polizas",
       Clientes: "Clientes",
       Siniestros: "Siniestros",
@@ -273,6 +274,7 @@ export default {
     NuevoRecibo: "Nuevo Recibo",
     EliminarRecibo: "Eliminar Recibo",
     NuevaGestion: "Nueva Gestión",
+    NuevoMovimiento: "Nuevo Movimiento",
     EditarGestion: "Editar",
     EliminarGestion: "Eliminar Gestión",
     EliminarGestionT: "Eliminar gestión del recibo",
@@ -395,6 +397,7 @@ export default {
     // MENU
     menu: {
       Recibos: "Rebuts",
+      Liquidaciones: "Liquidacions",
       Polizas: "Pòlisses",
       Clientes: "Clients",
       Siniestros: "Sinistres",
@@ -573,6 +576,7 @@ export default {
     NuevoRecibo: "Nou Rebut",
     EliminarRecibo: "Eliminar rebut",
     NuevaGestion: "Nova Gestió",
+    NuevoMovimiento: "Nou Moviment",
     EditarGestion: "Editar",
     EditarGestionT: "Editar gestió de rebut seleccionat",
     EliminarGestion: "Eliminar Gestió",

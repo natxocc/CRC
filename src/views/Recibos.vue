@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- TABS -->
-    <v-tabs show-arrows align-with-title centered color="secondary" icons-and-text>
+    <v-tabs align-with-title centered color="secondary" icons-and-text show-arrows>
       <v-tabs-slider color="primary"></v-tabs-slider>
       <v-tab to="/recibos/gestion">
         {{lang.Gestion}}
@@ -10,10 +10,6 @@
       <v-tab to="/recibos/bajas">
         {{lang.BajasPendientes}}
         <v-icon>assignment_returned</v-icon>
-      </v-tab>
-      <v-tab to="/recibos/liq">
-        {{lang.Liquidacion}}
-        <v-icon>credit_card</v-icon>
       </v-tab>
     </v-tabs>
 
@@ -47,30 +43,7 @@
         </v-flex>
       </template>
     </v-layout>
-    <!-- FILTER ONLY LIQ & CAJA -->
-    <v-layout align-start row wrap>
-      <template v-if="this.$route.params.recibo=='liq'">
-        <v-flex class="px-1" md8 xs12>
-          <v-dialog full-width v-model="filter.dateDialog" width="290px">
-            <v-text-field prepend-icon="event" readonly slot="activator" v-model="filter.date"></v-text-field>
-            <v-date-picker :locale="locale" no-title scrollable show-week v-model="filter.date" :first-day-of-week="1">
-              <v-spacer></v-spacer>
-              <v-btn @click="callDataLiq" color="primary" flat>OK</v-btn>
-            </v-date-picker>
-          </v-dialog>
-        </v-flex>
-      </template>
-    </v-layout>
-    <!-- <template v-else-if="this.$route.params.recibo=='liq'">
-          <div class="col-xs-12 col-md-4" style="padding: 10px">
-            <q-select :label="$q.lang.ano" :options="filter.years" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.year"/>
-          </div>
-          <div class="col-xs-12 col-md-4" style="padding: 10px">
-            <q-select :label="$q.lang.semana" :options="filter.weeks" @input="callDataLiq" dense expandBesides optionsDense v-model="filter.week"/>
-          </div>
-        </template>
-    </div>-->
-    <!-- MINI TOOLBAR-->
+    <!-- MINI TOOLBAR PARA GESTION Y BAJAS-->
     <v-flex class="pt-1">
       <v-toolbar color="primary" dense>
         <v-btn @click="dialogModel=true" color="secondary black--text" small v-if="!recibo.selected && !recibo.selectedSub">
@@ -143,7 +116,6 @@ export default {
     return {
       locale: localStorage.lang,
       filters: null,
-      fec: "02",
       filter: {
         userby: {
           value: "NombreTomador"
@@ -151,11 +123,7 @@ export default {
         },
         estadosSel: null,
         alldata: false,
-        date: null,
-        dateDialog: false,
-        weeks: [],
         yearmonth: new Date().toISOString().substr(0, 7),
-        week: 1,
         dateMonth: false
       },
       rowClassRules: {
@@ -238,14 +206,6 @@ export default {
       let where = "(Gestion LIKE 'AN%') AND (FechaEfecto LIKE '" + this.filter.yearmonth + "%')";
       this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
     },
-    // CALL DATA LIQ
-    callDataLiq() {
-      this.filter.dateDialog = false
-      let self = this;
-      // let days = this.getDaysWeek(this.filter.year, this.filter.month);
-      // let where = "(Estado LIKE 'COBRADO') AND (Situacion>='" + days.dateini + "' AND Situacion<='" + days.dateend + "') ORDER BY Situacion DESC";
-      // this.callData({cmd: "getRecords", table: "Recibos", where}).then(function(response) {});
-    },
     // CALL DATA RECIBO
     callDataRecibo() {
       let self = this;
@@ -301,7 +261,6 @@ export default {
       this.dialogModel = false;
       if (this.$route.params.recibo == "bajas") this.callDataBajas();
       if (this.$route.params.recibo == "gestion") this.callDataGestion();
-      if (this.$route.params.recibo == "liq") this.callDataLiq();
       if (this.$route.params.recibo == "") this.callDataRecibo();
     }
   },

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 import Recibos from './views/Recibos.vue'
+import Liquidaciones from './views/Liquidaciones.vue'
 import Clientes from './views/Clientes.vue'
 import Polizas from './views/Polizas.vue'
 import Usuarios from './views/Usuarios.vue'
@@ -19,6 +20,11 @@ export default new Router({
       path: '/recibos/:recibo',
       name: 'Recibos',
       component: Recibos
+    },
+    {
+      path: '/liquidaciones',
+      name: 'Liquidaciones',
+      component: Liquidaciones
     },
     {
       path: '/clientes',

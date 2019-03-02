@@ -6,6 +6,12 @@ export const store = new Vuex.Store({
   state: {
     lang,
     loading: true,
+    user: {
+      user:null,
+      pass: null,
+      mail: null,
+      name: null
+    },
     notify: {
       model: false,
       color: '',

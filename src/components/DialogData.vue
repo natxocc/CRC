@@ -18,7 +18,7 @@
             <template v-for="(value,key, index) in data">
               <v-flex :key="index" lg2 md4 pa-1 sm6 v-show="!fields[key].props.hidden" xs12>
                 <!-- ES TEXTO -->
-                <v-text-field :disabled="fields[key].props.disabled" :label="fields[key].name" :rules="fields[key].props.rules" @input="onChange(data[key], key)" type="text" v-if="fields[key].type =='text'" v-model="data[key]"></v-text-field>
+                <v-textarea rows="1" auto-grow :disabled="fields[key].props.disabled" :label="fields[key].name" :rules="fields[key].props.rules" @input="onChange(data[key], key)" v-if="fields[key].type =='text'" v-model="data[key]"></v-textarea>
                 <!-- ES NUMERO -->
                 <v-text-field :disabled="fields[key].props.disabled" :label="fields[key].name" :rules="fields[key].props.rules" @input="onChange(data[key], key)" type="number" v-if="fields[key].type =='number'" v-model="data[key]"></v-text-field>
                 <!-- ES SELECT -->
